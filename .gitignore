@@ -102,3 +102,29 @@ dist
 
 # TernJS port file
 .tern-port
+
+
+#server:
+
+#main:
+/.env
+
+#Auth:
+/server/auth/.env
+/server/auth/package-lock.json
+/server/auth/node_modules
+
+#parser:
+/server/parser/.env
+/server/parser/package-lock.json
+/server/parser/node_modules
+
+#Users:
+/server/users/.env
+/server/users/package-lock.json
+/server/users/node_modules
+
+#Profile
+/server/profile/package-lock.json
+/server/profile/.env
+/server/profile/node_modules
