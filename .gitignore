@@ -128,3 +128,4 @@ dist
 /server/profile/package-lock.json
 /server/profile/.env
 /server/profile/node_modules
+package-lock.json
