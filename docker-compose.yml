@@ -5,24 +5,19 @@ services:
     container_name: postgres-dns-movies
     image: postgres:15.2
     restart: always
+    env_file:
+      - ./.env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - PGDATA="/var/lib/postgresql/data/pgdata"
     volumes:
-      - .:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
-  backend_auth:
-    container_name: backend_auth
-    build: ./server/auth
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+  rabbitmq:
+    container_name: pabbitmq-dns-movies
+    image: rabbitmq
     ports:
-      - "5000:5000"
-    depends_on:
-      - postgres
+      - "5672:5672"
