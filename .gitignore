@@ -113,6 +113,8 @@ dist
 /server/auth/.env
 /server/auth/package-lock.json
 /server/auth/node_modules
+/server/auth/.docker.env
+/server/auth/.development.env
 
 #parser:
 /server/parser/.env
@@ -123,6 +125,8 @@ dist
 /server/users/.env
 /server/users/package-lock.json
 /server/users/node_modules
+/server/users/.development.env
+/server/users/.docker.env
 
 #Profile
 /server/profile/package-lock.json

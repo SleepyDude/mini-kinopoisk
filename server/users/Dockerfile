@@ -6,4 +6,4 @@ COPY . /app
 
 RUN npm install
 
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start:docker" ]

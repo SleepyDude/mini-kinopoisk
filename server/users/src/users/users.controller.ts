@@ -1,15 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.user.dto';
-import { MessagePattern } from '@nestjs/microservices';
+import {MessagePattern, Payload} from '@nestjs/microservices';
 
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @MessagePattern({ cmd: 'create_user' })
-  create(@Body() userDto: CreateUserDto) {
-    return this.usersService.createUser(userDto);
+  async create(@Payload() userDto: CreateUserDto) {
+    return await this.usersService.createUser(userDto);
   }
 
   @Get()

@@ -25,9 +25,10 @@ export class AuthController {
   @Post('/registration')
   async registration(
     @Body() userDto: CreateUserDto,
-    profileDto: CreateProfileDto,
-    avatar,
+    // profileDto: CreateProfileDto,
+    // avatar,
   ) {
+    console.log('CONTROLLER AUTH: ', userDto)
     return this.authService.registration(userDto);
   }
 

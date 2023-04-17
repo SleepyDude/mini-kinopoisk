@@ -11,7 +11,13 @@ export class AuthService {
   }
 
   async registration(userDto: CreateUserDto) {
-    return await this.client.send({ cmd: 'create_user' }, userDto).toPromise();
+    console.log('SERVICE AUTH: ', userDto)
+    try {
+      let user = await this.client.send({ cmd: 'create_user' }, userDto).toPromise();
+      return user;
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async logout() {
