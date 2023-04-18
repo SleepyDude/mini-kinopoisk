@@ -1,0 +1,839 @@
+[
+  {
+    "filmId": "535341",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 9500000,
+        "currencyCode": "EUR",
+        "name": "Euro",
+        "symbol": "€"
+      },
+      {
+        "type": "RUS",
+        "amount": 1725813,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 10198820,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 426588510,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "1143242",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 22000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 18003343,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 36471795,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 115171795,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "462682",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 100000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 13796916,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 116900694,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 392000694,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "1318972",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 40000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 13318455,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 27466489,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 103966489,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "41519",
+    "total": 1,
+    "items": [
+      {
+        "type": "WORLD",
+        "amount": 1362281,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "8124",
+    "total": 3,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 18000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 285761243,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 476684675,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "251733",
+    "total": 4,
+    "items": [
+      {
+        "type": "WORLD",
+        "amount": 2923905528,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "BUDGET",
+        "amount": 237000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 119903638,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 785221649,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "447301",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 160000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 66113,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 292576195,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 828322032,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "326",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 25000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 87432,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 28341469,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 28418687,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "435",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 60000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "MARKETING",
+        "amount": 30000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 136801374,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 286801374,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "42664",
+    "total": 0,
+    "items": []
+  },
+  {
+    "filmId": "775276",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 150000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 39664652,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 341268248,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 1023784195,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "464963",
+    "total": 0,
+    "items": []
+  },
+  {
+    "filmId": "4374",
+    "total": 5,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 140000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "MARKETING",
+        "amount": 40000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 9060000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 654264015,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 305413918,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "1188529",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 40000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 6288706,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 165363234,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 312897920,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "689",
+    "total": 5,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 125000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "MARKETING",
+        "amount": 40000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 317575550,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 974755371,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 5474384,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "258687",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 165000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 26192066,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 188020017,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 774136705,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "41520",
+    "total": 3,
+    "items": [
+      {
+        "type": "WORLD",
+        "amount": 543825,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "BUDGET",
+        "amount": 1500000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 1080000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "361",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 63000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 334590,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 37030102,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 100853753,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "448",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 55000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 84460,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 329694499,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 677387716,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "42782",
+    "total": 0,
+    "items": []
+  },
+  {
+    "filmId": "685246",
+    "total": 0,
+    "items": []
+  },
+  {
+    "filmId": "1108577",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 23000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 9319859,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 85080171,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 321752656,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "45146",
+    "total": 0,
+    "items": []
+  },
+  {
+    "filmId": "397667",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 80000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 5430049,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 128012934,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 294804195,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "843649",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 321000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 34793936,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 678815482,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 2048359754,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "1100777",
+    "total": 0,
+    "items": []
+  },
+  {
+    "filmId": "2213",
+    "total": 5,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 200000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "MARKETING",
+        "amount": 40000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 18400000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 665763944,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 2216990964,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "463634",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 100000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 32747628,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 213515506,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 856085151,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "843650",
+    "total": 4,
+    "items": [
+      {
+        "type": "BUDGET",
+        "amount": 356000000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "RUS",
+        "amount": 47450130,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "USA",
+        "amount": 858373000,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      },
+      {
+        "type": "WORLD",
+        "amount": 2799439100,
+        "currencyCode": "USD",
+        "name": "US Dollar",
+        "symbol": "$"
+      }
+    ]
+  },
+  {
+    "filmId": "820638",
+    "total": 0,
+    "items": []
+  }
+]
