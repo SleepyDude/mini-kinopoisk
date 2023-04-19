@@ -48,6 +48,18 @@ services:
       - ./server/users:/app
       - /app/node_modules
 
+  persons:
+    container_name: persons-dns-movies
+    build: ./server/persons
+    env_file:
+      - ./.env
+    depends_on:
+      - rabbitmq
+      - postgres
+    volumes:
+      - ./server/api:/app
+      - /app/node_modules
+
   api:
     container_name: api-dns-movies
     build: ./server/api
@@ -56,6 +68,7 @@ services:
     depends_on:
       - rabbitmq
       - users
+      - persons
     volumes:
       - ./server/api:/app
       - /app/node_modules
