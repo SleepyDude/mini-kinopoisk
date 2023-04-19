@@ -133,3 +133,14 @@ dist
 /server/profile/.env
 /server/profile/node_modules
 package-lock.json
+
+#Movies
+/server/movies/package-lock.json
+/server/movies/.development.env
+/server/movies/.docker.env
+
+#Persons
+/server/persons/package-lock.json
+/server/persons/.development.env
+/server/persons/.docker.env
+
