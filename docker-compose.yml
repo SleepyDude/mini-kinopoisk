@@ -60,6 +60,18 @@ services:
       - ./server/persons:/app
       - /app/node_modules
 
+  movies:
+    container_name: movies-dns-movies
+    build: ./server/movies
+    env_file:
+      - ./.env
+    depends_on:
+      - rabbitmq
+      - postgres
+    volumes:
+      - ./server/movies:/app
+      - /app/node_modules
+
   api:
     container_name: api-dns-movies
     build: ./server/api
