@@ -133,3 +133,10 @@ dist
 /server/profile/.env
 /server/profile/node_modules
 package-lock.json
+
+#Users:
+/server/usersroles/.env
+/server/usersroles/package-lock.json
+/server/usersroles/node_modules
+/server/usersroles/.development.env
+/server/usersroles/.docker.env
