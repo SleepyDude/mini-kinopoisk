@@ -48,41 +48,44 @@ services:
       - ./server/users:/app
       - /app/node_modules
 
-  persons:
-    container_name: persons-dns-movies
-    build: ./server/persons
-    env_file:
-      - ./.env
-    depends_on:
-      - rabbitmq
-      - postgres
-    volumes:
-      - ./server/persons:/app
-      - /app/node_modules
+  # persons:
+  #   container_name: persons-dns-movies
+  #   build: ./server/persons
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
+  #   volumes:
+  #     - ./server/persons:/app
+  #     - /app/node_modules
 
-  movies:
-    container_name: movies-dns-movies
-    build: ./server/movies
-    env_file:
-      - ./.env
-    depends_on:
-      - rabbitmq
-      - postgres
-    volumes:
-      - ./server/movies:/app
-      - /app/node_modules
+  # movies:
+  #   container_name: movies-dns-movies
+  #   build: ./server/movies
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
+  #   volumes:
+  #     - ./server/movies:/app
+  #     - /app/node_modules
 
   api:
     container_name: api-dns-movies
-    build: ./server/api
+    build:
+      context: ./
+      dockerfile: ./server/api/Dockerfile
     env_file:
       - ./.env
     depends_on:
       - rabbitmq
       - users
-      - persons
+      # - persons
     volumes:
-      - ./server/api:/app
+      - ./server/api:/app/server/api
+      - ./shared:/app/shared
       - /app/node_modules
     ports:
       - ${API_GATEWAY_PORT}:3000

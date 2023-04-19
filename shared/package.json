@@ -1,0 +1,23 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "Sharable data for cooperative nestjs project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && tsc",
+    "prepublish": "npm run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/common": "^9.4.0",
+    "@nestjs/config": "^2.3.1",
+    "@nestjs/microservices": "^9.4.0",
+    "@types/node": "^18.15.11",
+    "rimraf": "^5.0.0",
+    "rxjs": "^7.8.0",
+    "typescript": "^5.0.4"
+  }
+}
