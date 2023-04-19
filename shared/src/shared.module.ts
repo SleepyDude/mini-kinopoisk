@@ -7,7 +7,7 @@ import { Transport } from '@nestjs/microservices/enums/transport.enum';
 
 @Module({})
 export class SharedModule {
-  static registerRmq(service: string, queue: string, cloudamqpUrl: string): DynamicModule {
+  static registerRmq(service: string, queue: string): DynamicModule {
     const providers = [
       {
         provide: service,
@@ -16,7 +16,7 @@ export class SharedModule {
           return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
-              urls: [cloudamqpUrl],
+              urls: [process.env.CLOUDAMQP_URL],
               queue: queue,
               queueOptions: {
                 durable: false,
