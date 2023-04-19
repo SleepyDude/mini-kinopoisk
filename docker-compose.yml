@@ -57,7 +57,7 @@ services:
       - rabbitmq
       - postgres
     volumes:
-      - ./server/api:/app
+      - ./server/persons:/app
       - /app/node_modules
 
   api:
