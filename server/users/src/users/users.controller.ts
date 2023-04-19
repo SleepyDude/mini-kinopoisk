@@ -7,18 +7,11 @@ import {MessagePattern, Payload} from '@nestjs/microservices';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @MessagePattern({ cmd: 'create_user' })
-  async create(@Payload() userDto: CreateUserDto) {
-    return await this.usersService.createUser(userDto);
-  }
-
+  @MessagePattern({ cmd: 'get-all-users' })
   @Get()
   getAll() {
-    return this.usersService.getAll();
+    return 'ALL USERS';
+    // return this.usersService.getAll();
   }
 
-  @Delete('/:id')
-  deleteUser(@Param('id') id: string) {
-    return this.usersService.delete(id);
-  }
 }

@@ -108,6 +108,7 @@ dist
 
 #main:
 /.env
+pgdata
 
 #Auth:
 /server/auth/.env
