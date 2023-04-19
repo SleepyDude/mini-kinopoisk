@@ -12,27 +12,27 @@ const linkPerson = 'https://kinopoiskapiunofficial.tech/api/v1/staff/';
 const linkTrailer = 'https://kinopoiskapiunofficial.tech/api/v2.2/films/'
 
 const filmsId = [
-    "3498",
-    "407636",
-    "104992",
-    "5928",
-    "804662",
-    "1224067",
-    "102124",
-    "312",
-    "88173",
-    "4647040",
-    "404900",
-    "4542208",
-    "1392743",
-    "5078983",
-    "278522",
-    "45319",
-    "88198",
-    "526",
-    "478491",
-    "591929",
-    "44168",
+    "1047883",
+    "1236063",
+    "370",
+    "819101",
+    "1109271",
+    "493208",
+    "505851",
+    "571335",
+    "822709",
+    "8408",
+    "4541",
+    "841263",
+    "522",
+    "39577",
+    "930878",
+    "920265",
+    "5167",
+    "387556",
+    "43869",
+    "77044",
+    "470178",
 ]
 
 function delay(ms) {
@@ -75,64 +75,64 @@ async function parser(filmsId) {
 
         }
 
-        await fs.writeFile('filmBase.json', JSON.stringify(filmBase), err => {
+        await fs.writeFile('filmBase6.json', JSON.stringify(filmBase), err => {
             if (err) throw err
             console.log('SAVED', filmBase.length, 'Фильмов')
         });
 
-        await fs.writeFile('budgetBase.json', JSON.stringify(budgetBase), err => {
+        await fs.writeFile('budgetBase6.json', JSON.stringify(budgetBase), err => {
             if (err) throw err
             console.log('SAVED', budgetBase.length, 'Бюджета')
         });
 
-        await fs.writeFile('similarBase.json', JSON.stringify(similarBase), err => {
+        await fs.writeFile('similarBase6.json', JSON.stringify(similarBase), err => {
             if (err) throw err
             console.log('SAVED', similarBase.length, 'Зависимостей')
         });
 
-        await fs.writeFile('trailerBase.json', JSON.stringify(trailerBase), err => {
+        await fs.writeFile('trailerBase6.json', JSON.stringify(trailerBase), err => {
             if (err) throw err
             console.log('SAVED', trailerBase.length, 'Трейлеров')
         });
 
-        await fs.writeFile('staffBase.json', JSON.stringify(staffBase), err => {
+        await fs.writeFile('staffBase6.json', JSON.stringify(staffBase), err => {
             if (err) throw err
             console.log('SAVED', staffBase.length, 'персонала')
         });
 
-        await fs.writeFile('actorBase.json', JSON.stringify(actorsBase), err => {
+        await fs.writeFile('actorBase6.json', JSON.stringify(actorsBase), err => {
             if (err) throw err
             console.log('SAVED', actorsBase.length, 'актеров')
         });
 
     } catch (e) {
 
-        await fs.writeFile('filmBase.json', JSON.stringify(filmBase), err => {
+        await fs.writeFile('filmBase6.json', JSON.stringify(filmBase), err => {
             if (err) throw err
             console.log('SAVED', filmBase.length, 'Фильмов')
         });
 
-        await fs.writeFile('budgetBase.json', JSON.stringify(budgetBase), err => {
+        await fs.writeFile('budgetBase6.json', JSON.stringify(budgetBase), err => {
             if (err) throw err
             console.log('SAVED', budgetBase.length, 'Бюджета')
         });
 
-        await fs.writeFile('similarBase.json', JSON.stringify(similarBase), err => {
+        await fs.writeFile('similarBase6.json', JSON.stringify(similarBase), err => {
             if (err) throw err
             console.log('SAVED', similarBase.length, 'Зависимостей')
         });
 
-        await fs.writeFile('trailerBase.json', JSON.stringify(trailerBase), err => {
+        await fs.writeFile('trailerBase6.json', JSON.stringify(trailerBase), err => {
             if (err) throw err
             console.log('SAVED', trailerBase.length, 'Трейлеров')
         });
 
-        await fs.writeFile('staffBase.json', JSON.stringify(staffBase), err => {
+        await fs.writeFile('staffBase6.json', JSON.stringify(staffBase), err => {
             if (err) throw err
             console.log('SAVED', staffBase.length, 'персонала')
         });
 
-        await fs.writeFile('actorBase.json', JSON.stringify(actorsBase), err => {
+        await fs.writeFile('actorBase6.json', JSON.stringify(actorsBase), err => {
             if (err) throw err
             console.log('SAVED', actorsBase.length, 'актеров')
         });
