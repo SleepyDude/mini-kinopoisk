@@ -2,8 +2,10 @@ FROM node:19-alpine
 
 WORKDIR /app
 
-COPY . /app
+COPY package*.json .
 
 RUN npm install
 
-CMD [ "npm", "run", "start:docker" ]
+COPY . .
+
+CMD ["npm", "run", "start:dev"]

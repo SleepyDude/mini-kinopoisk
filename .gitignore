@@ -108,6 +108,7 @@ dist
 
 #main:
 /.env
+pgdata
 
 #Auth:
 /server/auth/.env
@@ -134,9 +135,12 @@ dist
 /server/profile/node_modules
 package-lock.json
 
-#Users:
-/server/usersroles/.env
-/server/usersroles/package-lock.json
-/server/usersroles/node_modules
-/server/usersroles/.development.env
-/server/usersroles/.docker.env
+#Movies
+/server/movies/package-lock.json
+/server/movies/.development.env
+/server/movies/.docker.env
+
+#Persons
+/server/persons/package-lock.json
+/server/persons/.development.env
+/server/persons/.docker.env

@@ -33,12 +33,4 @@ export class Users extends Model<Users, UserCreateAttrs> {
   @ApiProperty({example: '', description: 'Activation link'}) 
   @Column({ type: DataType.STRING, allowNull: false })
   activationLink: string;
-
-  @ApiProperty({example: 'user', description: 'User role'}) 
-  @Column({ type: DataType.STRING, defaultValue: 'USER' })
-  role: string;
-
-  @ApiProperty({example: '1', description: 'Profile id'}) 
-  @Column({ type: DataType.INTEGER, allowNull: false })
-  profileId: number;
 }
