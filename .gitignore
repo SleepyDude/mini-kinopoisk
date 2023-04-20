@@ -144,4 +144,3 @@ package-lock.json
 /server/persons/package-lock.json
 /server/persons/.development.env
 /server/persons/.docker.env
-
