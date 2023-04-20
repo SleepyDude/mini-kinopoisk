@@ -1,7 +1,7 @@
 import {Column, DataType, Model, Table} from "sequelize-typescript";
 
-@Table({tableName: 'persons_films'})
-export class PersonsFilms extends Model<PersonsFilms> {
+@Table({tableName: 'trailers'})
+export class Trailers extends Model<Trailers> {
 
     @Column({
         type: DataType.INTEGER,
@@ -14,13 +14,12 @@ export class PersonsFilms extends Model<PersonsFilms> {
     @Column({ type: DataType.INTEGER })
     kinopoiskFilmId: number;
 
-    @Column({ type: DataType.INTEGER })
-    personId: number;
+    @Column({ type: DataType.STRING })
+    url: string;
 
     @Column({ type: DataType.STRING })
-    professionText: string;
+    name: string;
 
     @Column({ type: DataType.STRING })
-    professionKey: string;
-
+    site: string;
 }

@@ -3,6 +3,7 @@ import { UsersController } from './controllers/users.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import {PersonsController} from "./controllers/persons.controller";
+import {ParserModule} from "./parser/parser.module";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import {PersonsController} from "./controllers/persons.controller";
           queueOptions: { durable: false },
         },
       },  
-    ])
+    ]),
+      ParserModule,
   ],
   controllers: [
       UsersController,

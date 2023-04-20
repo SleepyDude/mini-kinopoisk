@@ -41,14 +41,14 @@ export class Films extends Model<Films> {
     @Column({ type: DataType.INTEGER })
     ratingGoodReviewVoteCount: number;
 
-    @Column({ type: DataType.INTEGER })
-    ratingKinopoisk: number;
+    @Column({ type: DataType.STRING })
+    ratingKinopoisk: string;
 
     @Column({ type: DataType.INTEGER })
     ratingKinopoiskVoteCount: number;
 
-    @Column({ type: DataType.INTEGER })
-    ratingFilmCritics: number;
+    @Column({ type: DataType.STRING })
+    ratingFilmCritics: string;
 
     @Column({ type: DataType.INTEGER })
     ratingFilmCriticsVoteCount: number;
@@ -82,7 +82,4 @@ export class Films extends Model<Films> {
 
     @Column({ type: DataType.BOOLEAN, defaultValue: false })
     shortFilm: boolean;
-
-    @Column({ type: DataType.STRING })
-    trailerUrl: string;
 }

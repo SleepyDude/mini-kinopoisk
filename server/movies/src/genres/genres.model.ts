@@ -12,6 +12,9 @@ export class Genres extends Model<Genres> {
     id: number;
 
     @Column({ type: DataType.STRING })
-    genreName: string;
+    genreNameRu: string;
+
+    @Column({ type: DataType.STRING })
+    genreNameEng: string;
 
 }
