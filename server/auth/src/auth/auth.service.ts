@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
-import { switchMap } from 'rxjs';
+import { catchError, firstValueFrom, switchMap } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -17,15 +17,39 @@ export class AuthService {
     return 'login';
   }
 
+  async isUserExists(email: string) : Promise<Boolean> {
+    const user$ = this.userService.send( {cmd: 'get-user-by-email' }, email ).pipe(
+      switchMap((user) => { 
+        if (user) return user;
+      }),
+      catchError( (error) => {
+        console.log(error)
+        throw new BadRequestException;
+      })
+    );
+
+    const user = await firstValueFrom(user$);
+    return (user)? true : false;
+   
+  }
+
   async registration(userDto: LoginDto) {
 
     const hashedPassword = this.hashPassword(userDto.password);
 
-    const user$ = this.userService.send( {cmd: 'get-user-by-email' }, userDto.email ).pipe(
-      switchMap((value) => {
-        
+    if (this.isUserExists(userDto.email)) {
+      throw new HttpException(`Пользователь с таким e-mail уже существует`, HttpStatus.NOT_FOUND);
+    }
+
+    const userData$ = this.userService.send( {cmd: 'create-user'}, userDto).pipe(
+      switchMap((userData) => {
+        const {id, roles} = userData;
+        return {id, roles}
       })
     )
+
+    
+
 
     // const id$ = this.authService.send({ cmd: 'register' }, registerProfileDto).pipe(
     //   switchMap((value) => {
