@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('users')
@@ -8,23 +8,43 @@ export class UsersController {
       @Inject('USERS-SERVICE') private usersService: ClientProxy,
   ) {}
 
-  @Get()
-  async getAllUsers() {
+  @Post()
+  async createUser(
+    @Body() dto: any
+  ) {
     return this.usersService.send(
       {
-        cmd: 'get-all-users',
+        cmd: 'create-user',
       },
-      {},
+      dto,
     )
   }
 
-  @Get('/test')
-  async test() {
-    return this.usersService.send(
-        {
-          cmd: 'get-persons',
-        },
-        {},
-    )
-  }
+    // @RoleAccess({minRoleVal: initRoles.ADMIN.value, allowSelf: true})
+    // @UseGuards(RolesGuard)
+    @Get('/:email')
+    async getUserByEmail(
+        @Param('email') email: string,
+    ) {
+        return this.usersService.send(
+            {
+                cmd: 'get-user-by-email',
+            },
+            email,
+        )
+    }
+
+    // @RoleAccess(initRoles.ADMIN.value)
+    // @UseGuards(RolesGuard)
+    @Post('/add_role')
+    async addRole(
+        @Body() addRoleDto: any
+    ) {
+        return this.usersService.send(
+            {
+                cmd: 'add-role-to-user',
+            },
+            addRoleDto,
+        )
+    }
 }
