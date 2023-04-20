@@ -15,7 +15,7 @@ export class UsersService {
         private readonly roleService: RolesService
     ) {}
 
-    async createUser(dto: CreateUserDto) {
+    async createUser(dto: CreateUserDto): Promise<number> {
         const role = await this.roleService.getRoleByName('USER');
 
         console.log(`[auth][users.service][createUser] role = ${JSON.stringify(role)}`);
@@ -28,9 +28,7 @@ export class UsersService {
         let user = await this.userRepository.create(dto);
         await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
 
-        user.roles = [role]; // Не понимаю, почему не выходит присвоение свойства к модели роли! Вроде был в модели поле есть, да и отдаетсяя в другом эндпоинте по email вполне нормально. Непонятно.
-        // console.log(`[auth][users.service][createUser] user = ${JSON.stringify(user)}`);
-        return user;
+        return user.id;
     }
 
     async getAllUsers() {
