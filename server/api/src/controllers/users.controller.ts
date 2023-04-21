@@ -18,13 +18,4 @@ export class UsersController {
     )
   }
 
-  @Get('/test')
-  async test() {
-    return this.usersService.send(
-        {
-          cmd: 'get-persons',
-        },
-        {},
-    )
-  }
 }

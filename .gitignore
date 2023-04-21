@@ -111,11 +111,8 @@ dist
 pgdata
 
 #Auth:
-/server/auth/.env
 /server/auth/package-lock.json
 /server/auth/node_modules
-/server/auth/.docker.env
-/server/auth/.development.env
 
 #parser:
 /server/parser/.env
@@ -123,25 +120,17 @@ pgdata
 /server/parser/node_modules
 
 #Users:
-/server/users/.env
 /server/users/package-lock.json
 /server/users/node_modules
-/server/users/.development.env
-/server/users/.docker.env
 
 #Profile
 /server/profile/package-lock.json
-/server/profile/.env
 /server/profile/node_modules
-package-lock.json
 
 #Movies
 /server/movies/package-lock.json
-/server/movies/.development.env
-/server/movies/.docker.env
+/server/movies/node_modules
 
 #Persons
 /server/persons/package-lock.json
-/server/persons/.development.env
-/server/persons/.docker.env
-
+/server/persons/node_modules
