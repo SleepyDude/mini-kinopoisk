@@ -3,6 +3,7 @@ import { UsersController } from './controllers/users.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import {PersonsController} from "./controllers/persons.controller";
+import { InitController } from './controllers/init.controller';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import {PersonsController} from "./controllers/persons.controller";
   controllers: [
       UsersController,
       PersonsController,
+      InitController,
   ],
   providers: [],
 })

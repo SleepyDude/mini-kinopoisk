@@ -1,5 +1,7 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/roles/roles.model';
+import { UserRoles } from 'src/roles/user-roles.model';
 
 interface UserCreateAttrs {
   email: string;
@@ -7,7 +9,7 @@ interface UserCreateAttrs {
 }
 
 @Table({ tableName: 'users' })
-export class Users extends Model<Users, UserCreateAttrs> {
+export class User extends Model<User, UserCreateAttrs> {
 
   @ApiProperty({example: '1', description: 'Unique identifier'}) 
   @Column({
@@ -26,11 +28,14 @@ export class Users extends Model<Users, UserCreateAttrs> {
   @Column({ type: DataType.STRING, allowNull: false })
   password: string;
 
-  @ApiProperty({example: 'false', description: 'Is account activated?'}) 
-  @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  isActivated: boolean;
+  // @ApiProperty({example: 'false', description: 'Is account activated?'}) 
+  // @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  // isActivated: boolean;
 
-  @ApiProperty({example: '', description: 'Activation link'}) 
-  @Column({ type: DataType.STRING, allowNull: false })
-  activationLink: string;
+  // @ApiProperty({example: '', description: 'Activation link'}) 
+  // @Column({ type: DataType.STRING, allowNull: false })
+  // activationLink: string;
+
+  @BelongsToMany( () => Role, () => UserRoles)
+  roles: Role[];
 }
