@@ -55,7 +55,7 @@ export class FilmsService {
             let currentPerson = await this.usersClient.send({ cmd : 'get-person-by-id' }, person.personId);
             currentStaff.push({
                     professionText: person.professionText,
-                    proseffionKey: person.proseffionKey,
+                    professionKey: person.proseffionKey,
                     ...currentPerson,
                 });
         }
