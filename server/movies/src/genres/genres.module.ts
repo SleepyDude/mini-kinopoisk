@@ -10,6 +10,9 @@ import {GenresFilms} from "./genres.m2m.model";
   providers: [GenresService],
   imports: [
       SequelizeModule.forFeature([Genres, GenresFilms])
+  ],
+  exports: [
+      GenresService,
   ]
 })
 export class GenresModule {}
