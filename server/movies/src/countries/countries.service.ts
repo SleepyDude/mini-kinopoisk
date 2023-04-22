@@ -12,6 +12,10 @@ export class CountriesService {
     ) {}
 
     async getCountriesByFilmId(id) {
-        return await this.countriesFilmsRepository.findAll({ where: {  } })
+        return await this.countriesFilmsRepository.findAll({ where: { kinopoiskFilmId: id } });
+    }
+
+    async getCountryById(countryId: number) {
+        return await this.countriesRepository.findOne({ where: { id: countryId } });
     }
 }

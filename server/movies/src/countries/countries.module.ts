@@ -8,6 +8,9 @@ import {CountriesFilms} from "./countries.m2m.model";
 @Module({
   controllers: [CountriesController],
   providers: [CountriesService],
-  imports: [SequelizeModule.forFeature([Countries, CountriesFilms])]
+  imports: [SequelizeModule.forFeature([Countries, CountriesFilms])],
+  exports: [
+      CountriesService,
+  ]
 })
 export class CountriesModule {}
