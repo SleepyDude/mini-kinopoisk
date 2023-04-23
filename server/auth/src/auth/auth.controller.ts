@@ -71,14 +71,14 @@ export class AuthController {
     }
 
     // @UseFilters(new HttpExceptionFilter())
-    @MessagePattern({ cmd: 'refresh' })
-    async refresh(
-        // @Ctx() context: RmqContext,
-        @Payload('token') refreshToken,
-        @Payload('response') response
-    ) {
-        // this.sharedService.acknowledgeMessage(context);
-
-        return await this.tokenService.refresh(refreshToken, response);
-    }
+    // @MessagePattern({ cmd: 'refresh' })
+    // async refresh(
+    //     // @Ctx() context: RmqContext,
+    //     @Payload('token') refreshToken,
+    //     @Payload('response') response
+    // ) {
+    //     // this.sharedService.acknowledgeMessage(context);
+    //
+    //     return await this.tokenService.refresh(refreshToken, response);
+    // }
 }
