@@ -6,6 +6,8 @@ import {PersonsController} from "./controllers/persons.controller";
 import { InitModule } from './init/init.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all.exceptions.filter';
+import { AuthController } from './controllers/auth.controller';
+import {ApiController} from "./api.controller";
 
 @Module({
   imports: [
@@ -18,6 +20,15 @@ import { AllExceptionsFilter } from './filters/all.exceptions.filter';
           queue: process.env.USERS_QUEUE,
           queueOptions: { durable: false },
         },
+      },
+      {
+        name: 'AUTH-SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.CLOUDAMQP_URL],
+          queue: process.env.AUTH_QUEUE,
+          queueOptions: { durable: false },
+        },
       },  
     ]),
     InitModule
@@ -25,6 +36,8 @@ import { AllExceptionsFilter } from './filters/all.exceptions.filter';
   controllers: [
       UsersController,
       PersonsController,
+      AuthController,
+      ApiController,
   ],
   providers: [
     // {

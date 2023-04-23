@@ -12,5 +12,5 @@ export class CreateProfileDto {
 
   @ApiProperty({example: '+79999999999', description: 'Phone number'})
   @IsString({message: 'Value must be a type of String'})
-  telNumber: string;
+  phone: string;
 }

@@ -29,11 +29,24 @@ export class UsersController {
     }
 
     // @UseFilters(new HttpExceptionFilter())
+    @MessagePattern({ cmd: 'get-user-by-id' })
+    async getUserById(
+        // @Ctx() context: RmqContext,
+        @Payload() id: number,
+    ) {
+        // this.sharedService.acknowledgeMessage(context);
+        // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
+
+        return await this.usersService.getUserById(id); 
+    }
+
+    // @UseFilters(new HttpExceptionFilter())
     @MessagePattern({ cmd: 'create-user' })
     async createUser(
         // @Ctx() context: RmqContext,
-        @Payload() dto: CreateUserDto,
+        @Payload() dto,
     ) {
+        console.log('DTOO: ', dto)
         // this.sharedService.acknowledgeMessage(context);
         // console.log(`[auth][users.controller][createUser] +`);
 

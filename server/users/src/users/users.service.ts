@@ -20,16 +20,10 @@ export class UsersService {
     async createUser(dto: CreateUserDto): Promise<number> {
         const role = await this.roleService.getRoleByName('USER');
 
-        console.log(`[auth][users.service][createUser] role = ${JSON.stringify(role)}`);
-
         if (role === null) {
-            // throw new HttpException(
-            //     "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
-            //     HttpStatus.I_AM_A_TEAPOT
-            // )
             throw new RpcException("Роль 'USER' не найдена, необходимо выполнение инициализации ресурса");
         }
-
+        
         try {
             let user = await this.userRepository.create(dto);
             await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
@@ -45,6 +39,11 @@ export class UsersService {
 
     async getUserByEmail(email: string) {
         const user = await this.userRepository.findOne({ where: {email: email}, include: {all: true} });
+        return user;
+    }
+
+    async getUserById(id: number) {
+        const user = await this.userRepository.findOne({ where: {id: id}, include: {all: true} });
         return user;
     }
 

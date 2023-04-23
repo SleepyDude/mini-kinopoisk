@@ -8,7 +8,7 @@ export class UserDto {
     id: number;
 
     @ApiProperty({example: '1', description: 'Unique user id'})
-    roles: [any];
+    roles: [any] | [];
 
     constructor(model) {
         this.email = model.email;
