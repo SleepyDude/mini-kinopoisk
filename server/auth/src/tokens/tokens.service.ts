@@ -13,13 +13,14 @@ export class TokensService {
     private jwtService: JwtService
     ){}
 
-async generateAndSaveToken(payload : UserDto, response) {
+async generateAndSaveToken(payload : UserDto) {
+        // Удалил респонс который был на прием
     
-    const refreshToken = this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
-    const accessToken = this.jwtService.sign(payload, {secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, {secret: '123123123', expiresIn: '30d' });
+    const accessToken = this.jwtService.sign(payload, {secret: '345345345', expiresIn: '15m' });
 
     await this.saveToken(payload.id, refreshToken);
-    response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true}) // будет жить в куках 30 дней в безопасности.
+    // response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true}) // будет жить в куках 30 дней в безопасности.
 
     return {refreshToken, accessToken}
 
@@ -88,30 +89,30 @@ async getUserIdByRefreshToken(token) {
   }
 
 
-  async refresh(refreshToken, response) {
-    if (!refreshToken) {
-      throw UnauthorizedException;
-    }
-    const userData = await this.validateRefreshToken(refreshToken);
-    const tokenFromDb = await this.isTokenInDb(refreshToken);
-    if (!userData || !tokenFromDb) {
-      throw UnauthorizedException;
-    }
-
-    const user$ = this.userService.send( {cmd: 'get-user-by-id' }, userData.id ).pipe(
-        switchMap((user) => { 
-          if (user) return user;
-        }),
-        catchError( (error) => {
-          console.log(error)
-          throw new BadRequestException;
-        })
-      );
-    const user = await firstValueFrom(user$);
-    const userDto = new UserDto(user);
-    const tokens = await this.generateAndSaveToken({...userDto}, response);
-        
-    return {...tokens, user: userDto};
-    }
+  // async refresh(refreshToken, response) {
+  //   if (!refreshToken) {
+  //     throw UnauthorizedException;
+  //   }
+  //   const userData = await this.validateRefreshToken(refreshToken);
+  //   const tokenFromDb = await this.isTokenInDb(refreshToken);
+  //   if (!userData || !tokenFromDb) {
+  //     throw UnauthorizedException;
+  //   }
+  //
+  //   const user$ = this.userService.send( {cmd: 'get-user-by-id' }, userData.id ).pipe(
+  //       switchMap((user) => {
+  //         if (user) return user;
+  //       }),
+  //       catchError( (error) => {
+  //         console.log(error)
+  //         throw new BadRequestException;
+  //       })
+  //     );
+  //   const user = await firstValueFrom(user$);
+  //   const userDto = new UserDto(user);
+  //   const tokens = await this.generateAndSaveToken({...userDto}, response);
+  //
+  //   return {...tokens, user: userDto};
+  //   }
 
 }
