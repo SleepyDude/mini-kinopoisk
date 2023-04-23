@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable } fr
 import { ClientProxy } from '@nestjs/microservices';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
-import { catchError, firstValueFrom, switchMap } from 'rxjs';
+import {catchError, firstValueFrom, lastValueFrom, switchMap} from 'rxjs';
 import { TokensService } from 'src/tokens/tokens.service';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class AuthService {
     if (!isRightPassword && !skipPasswordCheck) {
       throw new BadRequestException("Invalid credentials");
     }
-    return await this.tokenService.generateAndSaveToken({...userDto}, response)
+    // return await this.tokenService.generateAndSaveToken({...userDto}, response)
   }
 
   async defineUserExists(email: string) : Promise<any> {
@@ -39,7 +39,8 @@ export class AuthService {
     return (user)? user : null;
   }
 
-  async registration(userDto: LoginDto, response) { 
+  async registration(userDto: LoginDto) {
+    console.log('TEST: ', userDto)
     // response получим уже в main
 
     const hashedPassword = bcrypt.hash(userDto.password, process.env.SALT);
@@ -48,16 +49,19 @@ export class AuthService {
       throw new HttpException(`Пользователь с таким e-mail уже существует`, HttpStatus.NOT_FOUND);
     }
 
-    const id$ = this.userService.send( {cmd: 'create-user'}, {...userDto, password: hashedPassword}).pipe(
-      switchMap((id) => {
-        return id
-      })
-    )
-    const id = +await firstValueFrom(id$);
+    // const id$ = this.userService.send( {cmd: 'create-user'}, {...userDto, password: hashedPassword}).pipe(
+    //   switchMap((id) => {
+    //     return id
+    //   })
+    // )
+    // const id = +await firstValueFrom(id$);
+
+    // Просто оставлю в таком виде, работает точно так же, как функция выше.
+    const test =await lastValueFrom(this.userService.send( {cmd: 'create-user'}, {email: userDto.email, password: hashedPassword}))
 
     // createProfile(userDto)
 
-    return await this.tokenService.generateAndSaveToken({email: userDto.email, id: id, roles: []}, response)
+    return await this.tokenService.generateAndSaveToken({email: userDto.email, id: test, roles: []})
   }
 
   async logout(refreshToken, response) {
