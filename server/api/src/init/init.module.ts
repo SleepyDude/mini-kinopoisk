@@ -14,15 +14,26 @@ import { InitService } from './init.service';
     imports: [
         // RolesModule, // для создания и проверки ролей
         // UsersModule, // для addRole
-        ClientsModule.register([{
-            name: 'USERS-SERVICE',
-            transport: Transport.RMQ,
-            options: {
-                urls: [process.env.CLOUDAMQP_URL],
-                queue: process.env.USERS_QUEUE,
-                queueOptions: { durable: false },
+        ClientsModule.register([
+            {
+                name: 'USERS-SERVICE',
+                transport: Transport.RMQ,
+                options: {
+                    urls: [process.env.CLOUDAMQP_URL],
+                    queue: process.env.USERS_QUEUE,
+                    queueOptions: { durable: false },
+                },
             },
-        },]),
+            {
+                name: 'AUTH-SERVICE',
+                transport: Transport.RMQ,
+                options: {
+                    urls: [process.env.CLOUDAMQP_URL],
+                    queue: process.env.AUTH_QUEUE,
+                    queueOptions: { durable: false },
+                },
+            },
+        ]),
     ],
     exports: []
 })

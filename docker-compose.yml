@@ -18,15 +18,15 @@ services:
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
-#  rabbitmq:
-#    container_name: rabbitmq-dns-movies
-#    image: rabbitmq
-#    hostname: rabbitmq
-#    restart: always
-#    env_file:
-#      - ./.env
-#    ports:
-#      - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
+  rabbitmq:
+    container_name: rabbitmq-dns-movies
+    image: rabbitmq
+    hostname: rabbitmq
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
 
   auth:
     container_name: auth-dns-movies

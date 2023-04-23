@@ -48,7 +48,7 @@ export class AuthController {
         // @Ctx() context: RmqContext,
         // @Payload('dto') dto: LoginDto,
         // @Payload('response') response
-        @Payload() obj
+        @Payload() obj: LoginDto
     ) {
         return await this.authService.registration(obj)
         // this.sharedService.acknowledgeMessage(context);

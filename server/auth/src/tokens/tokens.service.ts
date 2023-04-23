@@ -22,6 +22,7 @@ async generateAndSaveToken(payload : UserDto) {
     await this.saveToken(payload.id, refreshToken);
     // response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true}) // будет жить в куках 30 дней в безопасности.
 
+    console.log(`[auth][tokens.service][generateAndSaveToken] accessToken = ${accessToken}}`);
     return {refreshToken, accessToken}
 
 }

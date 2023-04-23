@@ -24,8 +24,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
             }
         } else {
             console.log(`got exception: \n\n${JSON.stringify(exception)}\n\n`);
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-            errorMessage = 'Произошла неизвестная ошибка отличная от HttpException';
+            const { message } = exception as {message: string};
+            if (message) {
+                errorMessage = message;
+                status = HttpStatus.BAD_REQUEST;
+            } else {
+                errorMessage = 'Произошла неизвестная ошибка отличная от HttpException';
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+            }
         }
 
         const errorResponse = this.getErrorResponse(status, errorMessage, request);

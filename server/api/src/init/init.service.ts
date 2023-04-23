@@ -10,9 +10,10 @@ export class InitService {
 
     constructor(
         @Inject('USERS-SERVICE') private usersService: ClientProxy,
+        @Inject('AUTH-SERVICE')  private authService: ClientProxy,
     ) {}
 
-    async createAdminAndRoles(initDto: InitDto) {
+    async createAdminAndRoles(initDto: InitDto): Promise<{refreshToken: string, accessToken: string}> {
         // Метод должен быть вызван только единожды, поэтому проверяем, есть ли уже роль OWNER и как следствие главный админ
         const ownerRole = await firstValueFrom(this.usersService.send({ cmd: 'get-role-by-name' }, 'OWNER').pipe(
             map((value) => {
@@ -43,7 +44,11 @@ export class InitService {
         //     password: initDto.password,
         // })
         // // Пока что без модуля авторизации буду просто создавать пользователя
-        const id = await firstValueFrom(this.usersService.send({ cmd: 'create-user' }, initDto).pipe(
+        const tokens = await firstValueFrom(this.authService.send({ cmd: 'registration' }, initDto).pipe(
+            map( (val) => {
+                // console.log(`[init][pipe 'registration'] val: ${JSON.stringify(val)}`);
+                return val;
+            }),
             catchError(val => {
                 // Удалю созданные роли
                 this.usersService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['USER'] });
@@ -54,10 +59,9 @@ export class InitService {
             })
         ));
         
-        console.log(`got from create user, id: ${JSON.stringify(id)}`);
-        
         // // Присвоим владельцу ресурса соответствующую роль
-        await firstValueFrom(this.usersService.send({ cmd: 'add-role-to-user-by-id' }, {userId: id, roleName: initRoles.OWNER.name}));
-        return {"message": "Администратор ресурса и базовые роли созданы успешно, наслаждайтесь."};
+        await firstValueFrom(this.usersService.send({ cmd: 'add-role-to-user-by-email' }, {email: initDto.email, roleName: initRoles.OWNER.name}));
+        
+        return tokens;
     }
 }

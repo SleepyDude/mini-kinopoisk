@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, UseFilters } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
 
 @Controller('users')
 export class UsersController {
@@ -9,6 +10,7 @@ export class UsersController {
       @Inject('USERS-SERVICE') private usersService: ClientProxy,
   ) {}
 
+  @UseFilters(AllExceptionsFilter)
   @Post()
   async createUser(
     @Body() dto: any
