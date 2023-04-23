@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Inject, Param, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import {Response} from "express";
+import {lastValueFrom} from "rxjs";
 
 @Controller('auth')
 export class AuthController {
@@ -28,13 +30,10 @@ export class AuthController {
         @Body() dto: any, 
         @Res({ passthrough: true }) response: Response
     ) {
-        console.log(`!!!!!!!!!!!!!!!!${response}`)
-        return this.authService.send(
-            {
-                cmd: 'registration',
-            },
-            {dto: dto, response: response}
-            )
+            const userData = await lastValueFrom(this.authService.send({cmd: 'registration'}, dto));
+            response.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+            return userData;
+
     }
 
     // @RoleAccess(initRoles.ADMIN.value)
