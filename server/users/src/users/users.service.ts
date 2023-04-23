@@ -16,17 +16,17 @@ export class UsersService {
     ) {}
 
     async createUser(dto: CreateUserDto): Promise<number> {
-        const role = await this.roleService.getRoleByName('USER');
+        // const role = await this.roleService.getRoleByName('USER');
 
-        console.log(`[auth][users.service][createUser] role = ${JSON.stringify(role)}`);
+        // console.log(`[auth][users.service][createUser] role = ${JSON.stringify(role)}`);
 
-        if (role === null) { throw new HttpException(
-            "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
-            HttpStatus.I_AM_A_TEAPOT
-        )}
+        // if (role === null) { throw new HttpException(
+        //     "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
+        //     HttpStatus.I_AM_A_TEAPOT
+        // )}
         
         let user = await this.userRepository.create(dto);
-        await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+        // await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
 
         return user.id;
     }

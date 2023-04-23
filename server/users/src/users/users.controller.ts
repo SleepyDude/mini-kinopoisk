@@ -45,8 +45,9 @@ export class UsersController {
     @MessagePattern({ cmd: 'create-user' })
     async createUser(
         // @Ctx() context: RmqContext,
-        @Payload() dto: CreateUserDto,
+        @Payload() dto,
     ) {
+        console.log('DTOO: ', dto)
         // this.sharedService.acknowledgeMessage(context);
         // console.log(`[auth][users.controller][createUser] +`);
 
