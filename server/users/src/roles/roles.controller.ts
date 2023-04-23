@@ -41,4 +41,12 @@ export class RolesController {
     getAllRoles() {
         return this.rolesService.getAllRoles();
     }
+
+    @MessagePattern({ cmd: 'delete-role-by-name' })
+    deleteRoleByName(
+        @Payload('name') roleName: string,
+        @Payload('permission') perm: number
+    ) {
+        return this.rolesService.deleteByName(roleName, perm);
+    }
 }

@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersModule } from './users/users.module';
-import {ConfigModule} from "@nestjs/config";
 import { RolesModule } from './roles/roles.module';
-import { InitModule } from './init/init.module';
 
 @Module({
   imports: [
@@ -19,7 +17,6 @@ import { InitModule } from './init/init.module';
     }),
     UsersModule,
     RolesModule,
-    InitModule,
   ],
   controllers: [],
   providers: [],

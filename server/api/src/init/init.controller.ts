@@ -1,6 +1,9 @@
-import { Controller, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
+import { HttpRpcException } from 'src/exceptions/http.rpc.exception';
+import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
+import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
 import { InitDto } from './dto/init.dto';
 // import { DtoValidationPipe, HttpExceptionFilter, ObservableExceptionFilter, SharedService } from 'y/shared';
 // import { InitDto } from './dto/init.dto';
@@ -12,17 +15,14 @@ export class InitController {
 
     constructor(
         private initService: InitService,
-        // private readonly sharedService: SharedService,
     ) {}
 
-    @UseFilters()
-    @MessagePattern({ cmd: 'init-server' })
+    @UseFilters(new AllExceptionsFilter())
+    @Post()
     async createAdminAndRoles(
-        // @Ctx() context: RmqContext,
-        @Payload() dto: InitDto,
+        @Body(new DtoValidationPipe()) dto: InitDto
     ) {
-        // this.sharedService.acknowledgeMessage(context);
-
+        console.log(`[init.controller] +`);
         return await this.initService.createAdminAndRoles(dto);
     }
     

@@ -1,9 +1,9 @@
-import { CreateRoleDto } from "../roles/dto/create-role.dto";
+// import { CreateRoleDto } from "../roles/dto/create-role.dto";
 
 type BaseRole = 'USER' | 'ADMIN' | 'OWNER';
 
 type InitRoles = {
-    [role in BaseRole]: CreateRoleDto;
+    [role in BaseRole]: { name: string, value: number, description: string};
 }
 
 export const initRoles: InitRoles = {
