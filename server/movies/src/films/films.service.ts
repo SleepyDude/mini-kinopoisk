@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { CountriesService } from '../countries/countries.service';
@@ -19,9 +19,7 @@ export class FilmsService {
   ) {}
   async getAllFilms(params) {
     const { page, size, field, value } = params;
-    const condition = value
-      ? { [field]: { [Op.iLike]: `%${value}%` } }
-      : null;
+    const condition = value ? { [field]: { [Op.iLike]: `%${value}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
 
     return await this.filmsRepository.findAndCountAll({
@@ -89,5 +87,4 @@ export class FilmsService {
 
     return { limit, offset };
   }
-
 }

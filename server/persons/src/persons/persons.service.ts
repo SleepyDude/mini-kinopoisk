@@ -11,8 +11,6 @@ export class PersonsService {
     @InjectModel(Persons) private personsRepository: typeof Persons,
   ) {}
 
-  async getCardPersonById(id) {}
-
   async getStaffByFilmId(id) {
     const actors = [];
     const staff = await this.personsFilmsRepository.findAll({
