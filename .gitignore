@@ -110,7 +110,8 @@ dist
 /.env
 pgdata
 
-#api:
+
+#api
 /server/api/package-lock.json
 
 #Auth:

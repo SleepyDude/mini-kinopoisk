@@ -1,5 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
+import { SequelizeScopeError } from 'sequelize';
 // import { AddRoleDto, AddRoleDtoEmail, CreateUserDto, UpdateUserDto } from 'y/shared/dto';
 import { RolesService } from '../roles/roles.service';
 import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
@@ -20,15 +22,21 @@ export class UsersService {
 
         console.log(`[auth][users.service][createUser] role = ${JSON.stringify(role)}`);
 
-        if (role === null) { throw new HttpException(
-            "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
-            HttpStatus.I_AM_A_TEAPOT
-        )}
-        
-        let user = await this.userRepository.create(dto);
-        await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+        if (role === null) {
+            // throw new HttpException(
+            //     "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
+            //     HttpStatus.I_AM_A_TEAPOT
+            // )
+            throw new RpcException("Роль 'USER' не найдена, необходимо выполнение инициализации ресурса");
+        }
 
-        return user.id;
+        try {
+            let user = await this.userRepository.create(dto);
+            await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+            return user.id;
+        } catch (e) {
+            throw new RpcException("Пользователь уже существует");
+        }
     }
 
     async getAllUsers() {
@@ -44,7 +52,7 @@ export class UsersService {
         const user = await this.userRepository.findOne({where: {email}});
 
         if (!user) {
-            throw new HttpException(`Пользователя с email ${email} не существует`, HttpStatus.NOT_FOUND);
+            throw new RpcException(`Пользователя с email ${email} не существует`);
         }
 
         await user.update(dto);
@@ -55,7 +63,7 @@ export class UsersService {
         const user = await this.userRepository.findOne({where: {email}});
 
         if (!user) {
-            throw new HttpException(`Пользователя с email ${email} не существует`, HttpStatus.NOT_FOUND);
+            throw new RpcException(`Пользователя с email ${email} не существует`);
         }
 
         await user.destroy();
@@ -70,7 +78,7 @@ export class UsersService {
             return user;
         }
         
-        throw new HttpException('Пользователь или роль не найдены', HttpStatus.NOT_FOUND);
+        throw new RpcException('Пользователь или роль не найдены');
     }
 
     async addRoleByEmail(dto: AddRoleDtoEmail) {
@@ -82,6 +90,6 @@ export class UsersService {
             return user;
         }
         
-        throw new HttpException('Пользователь или роль не найдены', HttpStatus.NOT_FOUND);
+        throw new RpcException('Пользователь или роль не найдены');
     }
 }

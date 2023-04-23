@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateRoleDto } from './dto/create-role.dto';
 // import { CreateRoleDto } from 'y/shared/dto';
@@ -12,6 +13,7 @@ export class RolesService {
     constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
 
     async createRole(dto: CreateRoleDto, userPerm: number = Infinity) {
+        console.log(`[roles.service][create-role] dto: ${JSON.stringify(dto)}`);
         if (userPerm <= dto.value) {
             throw new HttpException('Можно создать роль только с меньшими чем у Вас правами', HttpStatus.FORBIDDEN);
         }
@@ -34,17 +36,17 @@ export class RolesService {
         return roles;
     }
 
-    async deleteByName(name: string, userPerm: number) {
+    async deleteByName(name: string, userPerm: number = Infinity) {
         const role = await this.roleRepository.findOne({where: {name}});
         if (role) {
             // Проверим, что пользователь вправе удалить роль
             if (userPerm <= role.value) {
-                throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN);
+                throw new RpcException('Недостаточно прав');
             }
             role.destroy();
             return;
         }
-        throw new HttpException('Роли с таким именем не существует', HttpStatus.NOT_FOUND);
+        throw new RpcException('Роли с таким именем не существует');
     }
 
     async updateByName(name: string, dto: UpdateRoleDto, userPerm: number) {
