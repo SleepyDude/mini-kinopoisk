@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Inject, Param, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {Response} from "express";
-import {lastValueFrom} from "rxjs";
+import {firstValueFrom, lastValueFrom} from "rxjs";
 
 @Controller('auth')
 export class AuthController {
@@ -15,12 +15,10 @@ export class AuthController {
     @Body() dto: any, 
     @Res({ passthrough: true }) response: Response
   ) {
-    return this.authService.send(
-      {
-        cmd: 'login',
-      },
-      {dto: dto, response: response}
-    )
+    const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
+    response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+    response.cookie('accessToken', accessToken, {maxAge: 15 * 60 * 1000, httpOnly: true});
+    return {"message": "Логин успешен, токены ищи в куках"};
   }
 
     // @RoleAccess({minRoleVal: initRoles.ADMIN.value, allowSelf: true})
@@ -30,10 +28,9 @@ export class AuthController {
         @Body() dto: any, 
         @Res({ passthrough: true }) response: Response
     ) {
-            const userData = await lastValueFrom(this.authService.send({cmd: 'registration'}, dto));
-            response.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-            return userData;
-
+        const userData = await lastValueFrom(this.authService.send({cmd: 'registration'}, dto));
+        response.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+        return userData;
     }
 
     // @RoleAccess(initRoles.ADMIN.value)
