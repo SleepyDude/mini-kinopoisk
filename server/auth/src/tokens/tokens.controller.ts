@@ -40,14 +40,14 @@ export class TokensController {
         return await this.tokenService.validateRefreshToken(token);
     }
 
-    @MessagePattern({ cmd: 'generate-and-save-tokens' })
-    async generateAndSaveTokens(
-        // @Ctx() context: RmqContext,
-        @Payload() userDto: UserDto, response
-    ) {
-        // this.sharedService.acknowledgeMessage(context);
-        // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
-
-        return await this.tokenService.generateAndSaveToken(userDto, response)
-    }
+    // @MessagePattern({ cmd: 'generate-and-save-tokens' })
+    // async generateAndSaveTokens(
+    //     // @Ctx() context: RmqContext,
+    //     @Payload() userDto: UserDto, response
+    // ) {
+    //     // this.sharedService.acknowledgeMessage(context);
+    //     // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
+    //
+    //     return await this.tokenService.generateAndSaveToken(userDto, response)
+    // }
 }
