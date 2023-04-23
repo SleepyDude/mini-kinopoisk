@@ -5,7 +5,7 @@ import { ClientProxy } from '@nestjs/microservices';
 export class MoviesController {
 
     constructor(
-        @Inject('USERS-SERVICE') private usersService: ClientProxy,
+        @Inject('MOVIES-SERVICE') private usersService: ClientProxy,
     ) {}
 
     @Get()

@@ -1,9 +1,0 @@
-Бюджет
-таблица где
-filmId
-Budget - amount
-RUS - amount
-USA - amount
-WORLD - amount
-
-Остановился на ID:  820638

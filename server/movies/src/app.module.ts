@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FilmsModule } from './films/films.module';
-import {SequelizeModule} from "@nestjs/sequelize";
+import { SequelizeModule } from '@nestjs/sequelize';
 import { GenresModule } from './genres/genres.module';
 import { CountriesModule } from './countries/countries.module';
 import { BudgetModule } from './budget/budget.module';
@@ -18,11 +18,11 @@ import { ReviewsModule } from './reviews/reviews.module';
       models: [],
       autoLoadModels: true,
     }),
-      FilmsModule,
-      GenresModule,
-      CountriesModule,
-      BudgetModule,
-      ReviewsModule
+    FilmsModule,
+    GenresModule,
+    CountriesModule,
+    BudgetModule,
+    ReviewsModule,
   ],
   controllers: [],
   providers: [],

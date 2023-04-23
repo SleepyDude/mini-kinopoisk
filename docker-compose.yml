@@ -18,72 +18,51 @@ services:
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
-  rabbitmq:
-    container_name: rabbitmq-dns-movies
-    image: rabbitmq
-    hostname: rabbitmq
-    restart: always
-    env_file:
-      - ./.env
-    ports:
-      - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
-
-  # auth:
-  #   container_name: auth-dns-movies
-  #   build: ./server/auth
-  #   ports:
-  #     - ${PORT_AUTH}:${PORT_AUTH}
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-
-#  users:
-#    container_name: users-dns-movies
-#    build: ./server/users
+#  rabbitmq:
+#    container_name: rabbitmq-dns-movies
+#    image: rabbitmq
+#    hostname: rabbitmq
+#    restart: always
+#    env_file:
+#      - ./.env
+#    ports:
+#      - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
+#
+#  persons:
+#    container_name: persons-dns-movies
+#    build: ./server/persons
 #    env_file:
 #      - ./.env
 #    depends_on:
+#      - rabbitmq
 #      - postgres
+#      - api
+#    volumes:
+#      - ./server/persons:/app
+#      - /app/node_modules
+#
+#  movies:
+#    container_name: movies-dns-movies
+#    build: ./server/movies
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - rabbitmq
+#      - postgres
+#      - api
+#    volumes:
+#      - ./server/movies:/app
+#      - /app/node_modules
+#
+#  api:
+#    container_name: api-dns-movies
+#    build: ./server/api
+#    env_file:
+#      - ./.env
+#    depends_on:
 #      - rabbitmq
 #    volumes:
-#      - ./server/users:/app
+#      - ./server/api:/app
 #      - /app/node_modules
-
-  persons:
-    container_name: persons-dns-movies
-    build: ./server/persons
-    env_file:
-      - ./.env
-    depends_on:
-      - rabbitmq
-      - postgres
-    volumes:
-      - ./server/persons:/app
-      - /app/node_modules
-
-  movies:
-    container_name: movies-dns-movies
-    build: ./server/movies
-    env_file:
-      - ./.env
-    depends_on:
-      - rabbitmq
-      - postgres
-    volumes:
-      - ./server/movies:/app
-      - /app/node_modules
-
-  api:
-    container_name: api-dns-movies
-    build: ./server/api
-    env_file:
-      - ./.env
-    depends_on:
-      - rabbitmq
-#      - users
-      - persons
-    volumes:
-      - ./server/api:/app
-      - /app/node_modules
-    ports:
-      - ${API_GATEWAY_PORT}:3000
+#    ports:
+#      - ${API_GATEWAY_PORT}:3000

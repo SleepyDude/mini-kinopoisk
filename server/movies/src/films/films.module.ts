@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { FilmsController } from './films.controller';
 import { FilmsService } from './films.service';
-import {SequelizeModule} from "@nestjs/sequelize";
-import {Films} from "./films.model";
-import {CountriesModule} from "../countries/countries.module";
-import {GenresModule} from "../genres/genres.module";
-import {BudgetModule} from "../budget/budget.module";
-import {ClientsModule, Transport} from "@nestjs/microservices";
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Films } from './films.model';
+import { CountriesModule } from '../countries/countries.module';
+import { GenresModule } from '../genres/genres.module';
+import { BudgetModule } from '../budget/budget.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   controllers: [FilmsController],
@@ -14,11 +14,11 @@ import {ClientsModule, Transport} from "@nestjs/microservices";
   imports: [
     ClientsModule.register([
       {
-        name: 'USERS-SERVICE',
+        name: 'MOVIES-SERVICE',
         transport: Transport.RMQ,
         options: {
           urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.USERS_QUEUE,
+          queue: process.env.MOVIES_QUEUE,
           queueOptions: { durable: false },
         },
       },
@@ -26,7 +26,7 @@ import {ClientsModule, Transport} from "@nestjs/microservices";
     SequelizeModule.forFeature([Films]),
     CountriesModule,
     GenresModule,
-      BudgetModule,
-  ]
+    BudgetModule,
+  ],
 })
 export class FilmsModule {}
