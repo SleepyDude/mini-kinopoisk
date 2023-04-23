@@ -3,21 +3,29 @@ import { ClientProxy } from '@nestjs/microservices';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
 import { catchError, firstValueFrom, switchMap } from 'rxjs';
+import { TokensService } from 'src/tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
-  constructor(@Inject('AUTH_SERVICE') private readonly client: ClientProxy,
-  @Inject('USER_SERVICE') private readonly userService: ClientProxy,) {}
+  constructor(
+  @Inject('USER_SERVICE') private readonly userService: ClientProxy,
+  private tokenService: TokensService) {}
 
-  private async hashPassword(password: string) {
-    return await bcrypt.hash(password, process.env.SALT);
+  async login(userDto: LoginDto | any, response, skipPasswordCheck: boolean = false) {
+    // response получим уже в main
+    
+    const hashedPassword = bcrypt.hash(userDto.password, process.env.SALT);
+    const user = await this.defineUserExists(userDto.email);
+    const userPassword = user?.password;
+    const isRightPassword = (hashedPassword == userPassword);
+
+    if (!isRightPassword && !skipPasswordCheck) {
+      throw new BadRequestException("Invalid credentials");
+    }
+    return await this.tokenService.generateAndSaveToken({...userDto}, response)
   }
 
-  async login(userDto: LoginDto) {
-    return 'login';
-  }
-
-  async isUserExists(email: string) : Promise<Boolean> {
+  async defineUserExists(email: string) : Promise<any> {
     const user$ = this.userService.send( {cmd: 'get-user-by-email' }, email ).pipe(
       switchMap((user) => { 
         if (user) return user;
@@ -27,57 +35,32 @@ export class AuthService {
         throw new BadRequestException;
       })
     );
-
     const user = await firstValueFrom(user$);
-    return (user)? true : false;
-   
+    return (user)? user : null;
   }
 
-  async registration(userDto: LoginDto) {
+  async registration(userDto: LoginDto, response) { 
+    // response получим уже в main
 
-    const hashedPassword = this.hashPassword(userDto.password);
+    const hashedPassword = bcrypt.hash(userDto.password, process.env.SALT);
 
-    if (this.isUserExists(userDto.email)) {
+    if (await this.defineUserExists(userDto.email)) {
       throw new HttpException(`Пользователь с таким e-mail уже существует`, HttpStatus.NOT_FOUND);
     }
 
-    const userData$ = this.userService.send( {cmd: 'create-user'}, userDto).pipe(
-      switchMap((userData) => {
-        const {id, roles} = userData;
-        return {id, roles}
+    const id$ = this.userService.send( {cmd: 'create-user'}, {...userDto, password: hashedPassword}).pipe(
+      switchMap((id) => {
+        return id
       })
     )
+    const id = +await firstValueFrom(id$);
 
-    
+    // createProfile(userDto)
 
-
-    // const id$ = this.authService.send({ cmd: 'register' }, registerProfileDto).pipe(
-    //   switchMap((value) => {
-    //       // console.log(`[profiles][registration] service. return from authService: ${JSON.stringify(value)}`);
-    //       const { id } = value;
-    //       // console.log(`id = ${id}`);
-    //       return of(id)
-    //   }),
-    //   catchError( (error) => {
-    //       console.log(`[profiles][registration] catchError error = ${JSON.stringify(error)}`)
-    //       throw new UnauthorizedException(error);
-    //   })
-
-    // const candidate = await this.userService.getUserByEmail(profileDTO.email);
-    // if (candidate) {
-    //     throw new HttpException(`A user with email ${profileDTO.email} already exists`, HttpStatus.BAD_REQUEST)
-    // }
-
-    console.log('SERVICE AUTH: ', userDto)
-    try {
-      let user = await this.client.send({ cmd: 'create_user' }, userDto).toPromise();
-      return user;
-    } catch (e) {
-      console.log(e)
-    }
+    return await this.tokenService.generateAndSaveToken({email: userDto.email, id: id, roles: []}, response)
   }
 
-  async logout() {
-    return 'logout';
+  async logout(refreshToken, response) {
+    await this.tokenService.removeToken(refreshToken, response);
   }
 }
