@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   postgres:
     container_name: postgres-dns-movies
     image: postgres:15.2
@@ -10,36 +11,58 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_DB=${POSTGRES_USERS_DB}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
-  rabbitmq:
-    container_name: pabbitmq-dns-movies
-    image: rabbitmq
-    hostname: rabbitmq
-    restart: always
-    env_file:
-      - ./.env
-    ports:
-      - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
-
-  auth:
-    container_name: auth-dns-movies
-    build: ./server/auth
-    ports:
-      - ${PORT_AUTH}:${PORT_AUTH}
-    depends_on:
-      - postgres
-      - rabbitmq
-
-  users:
-    container_name: users-dns-movies
-    build: ./server/users
-    environment:
-      - CLOUDAMQP_URL=${CLOUDAMQP_URL}
-    depends_on:
-      - postgres
-      - rabbitmq
+#  rabbitmq:
+#    container_name: rabbitmq-dns-movies
+#    image: rabbitmq
+#    hostname: rabbitmq
+#    restart: always
+#    env_file:
+#      - ./.env
+#    ports:
+#      - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
+#
+#  persons:
+#    container_name: persons-dns-movies
+#    build: ./server/persons
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - rabbitmq
+#      - postgres
+#      - api
+#    volumes:
+#      - ./server/persons:/app
+#      - /app/node_modules
+#
+#  movies:
+#    container_name: movies-dns-movies
+#    build: ./server/movies
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - rabbitmq
+#      - postgres
+#      - api
+#    volumes:
+#      - ./server/movies:/app
+#      - /app/node_modules
+#
+#  api:
+#    container_name: api-dns-movies
+#    build: ./server/api
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - rabbitmq
+#    volumes:
+#      - ./server/api:/app
+#      - /app/node_modules
+#    ports:
+#      - ${API_GATEWAY_PORT}:3000

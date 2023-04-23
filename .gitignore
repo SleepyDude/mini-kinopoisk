@@ -106,30 +106,18 @@ dist
 
 #server:
 
+
 #main:
 /.env
+pgdata
 
-#Auth:
-/server/auth/.env
-/server/auth/package-lock.json
-/server/auth/node_modules
-/server/auth/.docker.env
-/server/auth/.development.env
+#api
+/server/api/package-lock.json
 
-#parser:
-/server/parser/.env
-/server/parser/package-lock.json
-/server/parser/node_modules
+#Movies
+/server/movies/package-lock.json
+/server/movies/node_modules
 
-#Users:
-/server/users/.env
-/server/users/package-lock.json
-/server/users/node_modules
-/server/users/.development.env
-/server/users/.docker.env
-
-#Profile
-/server/profile/package-lock.json
-/server/profile/.env
-/server/profile/node_modules
-package-lock.json
+#Persons
+/server/persons/package-lock.json
+/server/persons/node_modules
