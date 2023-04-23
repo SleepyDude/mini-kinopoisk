@@ -110,6 +110,9 @@ dist
 /.env
 pgdata
 
+#api:
+/server/api/package-lock.json
+
 #Auth:
 /server/auth/package-lock.json
 /server/auth/node_modules

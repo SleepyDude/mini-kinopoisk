@@ -8,12 +8,6 @@ export class MoviesController {
         @Inject('USERS-SERVICE') private usersService: ClientProxy,
     ) {}
 
-    // @Get('?page=:pageNum&limit=limitNum')
-    // async getAllFilmsPagination(@Param('pageNum') pageNum,
-    //                   @Param('limitNum') limitNum) {
-    //     return this.usersService.send({ cmd : 'get-all-films' }, {pageNum, limitNum});
-    // }
-
     @Get()
     async getAllFilms(@Query() param) {
         return this.usersService.send({ cmd : 'get-all-films' }, param);
