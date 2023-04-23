@@ -46,13 +46,15 @@ export class AuthController {
     @MessagePattern({ cmd: 'registration' })
     async registration(
         // @Ctx() context: RmqContext,
-        @Payload('dto') dto: LoginDto, 
-        @Payload('response') response
+        // @Payload('dto') dto: LoginDto,
+        // @Payload('response') response
+        @Payload() obj
     ) {
+        return await this.authService.registration(obj)
         // this.sharedService.acknowledgeMessage(context);
         // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
 
-        return await this.authService.registration(dto, response); 
+        // return await this.authService.registration(dto, response);
     }
 
     // @UseFilters(new HttpExceptionFilter())
