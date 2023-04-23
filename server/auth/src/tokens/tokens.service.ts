@@ -9,7 +9,7 @@ import { catchError, firstValueFrom, switchMap } from 'rxjs';
 @Injectable()
 export class TokensService { 
     constructor(@InjectModel(Token) private tokenRepo: typeof Token,
-    @Inject('USER_SERVICE') private readonly userService: ClientProxy,
+    @Inject('USERS-SERVICE') private readonly userService: ClientProxy,
     private jwtService: JwtService
     ){}
 

@@ -10,7 +10,7 @@ export class VkService {
     constructor(
         private http: HttpService,  
         private authService: AuthService,
-        @Inject('USER_SERVICE') private readonly userService: ClientProxy,) {}
+        @Inject('USERS-SERVICE') private readonly userService: ClientProxy,) {}
 
     async getUserDataFromVk(userId: number, token: string): Promise<any> {
         return this.http

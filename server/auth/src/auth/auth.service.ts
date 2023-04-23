@@ -8,7 +8,7 @@ import { TokensService } from 'src/tokens/tokens.service';
 @Injectable()
 export class AuthService {
   constructor(
-  @Inject('USER_SERVICE') private readonly userService: ClientProxy,
+  @Inject('USERS-SERVICE') private readonly userService: ClientProxy,
   private tokenService: TokensService) {}
 
   async login(userDto: LoginDto | any, response, skipPasswordCheck: boolean = false) {

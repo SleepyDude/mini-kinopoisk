@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -10,7 +10,7 @@ import { VkModule } from 'src/vk/vk.module';
   controllers: [AuthController],
   providers: [AuthService],
   imports: [TokensModule,
-            VkModule,
+            forwardRef(() => VkModule),
             ClientsModule.register([
               {
                 name: 'USERS-SERVICE',
@@ -22,6 +22,7 @@ import { VkModule } from 'src/vk/vk.module';
                 },
               },  
             ])
-          ]
+          ],
+  exports: [AuthService]
 })
 export class AuthModule {}

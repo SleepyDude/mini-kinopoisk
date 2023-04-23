@@ -8,7 +8,7 @@ export class AuthController {
       @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
-  @Post()
+  @Post('login')
   async login(
     @Body() dto: any, 
     @Res({ passthrough: true }) response: Response
@@ -17,7 +17,7 @@ export class AuthController {
       {
         cmd: 'login',
       },
-      {dto, response}
+      {dto: dto, response: response}
     )
   }
 
@@ -28,12 +28,13 @@ export class AuthController {
         @Body() dto: any, 
         @Res({ passthrough: true }) response: Response
     ) {
+        console.log(`!!!!!!!!!!!!!!!!${response}`)
         return this.authService.send(
             {
                 cmd: 'registration',
             },
-            {dto, response},
-        )
+            {dto: dto, response: response}
+            )
     }
 
     // @RoleAccess(initRoles.ADMIN.value)
