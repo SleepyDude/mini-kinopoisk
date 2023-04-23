@@ -29,7 +29,7 @@ docker compose up
 
 ### Рабочие эндпоинты:
 
-</api/movies - GET>
+>/api/movies - GET
  
 #### Получить все фильмы.
 #### Пагинация: movies?size=10 - Устанавливает отображаемый лимит.
@@ -41,7 +41,7 @@ docker compose up
 #### movies?size=10&page=1&field=nameRu&value=голуби.
 #### Регистр не важен!
 
-</api/movies/id - GET>
+>/api/movies/id - GET
  
 #### id динамический id фильма.
 #### Выдаст всю информацию о фильме по его айди. Жанры, актеры, страны и т.д.
