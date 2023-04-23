@@ -2,13 +2,12 @@ import { Controller, UseFilters } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AddRoleDtoEmail } from './dto/add-role.dto';
+import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
 
 // import { DtoValidationPipe, HttpExceptionFilter, ObservableExceptionFilter, SharedService, UserPermission } from 'y/shared';
 // import { AddRoleDtoEmail, CreateUserDto } from 'y/shared/dto';
 
 // @UsePipes(ValidationPipe)
-// @ApiTags('Пользователи')
 @Controller('users')
 export class UsersController {
 
@@ -42,13 +41,25 @@ export class UsersController {
     }
 
     // @UseFilters(new HttpExceptionFilter())
-    @MessagePattern({ cmd: 'add-role-to-user' })
-    async addRole(
+    @MessagePattern({ cmd: 'add-role-to-user-by-email' })
+    async addRoleByEmail(
         // @Ctx() context: RmqContext,
         @Payload() dto: AddRoleDtoEmail,
     ) {
+        console.log(`[users.controller][add-role-to-user-by-email] +`);
         // this.sharedService.acknowledgeMessage(context);
 
         return await this.usersService.addRoleByEmail(dto);
+    }
+
+    @MessagePattern({ cmd: 'add-role-to-user-by-id' })
+    async addRoleById(
+        // @Ctx() context: RmqContext,
+        @Payload() dto: AddRoleDto,
+    ) {
+        console.log(`[users.controller][add-role-to-user-by-email] +`);
+        // this.sharedService.acknowledgeMessage(context);
+
+        return await this.usersService.addRole(dto);
     }
 }
