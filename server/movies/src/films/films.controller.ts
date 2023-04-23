@@ -1,5 +1,7 @@
-import {Controller, Get, Param} from '@nestjs/common';
+import {Controller, Get, Res} from '@nestjs/common';
 import {FilmsService} from "./films.service";
+import {MessagePattern, Payload} from "@nestjs/microservices";
+import { PaginateQueryInterface, PaginateQuery } from 'nestjs-sequelize-paginate';
 
 @Controller('films')
 export class FilmsController {
@@ -8,13 +10,18 @@ export class FilmsController {
         private filmsService: FilmsService,
     ) {}
 
-    @Get()
-    getAllFilms() {
-        return this.filmsService.getAllFilms();
+    @MessagePattern({ cmd : 'get-all-films' })
+    getAllFilms(@Payload() params) {
+        return this.filmsService.getAllFilms(params);
     }
 
-    @Get('/:id')
-    getFilmById(@Param('id') id) {
+    @MessagePattern({ cmd : 'get-film-byId' })
+    getFilmById(@Payload() id) {
         return this.filmsService.getFilmById(id);
+    }
+
+    @MessagePattern({ cmd : 'test-movies' })
+    test () {
+        return 'Test done';
     }
 }

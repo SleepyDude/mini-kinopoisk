@@ -12,6 +12,9 @@ export class Countries extends Model<Countries> {
     id: number;
 
     @Column({ type: DataType.STRING })
-    countryName: string;
+    countryNameRu: string;
+
+    @Column({ type: DataType.STRING })
+    countryNameEng: string;
 
 }

@@ -4,6 +4,7 @@ import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import {PersonsController} from "./controllers/persons.controller";
 import { InitController } from './controllers/init.controller';
+import {MoviesController} from "./controllers/movies.controller";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { InitController } from './controllers/init.controller';
       UsersController,
       PersonsController,
       InitController,
+      MoviesController,
   ],
   providers: [],
 })

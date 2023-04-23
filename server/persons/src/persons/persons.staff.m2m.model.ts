@@ -21,6 +21,6 @@ export class PersonsFilms extends Model<PersonsFilms> {
     professionText: string;
 
     @Column({ type: DataType.STRING })
-    proseffionKey: string;
+    professionKey: string;
 
 }

@@ -16,10 +16,23 @@ export class PersonsService {
     }
 
     async getStaffByFilmId(id) {
-        return await this.personsFilmsRepository.findAll({ where: { kinopoiskFilmId : id } });
+        let actors = [];
+        let staff =  await this.personsFilmsRepository.findAll({ where: { kinopoiskFilmId : id } });
+        console.log('+++++', staff)
+        for ( let personId of staff ) {
+            let person = await this.getPersonById(personId.personId)
+            actors.push({
+                personId: personId.personId,
+                professionText: personId.professionText,
+                professionKey: personId.professionKey,
+                person: person,
+            });
+        }
+        return actors;
     }
 
     async getPersonById(id) {
         return await this.personsRepository.findOne({ where: { personId : id } });
     }
+
 }

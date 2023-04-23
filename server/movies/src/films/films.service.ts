@@ -6,6 +6,7 @@ import {GenresService} from "../genres/genres.service";
 import {BudgetService} from "../budget/budget.service";
 import {ClientProxy} from "@nestjs/microservices";
 import {lastValueFrom} from "rxjs";
+import {Op} from "sequelize";
 
 @Injectable()
 export class FilmsService {
@@ -17,8 +18,16 @@ export class FilmsService {
         private genresService: GenresService,
         private budgetService: BudgetService,
     ) {}
-    async getAllFilms() {
-        return await this.filmsRepository.findAll();
+    async getAllFilms(params) {
+        const { page, size, title } = params;
+        let condition = title ? { title: { [Op.like]: `%${title}%` } }: null;
+        const { limit, offset } = this.getPagination(page, size);
+
+        return await this.filmsRepository.findAndCountAll({
+            where: condition,
+            offset: offset,
+            limit: limit,
+        });
     }
 
     async getFilmById(id) {
@@ -26,14 +35,11 @@ export class FilmsService {
         let currentCountries = [];
         let currentGenres = [];
         let currentBudget = [];
-        let currentStaff = [];
-        `Должен вернуть:
-        фильм
-        страны
-        жанры
-        актеров`
+        let actorArray = [];
+        let testArray = [];
+        console.log('+++ ID: ', id)
 
-        const currentFilm = await this.filmsRepository.findOne({ where: { kinopoiskId: id } });
+        const currentFilm = await this.filmsRepository.findOne({ where: { kinopoiskId: id.id } });
 
         const currentCountriesId = await this.countriesService.getCountriesByFilmId(currentFilm.kinopoiskId);
         for ( let country of currentCountriesId ) {
@@ -50,21 +56,23 @@ export class FilmsService {
             currentBudget.push(await this.budgetService.getBudgetById(budget.budgetId));
         }
 
-        const currentStaffId = lastValueFrom(await this.usersClient.send({ cmd : 'get-staff' }, currentFilm.kinopoiskId));
-        for ( let person of await currentStaffId ) {
-            let currentPerson = await this.usersClient.send({ cmd : 'get-person-by-id' }, person.personId);
-            currentStaff.push({
-                    professionText: person.professionText,
-                    professionKey: person.proseffionKey,
-                    ...currentPerson,
-                });
-        }
-        return result.push({
-                film: currentFilm,
-                countries: currentCountries,
-                genre: currentGenres,
-                budget: currentBudget,
-                staff: currentStaff
-            });
+        const currentStaff = await lastValueFrom(this.usersClient.send({ cmd : 'get-staff' }, currentFilm.kinopoiskId));
+
+        result.push({
+            film: currentFilm,
+            countries: currentCountries,
+            genre: currentGenres,
+            budget: currentBudget,
+            staff: currentStaff,
+        });
+
+        return result;
     }
+
+    private getPagination(page, size)  {
+        const limit = size ? +size : 3;
+        const offset = page ? page * limit : 0;
+
+        return { limit, offset };
+    };
 }

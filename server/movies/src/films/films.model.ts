@@ -82,7 +82,4 @@ export class Films extends Model<Films> {
 
     @Column({ type: DataType.BOOLEAN, defaultValue: false })
     shortFilm: boolean;
-
-    @Column({ type: DataType.STRING })
-    trailerUrl: string;
 }
