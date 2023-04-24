@@ -3,9 +3,8 @@ import { UsersController } from './controllers/users.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import {PersonsController} from "./controllers/persons.controller";
+import { MoviesController } from "./controllers/movies.controller";
 import { InitModule } from './init/init.module';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './filters/all.exceptions.filter';
 import { AuthController } from './controllers/auth.controller';
 import {ApiController} from "./api.controller";
 import { RolesController } from './controllers/roles.controller';
@@ -30,7 +29,16 @@ import { RolesController } from './controllers/roles.controller';
           queue: process.env.AUTH_QUEUE,
           queueOptions: { durable: false },
         },
-      },  
+      },
+      {
+        name: 'MOVIES-SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.CLOUDAMQP_URL],
+          queue: process.env.MOVIES_QUEUE,
+          queueOptions: { durable: false },
+        },
+      },
     ]),
     InitModule
   ],
@@ -40,12 +48,8 @@ import { RolesController } from './controllers/roles.controller';
       AuthController,
       ApiController,
       RolesController,
+      MoviesController,
   ],
-  providers: [
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: AllExceptionsFilter,
-    // }
-  ],
+  providers: [],
 })
 export class ApiModule {}

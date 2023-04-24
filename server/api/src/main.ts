@@ -22,7 +22,9 @@ async function bootstrap() {
 
 
 
-  await app.listen(PORT, () => {`Сервер запущен на внутреннем порту ${PORT}`}); // Внутри контейнера порт 3000 всегда
+  await app.listen(PORT, () => {
+    console.log(`Сервер запущен на внутреннем порту ${PORT}`);
+  }); // Внутри контейнера порт 3000 всегда
 }
 
 bootstrap();
