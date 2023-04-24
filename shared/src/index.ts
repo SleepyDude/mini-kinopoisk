@@ -8,6 +8,7 @@ export * from './dto/users/add-role.email.dto';
 
 export * from './dto/roles/create-role.dto';
 export * from './dto/roles/delete-role.dto';
+export * from './dto/roles/update-role.dto';
 
 // models
 export * from './models/users/users.model';

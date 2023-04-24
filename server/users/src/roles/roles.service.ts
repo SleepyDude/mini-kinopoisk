@@ -15,14 +15,14 @@ export class RolesService {
     async createRole(dto: CreateRoleDto, userPerm: number = Infinity) {
         console.log(`[roles.service][create-role] dto: ${JSON.stringify(dto)}`);
         if (userPerm <= dto.value) {
-            throw new HttpException('Можно создать роль только с меньшими чем у Вас правами', HttpStatus.FORBIDDEN);
+            throw new RpcException('Можно создать роль только с меньшими чем у Вас правами');
         }
 
         try {
             const role = await this.roleRepository.create(dto);
             return role;
         } catch (error) {
-            throw new HttpException('Ошибка при создании роли (роль уже существует)', HttpStatus.CONFLICT);
+            throw new RpcException('Ошибка при создании роли (роль уже существует)');
         }
     }
 
@@ -31,7 +31,7 @@ export class RolesService {
         return role;
     }
 
-    async getAllRoles() {
+    async getAllRoles(): Promise<Role[]> {
         const roles = await this.roleRepository.findAll();
         return roles;
     }
@@ -55,12 +55,12 @@ export class RolesService {
         // console.log(`find role ${JSON.stringify(role)}`)
         if (role) {
             if (userPerm <= role.value || dto.value && dto.value >= userPerm) {
-                throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN);
+                throw new RpcException('Недостаточно прав');
             }
             role.update(dto);
             return role;
         }
-        throw new HttpException('Роли с таким именем не существует', HttpStatus.NOT_FOUND);
+        throw new RpcException('Роли с таким именем не существует');
     }
 
 }

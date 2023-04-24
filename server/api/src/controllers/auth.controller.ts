@@ -1,15 +1,14 @@
 import { CreateUserDto } from '@hotels2023nestjs/shared';
-import { Body, Controller, Get, Inject, Param, Post, Req, Res, UseFilters } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req, Res, UseFilters } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 import { firstValueFrom } from "rxjs";
 import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
-import { rpcToHttp } from 'src/filters/proxy.error';
 import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
-import { MessageOutput } from 'src/types/message-output.type';
-import { TokenPair } from 'src/types/token.pair';
+import { Token, TokenEmail } from 'src/types/token.return.type';
 
+@UseFilters(AllExceptionsFilter)
 @ApiTags('Авторизация')
 @Controller('auth')
 export class AuthController {
@@ -18,9 +17,9 @@ export class AuthController {
       @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
-  @UseFilters(AllExceptionsFilter)
+  
   @ApiOperation({ summary: 'Регистрация' })
-  @ApiResponse({ status: 201, type: Object, description: 'Вернёт объект {email, token: AccessToken}, refresh token запишет в куки' })
+  @ApiResponse({ status: 201, type: TokenEmail, description: 'Регистрация, refresh token записывает в куки' })
   @Post('registration')
   async registration(
       @Body(DtoValidationPipe) dto: CreateUserDto, 
@@ -32,7 +31,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Логин' })
-  @ApiResponse({ status: 200, type: Object, description: 'Вернёт объект {token: AccessToken}, а refresh token запишет в куки' })
+  @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
   @Post('login')
   async login(
     @Body(DtoValidationPipe) dto: CreateUserDto, 
@@ -44,7 +43,7 @@ export class AuthController {
   }
 
     @ApiOperation({ summary: 'Логаут' })
-    @ApiResponse({ status: 200, description: 'Удалит токен из куков и из БД, если всё успешно возвращает true' })
+    @ApiResponse({ status: 200, description: 'Удалит refresh token из куков и из БД, если всё успешно возвращает true' })
     @Post('logout')
     async logout(
         @Req() request: Request,
@@ -57,7 +56,7 @@ export class AuthController {
     }  
     
     @ApiOperation({ summary: 'Получение нового токена доступа' })
-    @ApiResponse({ status: 200, type: Object, description: 'Вернёт объект {token: AccessToken}, а refresh token запишет в куки' })
+    @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
     @Post('refresh')
     async refresh(
         @Req() request: Request,
@@ -70,7 +69,7 @@ export class AuthController {
     }
 
     @ApiOperation({ summary: `Вход через ВК, получает объект типа AuthVK {code: string} ` })
-    @ApiResponse({ status: 200, description: 'Вернёт объект {email, token: AccessToken}, refresh token запишет в куки'})
+    @ApiResponse({ status: 200, type: TokenEmail, description: 'refresh token записывает в куки'})
     @Post('vk')
     async vkLogin(
         @Body() auth: any) {

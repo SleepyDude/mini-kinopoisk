@@ -57,7 +57,7 @@ export class UsersController {
     @MessagePattern({ cmd: 'add-role-to-user-by-email' })
     async addRoleByEmail(
         // @Ctx() context: RmqContext,
-        @Payload() dto: AddRoleDtoEmail,
+        @Payload() dto: AddRoleDtoEmail
     ) {
         console.log(`[users.controller][add-role-to-user-by-email] +`);
         // this.sharedService.acknowledgeMessage(context);

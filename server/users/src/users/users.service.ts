@@ -86,7 +86,7 @@ export class UsersService {
 
         if (role && user) {
             await user.$add('roles', role.id);
-            return user;
+            return role;
         }
         
         throw new RpcException('Пользователь или роль не найдены');

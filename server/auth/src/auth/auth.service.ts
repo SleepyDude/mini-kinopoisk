@@ -19,7 +19,7 @@ export class AuthService {
     const isRightPassword = await bcrypt.compare(userDto.password, userPassword);
 
     if (!isRightPassword && !skipPasswordCheck) {
-      throw new BadRequestException("Invalid credentials");
+      throw new RpcException("Invalid credentials");
     }
     const tokens = await this.tokenService.generateAndSaveToken({...user});
     return tokens;

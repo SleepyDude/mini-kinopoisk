@@ -8,6 +8,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all.exceptions.filter';
 import { AuthController } from './controllers/auth.controller';
 import {ApiController} from "./api.controller";
+import { RolesController } from './controllers/roles.controller';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import {ApiController} from "./api.controller";
       PersonsController,
       AuthController,
       ApiController,
+      RolesController,
   ],
   providers: [
     // {

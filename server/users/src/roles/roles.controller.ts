@@ -1,6 +1,8 @@
 import { Controller, UseFilters } from "@nestjs/common";
 import { Ctx, MessagePattern, Payload, RmqContext } from "@nestjs/microservices";
 import { CreateRoleDto } from "./dto/create-role.dto";
+import { DeleteRoleDto } from "./dto/delete-role.dto";
+import { UpdateRoleDto } from "./dto/update-role.dto";
 // import { HttpExceptionFilter, SharedService } from "y/shared";
 // import { CreateRoleDto } from "y/shared/dto";
 // import { DtoValidationPipe } from "y/shared/pipes/dto-validation.pipe";
@@ -19,12 +21,13 @@ export class RolesController {
     @MessagePattern({ cmd: 'create-role' })
     async getUser(
         // @Ctx() context: RmqContext,
-        @Payload() dto: CreateRoleDto
+        @Payload('dto') dto: CreateRoleDto,
+        @Payload('maxRoleValue') maxRoleValue: number,
     ) {
         // this.sharedService.acknowledgeMessage(context);
-        console.log(`[roles.controller][create-dto] dto: ${JSON.stringify(dto)}`);
+        console.log(`[roles.controller][create-dto] dto: ${JSON.stringify(dto)} maxRoleValue: ${maxRoleValue}`);
 
-        return await this.rolesService.createRole(dto);
+        return await this.rolesService.createRole(dto, maxRoleValue);
     }
 
     // @UseFilters(new HttpExceptionFilter())
@@ -44,9 +47,18 @@ export class RolesController {
 
     @MessagePattern({ cmd: 'delete-role-by-name' })
     deleteRoleByName(
-        @Payload('name') roleName: string,
-        @Payload('permission') perm: number
+        @Payload('name') name: string,
+        @Payload('maxRoleValue') maxRoleValue: number
     ) {
-        return this.rolesService.deleteByName(roleName, perm);
+        return this.rolesService.deleteByName(name, maxRoleValue);
+    }
+
+    @MessagePattern({ cmd: 'update-role-by-name' })
+    updateRoleByName(
+        @Payload('name') name: string,
+        @Payload('maxRoleValue') maxRoleValue: number,
+        @Payload('dto') dto: UpdateRoleDto,
+    ) {
+        return this.rolesService.updateByName(name, dto, maxRoleValue);
     }
 }
