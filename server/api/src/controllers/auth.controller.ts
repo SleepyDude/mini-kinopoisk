@@ -3,7 +3,7 @@ import { Body, Controller, Get, Inject, Param, Post, Req, Res, UseFilters } from
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {Request, Response} from "express";
-import {firstValueFrom, lastValueFrom} from "rxjs";
+import { firstValueFrom } from "rxjs";
 import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
 import { rpcToHttp } from 'src/filters/proxy.error';
 import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
@@ -20,20 +20,19 @@ export class AuthController {
 
   @UseFilters(AllExceptionsFilter)
   @ApiOperation({ summary: 'Регистрация' })
-  @ApiResponse({ status: 201, type: MessageOutput })
+  @ApiResponse({ status: 201, type: Object, description: 'Вернёт объект {email, token: AccessToken}, refresh token запишет в куки' })
   @Post('registration')
   async registration(
       @Body(DtoValidationPipe) dto: CreateUserDto, 
       @Res({ passthrough: true }) response: Response
   ) {
-      const {accessToken, refreshToken} = await lastValueFrom(this.authService.send({cmd: 'registration'}, dto));
+      const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'registration'}, dto));
       response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-      response.cookie('accessToken', accessToken, {maxAge: 15 * 60 * 1000, httpOnly: true});
-      return {"message": `Регистрация успешна, добро пожаловать на борт, ${dto.email}!`};
+      return {email: dto.email, token: accessToken};
   }
 
   @ApiOperation({ summary: 'Логин' })
-  @ApiResponse({ status: 200, type: MessageOutput })
+  @ApiResponse({ status: 200, type: Object, description: 'Вернёт объект {token: AccessToken}, а refresh token запишет в куки' })
   @Post('login')
   async login(
     @Body(DtoValidationPipe) dto: CreateUserDto, 
@@ -41,48 +40,40 @@ export class AuthController {
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
     response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-    response.cookie('accessToken', accessToken, {maxAge: 15 * 60 * 1000, httpOnly: true});
-    return {"message": "Логин успешен, токены ищи в куках"};
+    return {token: accessToken};
   }
 
     @ApiOperation({ summary: 'Логаут' })
-    @ApiResponse({ status: 200, type: MessageOutput })
+    @ApiResponse({ status: 200, description: 'Удалит токен из куков и из БД, если всё успешно возвращает true' })
     @Post('logout')
     async logout(
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response
     ) {
-        response.clearCookie('refreshToken');
         const { refreshToken } = request.cookies;
-        await firstValueFrom( this.authService.send({cmd: 'logout'}, refreshToken) );
-        return {"message": "Вы успешно вышли из системы (рефреш токен удален)."}
+        response.clearCookie('refreshToken');
+        const success =  await firstValueFrom(this.authService.send({cmd: 'logout'}, refreshToken));
+        return !!success;
     }  
     
     @ApiOperation({ summary: 'Получение нового токена доступа' })
-    @ApiResponse({ status: 200, type: MessageOutput })
+    @ApiResponse({ status: 200, type: Object, description: 'Вернёт объект {token: AccessToken}, а refresh token запишет в куки' })
     @Post('refresh')
     async refresh(
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response
     ) {
         const { refreshToken } = request.cookies;
-        
-        const { accessToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, refreshToken) );
-        response.cookie('accessToken', accessToken, {maxAge: 15 * 60 * 1000, httpOnly: true});
-        return {"message": "Токен доступа успешно обновлен."}
+        const { accessToken, newRefreshToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, refreshToken) );
+        response.cookie('refreshToken', newRefreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+        return {token: accessToken};
+    }
+
+    @ApiOperation({ summary: `Вход через ВК, получает объект типа AuthVK {code: string} ` })
+    @ApiResponse({ status: 200, description: 'Вернёт объект {email, token: AccessToken}, refresh token запишет в куки'})
+    @Post('vk')
+    async vkLogin(
+        @Body() auth: any) {
+        return this.authService.send( { cmd: 'vk' }, auth)
     }
 }
-
-   // Пока что закомментировал, чтобы фронты дергали роут
-    // @Post('vk')
-    // async addRole(
-    //     @Body() auth: any, 
-    //     @Res({ passthrough: true }) response: Response
-    // ) {
-    //     return this.authService.send(
-    //         {
-    //             cmd: 'vk',
-    //         },
-    //         {auth, response},
-    //     )
-    // }

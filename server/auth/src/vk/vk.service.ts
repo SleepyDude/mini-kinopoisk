@@ -35,7 +35,7 @@ export class VkService {
           .toPromise();
       }
 
-      async loginVk(auth: AuthVK, response) {
+      async loginVk(auth: AuthVK) {
         let authData;
     
         try {
@@ -46,20 +46,11 @@ export class VkService {
     
         const hasEmail = authData.data.hasOwnProperty("email");
 
-        const user$ = (!hasEmail)? this.userService.send( {cmd: 'get-user-by-vk-id'}, authData.data.user_id).pipe(
-            switchMap((user) => {
-              return user
-            })
-          ) : this.userService.send( {cmd: 'get-user-by-email'}, authData.data.email).pipe(
-            switchMap((user) => {
-              return user
-            })
-          )
+        const user = (hasEmail)? await this.userService.send( {cmd: 'get-user-by-email'}, authData.data.email) 
+        : await this.userService.send( {cmd: 'get-user-by-vk-id'}, authData.data.user_id)
 
-        const _user : any = await firstValueFrom(user$);
-
-        if (_user) {
-          return await this.authService.login({..._user}, true);
+        if (user) {
+          return await this.authService.login({...user}, true);
         }
     
         try {
@@ -67,21 +58,28 @@ export class VkService {
             authData.data.user_id,
             authData.data.access_token
           );
-    
-          let user = {
+          const profile = data.response[0];
+
+          let userData = {
             vk_id: authData.data.user_id,
             email: authData.data.email,
             password: null,
             roles: []
           };
-    
-          await this.userService.send( {cmd: 'create-user'}, {...user});
+
+          const id = await firstValueFrom(this.userService.send( {cmd: 'create-user'}, {...userData}))
+
+          let profileData = {
+            id: id,
+            name: profile.first_name,
+            lastName: profile.last_name,
+            avatar: profile.photo_400
+          };
 
           // создать профиль
     
-          return this.authService.login(user, true);
+          return this.authService.login(userData, true);
         } catch (err) {
-            console.log(err)
           throw new BadRequestException(err);
         }
       }

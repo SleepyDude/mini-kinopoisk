@@ -23,7 +23,7 @@ export class Profiles extends Model<Profiles, ProfileCreateAttrs> {
   firstName: string;
 
   @Column({ type: DataType.STRING })
-  telNumber: string;
+  phone: string;
 
   @Column({ type: DataType.STRING })
   avatar: string;

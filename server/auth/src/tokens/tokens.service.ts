@@ -14,15 +14,11 @@ export class TokensService {
     ){}
 
 async generateAndSaveToken(payload : UserDto) {
-        // Удалил респонс который был на прием
     
     const refreshToken = this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
     const accessToken = this.jwtService.sign(payload, {secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' });
-
     await this.saveToken(payload.id, refreshToken);
-    // response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true}) // будет жить в куках 30 дней в безопасности.
-
-    console.log(`[auth][tokens.service][generateAndSaveToken] accessToken = ${accessToken}}`);
+   
     return {refreshToken, accessToken}
 
 }
@@ -53,40 +49,35 @@ private async saveToken(id, refreshToken) {
     });
     if (tokenData) {
         tokenData.refreshToken = refreshToken;
-        return await tokenData.save();
+        await tokenData.save();
+        return;
     }
 
-    const token = await this.tokenRepo.create({
+    await this.tokenRepo.create({
         id: id,
         refreshToken: refreshToken
     })
-    return token;
 }
 
-async removeToken(token) : Promise<void> {
-    await this.tokenRepo.destroy({
-        where: {
-          refreshToken: token,
-        },
-    });
-    // response.cookie('refreshToken', null); // Женя: все цепочки по кукам вырезаны и логика перенесена в api контроллер
+async removeToken(refreshToken) {
+  return await this.tokenRepo.destroy({
+    where: {
+      refreshToken: refreshToken,
+    },
+  });
 }
 
-async isTokenInDb(token) {
-    const tokenData = await this.tokenRepo.findOne({where: {refreshToken: token}});
-    return (tokenData) ? tokenData.id : false;
+async tokenFromDB(refreshToken) {
+    const tokenData = await this.tokenRepo.findOne({where: {refreshToken: refreshToken}});
+    return (tokenData) ? tokenData : null;
 }
 
-async getUserIdByRefreshToken(token) {
-    if (!token) {
-      throw new UnauthorizedException();
+async getUserIdByRefreshToken(refreshToken) {
+    if (!refreshToken) {
+      throw UnauthorizedException;
     }
-    const userData = await this.validateRefreshToken(token);
-    if (!userData || !this.isTokenInDb(token)) {
-        throw new UnauthorizedException();
-    }
-
-    return userData.id
+    const userData = await this.validateRefreshToken(refreshToken);
+    return (userData) ? userData.id : null
   }
 
 
@@ -94,15 +85,15 @@ async getUserIdByRefreshToken(token) {
     if (!refreshToken) {
       throw UnauthorizedException;
     }
-    const userData = await this.validateRefreshToken(refreshToken);
-    const tokenFromDb = await this.isTokenInDb(refreshToken);
-    if (!userData || !tokenFromDb) {
+    const userId = await this.getUserIdByRefreshToken(refreshToken);
+    const tokenFromDb = await this.tokenFromDB(refreshToken);
+    if (!userId || !tokenFromDb) {
       throw UnauthorizedException;
     }
   
-    const user$ = this.userService.send( {cmd: 'get-user-by-id' }, userData.id ).pipe(
+    const user$ = this.userService.send( {cmd: 'get-user-by-id' }, userId ).pipe(
         switchMap((user) => {
-          if (user) return user;
+          if (user) return of(user);
           return of(null);
         }),
         catchError( (error) => {
@@ -114,7 +105,7 @@ async getUserIdByRefreshToken(token) {
     const userDto = new UserDto(user);
     const tokens = await this.generateAndSaveToken({...userDto});
   
-    return {"accessToken": tokens.accessToken};
+    return {accessToken: tokens.accessToken, newRefreshToken: tokens.refreshToken};
     }
 
 }

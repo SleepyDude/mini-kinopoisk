@@ -22,12 +22,11 @@ export class AuthController {
     async loginVk(
         // @Ctx() context: RmqContext,
         @Payload() auth: AuthVK,
-        @Payload('response') response
     ) {
         // this.sharedService.acknowledgeMessage(context);
         // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
 
-        return await this.vkService.loginVk(auth, response); 
+        return await this.vkService.loginVk(auth); 
     }
 
 
