@@ -1,8 +1,8 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
-import {catchError, firstValueFrom, lastValueFrom, switchMap, of} from 'rxjs';
+import {catchError, firstValueFrom, lastValueFrom, switchMap, of, throwError} from 'rxjs';
 import { TokensService } from 'src/tokens/tokens.service';
 
 @Injectable()
@@ -11,10 +11,10 @@ export class AuthService {
   @Inject('USERS-SERVICE') private readonly userService: ClientProxy,
   private tokenService: TokensService) {}
 
-  async login(userDto: LoginDto | any, response, skipPasswordCheck: boolean = false) {
+  async login(userDto: LoginDto | any, skipPasswordCheck: boolean = false) {
     // response получим уже в main
     
-    const hashedPassword = bcrypt.hash(userDto.password, process.env.SALT);
+    const hashedPassword = bcrypt.hash(userDto.password, +process.env.SALT);
     const user = await this.defineUserExists(userDto.email);
     const userPassword = user?.password;
     const isRightPassword = (hashedPassword == userPassword);
@@ -22,7 +22,8 @@ export class AuthService {
     if (!isRightPassword && !skipPasswordCheck) {
       throw new BadRequestException("Invalid credentials");
     }
-    // return await this.tokenService.generateAndSaveToken({...userDto}, response)
+    
+    return await this.tokenService.generateAndSaveToken({...userDto});
   }
 
   async defineUserExists(email: string) : Promise<any> {
@@ -60,14 +61,21 @@ export class AuthService {
     // const id = +await firstValueFrom(id$);
 
     // Просто оставлю в таком виде, работает точно так же, как функция выше.
-    const id = await lastValueFrom(this.userService.send( {cmd: 'create-user'}, {email: userDto.email, password: hashedPassword}))
+    const id = await lastValueFrom(this.userService.send( {cmd: 'create-user'}, {email: userDto.email, password: hashedPassword})
+      // .pipe(
+      //   catchError(val => {
+      //     console.log(`[auth][create-user pipe error] val: ${JSON.stringify(val)}`);
+      //     return throwError( () => new RpcException(val.message));
+      //   })
+      // )
+    )
     console.log(`[auth][auth.service][registration] new user id: ${JSON.stringify(id)}`)
     // createProfile(userDto)
 
     return await this.tokenService.generateAndSaveToken({email: userDto.email, id: id, roles: []})
   }
 
-  async logout(refreshToken, response) {
-    await this.tokenService.removeToken(refreshToken, response);
+  async logout(refreshToken) {
+    await this.tokenService.removeToken(refreshToken);
   }
 }

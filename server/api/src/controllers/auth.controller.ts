@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Inject, Param, Post, Res } from '@nestjs/common';
+import { CreateUserDto } from '@hotels2023nestjs/shared';
+import { Body, Controller, Get, Inject, Param, Post, Req, Res, UseFilters } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import {Response} from "express";
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {Request, Response} from "express";
 import {firstValueFrom, lastValueFrom} from "rxjs";
+import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
+import { rpcToHttp } from 'src/filters/proxy.error';
+import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
+import { MessageOutput } from 'src/types/message-output.type';
+import { TokenPair } from 'src/types/token.pair';
 
+@ApiTags('Авторизация')
 @Controller('auth')
 export class AuthController {
 
@@ -10,9 +18,25 @@ export class AuthController {
       @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
+  @UseFilters(AllExceptionsFilter)
+  @ApiOperation({ summary: 'Регистрация' })
+  @ApiResponse({ status: 201, type: MessageOutput })
+  @Post('registration')
+  async registration(
+      @Body(DtoValidationPipe) dto: CreateUserDto, 
+      @Res({ passthrough: true }) response: Response
+  ) {
+      const {accessToken, refreshToken} = await lastValueFrom(this.authService.send({cmd: 'registration'}, dto));
+      response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+      response.cookie('accessToken', accessToken, {maxAge: 15 * 60 * 1000, httpOnly: true});
+      return {"message": `Регистрация успешна, добро пожаловать на борт, ${dto.email}!`};
+  }
+
+  @ApiOperation({ summary: 'Логин' })
+  @ApiResponse({ status: 200, type: MessageOutput })
   @Post('login')
   async login(
-    @Body() dto: any, 
+    @Body(DtoValidationPipe) dto: CreateUserDto, 
     @Res({ passthrough: true }) response: Response
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
@@ -21,60 +45,44 @@ export class AuthController {
     return {"message": "Логин успешен, токены ищи в куках"};
   }
 
-    // @RoleAccess({minRoleVal: initRoles.ADMIN.value, allowSelf: true})
-    // @UseGuards(RolesGuard)
-    @Post('registration')
-    async registration(
-        @Body() dto: any, 
-        @Res({ passthrough: true }) response: Response
-    ) {
-        const userData = await lastValueFrom(this.authService.send({cmd: 'registration'}, dto));
-        response.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-        return userData;
-    }
-
-    // @RoleAccess(initRoles.ADMIN.value)
-    // @UseGuards(RolesGuard)
-    @Post('vk')
-    async addRole(
-        @Body() auth: any, 
-        @Res({ passthrough: true }) response: Response
-    ) {
-        return this.authService.send(
-            {
-                cmd: 'vk',
-            },
-            {auth, response},
-        )
-    }
-  // @RoleAccess(initRoles.ADMIN.value)
-    // @UseGuards(RolesGuard)
+    @ApiOperation({ summary: 'Логаут' })
+    @ApiResponse({ status: 200, type: MessageOutput })
     @Post('logout')
     async logout(
-        @Body() token: any, 
+        @Req() request: Request,
         @Res({ passthrough: true }) response: Response
     ) {
-        return this.authService.send(
-            {
-                cmd: 'logout',
-            },
-            {token, response},
-        )
+        response.clearCookie('refreshToken');
+        const { refreshToken } = request.cookies;
+        await firstValueFrom( this.authService.send({cmd: 'logout'}, refreshToken) );
+        return {"message": "Вы успешно вышли из системы (рефреш токен удален)."}
     }  
     
-    // @RoleAccess(initRoles.ADMIN.value)
-    // @UseGuards(RolesGuard)
+    @ApiOperation({ summary: 'Получение нового токена доступа' })
+    @ApiResponse({ status: 200, type: MessageOutput })
     @Post('refresh')
     async refresh(
-        @Body() token: any, 
+        @Req() request: Request,
         @Res({ passthrough: true }) response: Response
     ) {
-        return this.authService.send(
-            {
-                cmd: 'refresh',
-            },
-            {token, response},
-        )
+        const { refreshToken } = request.cookies;
+        
+        const { accessToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, refreshToken) );
+        response.cookie('accessToken', accessToken, {maxAge: 15 * 60 * 1000, httpOnly: true});
+        return {"message": "Токен доступа успешно обновлен."}
     }
-
 }
+
+   // Пока что закомментировал, чтобы фронты дергали роут
+    // @Post('vk')
+    // async addRole(
+    //     @Body() auth: any, 
+    //     @Res({ passthrough: true }) response: Response
+    // ) {
+    //     return this.authService.send(
+    //         {
+    //             cmd: 'vk',
+    //         },
+    //         {auth, response},
+    //     )
+    // }

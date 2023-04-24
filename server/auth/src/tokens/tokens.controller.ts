@@ -10,7 +10,7 @@ export class TokensController {
 
     @MessagePattern({ cmd: 'remove_token' })
     async remove(@Payload() token: Token, response) {
-        return await this.tokenService.removeToken(token, response);
+        return await this.tokenService.removeToken(token);
     }
 
     @MessagePattern({ cmd: 'get_id_by_token' })

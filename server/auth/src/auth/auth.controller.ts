@@ -5,7 +5,9 @@ import { LoginDto } from './dto/login.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { AuthVK } from 'src/vk/vk.model';
 import { VkService } from 'src/vk/vk.service';
+import { ExceptionFilter } from '../rpc-exception.filter';
 
+@UseFilters(ExceptionFilter)
 @Controller('auth')
 export class AuthController {
 
@@ -29,20 +31,18 @@ export class AuthController {
     }
 
 
-    // @UseFilters(new HttpExceptionFilter())
     @MessagePattern({ cmd: 'login' })
     async login(
         // @Ctx() context: RmqContext,
-        @Payload('dto') dto: LoginDto, 
-        @Payload('response') response
+        @Payload() dto: LoginDto, 
+        // @Payload('response') response // Женя: закомментил респонс и убрал его из всей цепочки
     ){
         // this.sharedService.acknowledgeMessage(context);
         // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
 
-        return await this.authService.login(dto, response); 
+        return await this.authService.login(dto); 
     }
 
-    // @UseFilters(new HttpExceptionFilter())
     @MessagePattern({ cmd: 'registration' })
     async registration(
         // @Ctx() context: RmqContext,
@@ -57,28 +57,21 @@ export class AuthController {
         // return await this.authService.registration(dto, response);
     }
 
-    // @UseFilters(new HttpExceptionFilter())
     @MessagePattern({ cmd: 'logout' })
     async logout(
         // @Ctx() context: RmqContext,
-        @Payload('token') refreshToken,
-        @Payload('response') response
+        @Payload() refreshToken,
     ) {
         // this.sharedService.acknowledgeMessage(context);
         // console.log(`[auth][users.controller][createUser] +`);
 
-        return await this.authService.logout(refreshToken, response);
+        return await this.authService.logout(refreshToken);
     }
 
-    // @UseFilters(new HttpExceptionFilter())
-    // @MessagePattern({ cmd: 'refresh' })
-    // async refresh(
-    //     // @Ctx() context: RmqContext,
-    //     @Payload('token') refreshToken,
-    //     @Payload('response') response
-    // ) {
-    //     // this.sharedService.acknowledgeMessage(context);
-    //
-    //     return await this.tokenService.refresh(refreshToken, response);
-    // }
+    @MessagePattern({ cmd: 'refresh' })
+    async refresh(
+        @Payload() refreshToken,
+    ) {
+        return await this.tokenService.refresh(refreshToken);
+    }
 }

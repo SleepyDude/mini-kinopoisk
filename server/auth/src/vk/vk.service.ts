@@ -59,7 +59,7 @@ export class VkService {
         const _user : any = await firstValueFrom(user$);
 
         if (_user) {
-          return await this.authService.login({..._user}, response, true);
+          return await this.authService.login({..._user}, true);
         }
     
         try {
@@ -79,7 +79,7 @@ export class VkService {
 
           // создать профиль
     
-          return this.authService.login(user, response, true);
+          return this.authService.login(user, true);
         } catch (err) {
             console.log(err)
           throw new BadRequestException(err);

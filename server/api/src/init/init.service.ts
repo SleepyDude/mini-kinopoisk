@@ -19,7 +19,7 @@ export class InitService {
             map((value) => {
                 return value;
             }),
-            rpcToHttp()
+            // rpcToHttp()
         ));
 
         console.log(`[init.service][init] ownerRole: ${JSON.stringify(ownerRole)}`);
@@ -36,17 +36,8 @@ export class InitService {
         await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, initRoles['OWNER']));
 
         // Зарегистрируем владельца ресурса
-
-        // // TODO - обращение к микросервису авторизации
-
-        // const {id} = await this.authService.register({
-        //     email: initDto.email,
-        //     password: initDto.password,
-        // })
-        // // Пока что без модуля авторизации буду просто создавать пользователя
         const tokens = await firstValueFrom(this.authService.send({ cmd: 'registration' }, initDto).pipe(
             map( (val) => {
-                // console.log(`[init][pipe 'registration'] val: ${JSON.stringify(val)}`);
                 return val;
             }),
             catchError(val => {
