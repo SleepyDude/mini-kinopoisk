@@ -29,11 +29,11 @@ export class InitService {
 
         // Создаём 3 базовые роли - USER, ADMIN и OWNER
         console.log(`before USER creation`)
-        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, initRoles['USER']));
+        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['USER']} ));
         console.log(`before ADMIN creation`)
-        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, initRoles['ADMIN']));
-        console.log(`before OWNER creation`)
-        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, initRoles['OWNER']));
+        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['ADMIN']} ));
+        console.log(`before OWNER creation`)    
+        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['OWNER']} ));
 
         // Зарегистрируем владельца ресурса
         const tokens = await firstValueFrom(this.authService.send({ cmd: 'registration' }, initDto).pipe(
@@ -50,9 +50,12 @@ export class InitService {
             })
         ));
         
-        // // Присвоим владельцу ресурса соответствующую роль
+        // Присвоим владельцу ресурса соответствующую роль
         await firstValueFrom(this.usersService.send({ cmd: 'add-role-to-user-by-email' }, {email: initDto.email, roleName: initRoles.OWNER.name}));
         
-        return tokens;
+        // старый токен уже ее не содержит, обновим
+        const { accessToken, newRefreshToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, tokens.refreshToken) );
+
+        return { accessToken, refreshToken: newRefreshToken };
     }
 }

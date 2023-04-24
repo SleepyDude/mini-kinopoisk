@@ -9,8 +9,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(cookieParser())
 
-  const PORT = 3000;
-
   const config = new DocumentBuilder()
     .setTitle('Фильмы. Финальный проект')
     .setDescription('Документация REST API')
@@ -20,11 +18,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/api/docs', app, document);
 
-
-
-  await app.listen(PORT, () => {
-    console.log(`Сервер запущен на внутреннем порту ${PORT}`);
-  }); // Внутри контейнера порт 3000 всегда
+  const PORT = 3000;
+  await app.listen(PORT); // Внутри контейнера порт 3000 всегда
 }
 
 bootstrap();

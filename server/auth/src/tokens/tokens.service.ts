@@ -105,7 +105,7 @@ async getUserIdByRefreshToken(refreshToken) {
     const userDto = new UserDto(user);
     const tokens = await this.generateAndSaveToken({...userDto});
   
-    return {accessToken: tokens.accessToken, newRefreshToken: tokens.refreshToken};
-    }
+    return {accessToken: tokens.accessToken, newRefreshToken: tokens.refreshToken}; // думаю пару удобнее возвращать со стандартными именами (Женя)
+  }
 
 }
