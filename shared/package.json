@@ -1,0 +1,31 @@
+{
+  "name": "@hotels2023nestjs/shared",
+  "version": "1.2.0",
+  "description": "Sharable data for cooperative nestjs project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && tsc",
+    "prepublish": "npm run build"
+  },
+  "author": "Igor, Alex, Evgenii",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.4"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/microservices": "^9.4.0",
+    "@nestjs/swagger": "^6.3.0",
+    "class-validator": "^0.14.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "sequelize": "^6.31.0",
+    "sequelize-typescript": "^2.1.5"
+  }
+}

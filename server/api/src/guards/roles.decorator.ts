@@ -1,5 +1,4 @@
 import { SetMetadata } from "@nestjs/common";
-// import { CreateRoleDto } from "../dto";
 
 export interface RoleDecoratorParams {
     minRoleVal: number; // Минимальное значение для доли

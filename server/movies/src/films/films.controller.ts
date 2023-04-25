@@ -7,7 +7,7 @@ export class FilmsController {
   constructor(private filmsService: FilmsService) {}
 
   @MessagePattern({ cmd: 'get-all-films' })
-  getAllFilms(@Payload() params) {
+  getAllFilms(@Payload() params)  {
     return this.filmsService.getAllFilms(params);
   }
 

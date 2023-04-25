@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Inject, UnauthorizedException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
@@ -11,7 +11,7 @@ export class RolesGuard implements CanActivate {
 
     constructor(
         private readonly reflector: Reflector,
-        @Inject('USERS_SERVICE') private readonly authService: ClientProxy,
+        @Inject('AUTH-SERVICE') private readonly authService: ClientProxy,
     ) {}
 
     canActivate(
@@ -39,9 +39,10 @@ export class RolesGuard implements CanActivate {
 
         const jwt = authHeaderParts[1];
 
-        return this.authService.send({ cmd: 'verify-jwt' }, { jwt }).pipe(
+        return this.authService.send({ cmd: 'verify-access-token' }, jwt).pipe(
             switchMap((value) => {
-                const { email, roles } = value as { email: string, roles: Array<any>};
+                console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
+                const { email, id, roles } = value as { email: string, id: number, roles: Array<any>};
 
                 const { error } = value;
 
@@ -69,7 +70,10 @@ export class RolesGuard implements CanActivate {
                 // Теперь используем объект пользователя для проверки ролей
                 console.log(`[api][roles.guard] request.params: ${JSON.stringify(request.params)}`)
                 
-                if (roleParams.allowSelf && request.params['email'] == email) return of(true);
+                // Как узнать, что пользователь собирается взять параметры о себе? Если мы договоримся, что
+                // берем данные о пользователе только как параметры и что эти данные только email либо id.
+                if (roleParams.allowSelf && 
+                    ( request.params['email'] == email || request.params['id'] == id)) return of(true);
 
                 // Считаем максимальный уровень доступа для пользователя (записываем его в реквест чтобы можно было в декораторе достать)
                 request.userMaxPermission = Math.max(...roles.map( role => role.value ));
@@ -77,12 +81,12 @@ export class RolesGuard implements CanActivate {
                 if (request.userMaxPermission >= roleParams.minRoleVal) return of(true);
 
                 // если с ролями не получилось, то выкидываем ошибку, которая будет сразу поймана парой строк дальше
-                throw new UnauthorizedException('Недостаточно прав')
+                throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
             }),
             catchError( (error) => {
-                if (error instanceof UnauthorizedException)
+                if (error instanceof HttpException)
                     throw error;
-                throw new UnauthorizedException('Ошибка валидации токена');
+                throw new HttpException('Невалидный токен', HttpStatus.UNAUTHORIZED);
             })
         );
     }
