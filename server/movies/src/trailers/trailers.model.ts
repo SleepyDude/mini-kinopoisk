@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -6,10 +7,9 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { Films } from '../films/films.model';
-import { Genres } from './genres.model';
 
-@Table({ tableName: 'genres_films' })
-export class GenresFilms extends Model<GenresFilms> {
+@Table({ tableName: 'trailers' })
+export class Trailers extends Model<Trailers> {
   @Column({
     type: DataType.INTEGER,
     unique: true,
@@ -18,11 +18,19 @@ export class GenresFilms extends Model<GenresFilms> {
   })
   id: number;
 
+  @Column({ type: DataType.TEXT })
+  url: string;
+
+  @Column({ type: DataType.STRING })
+  name: string;
+
+  @Column({ type: DataType.STRING })
+  site: string;
+
   @ForeignKey(() => Films)
   @Column({ type: DataType.INTEGER })
-  filmId: number;
+  kinopoiskFilmId: number;
 
-  @ForeignKey(() => Genres)
-  @Column({ type: DataType.INTEGER })
-  genreId: number;
+  @BelongsTo(() => Films)
+  film: Films[];
 }
