@@ -40,16 +40,10 @@ export class UsersController {
         return await this.usersService.getUserById(id); 
     }
 
-    // @UseFilters(new HttpExceptionFilter())
     @MessagePattern({ cmd: 'create-user' })
     async createUser(
-        // @Ctx() context: RmqContext,
         @Payload() dto: CreateUserDto,
     ) {
-        console.log('DTOO: ', dto)
-        // this.sharedService.acknowledgeMessage(context);
-        // console.log(`[auth][users.controller][createUser] +`);
-
         return await this.usersService.createUser(dto);
     }
 
