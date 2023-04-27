@@ -17,7 +17,7 @@ export class UsersService {
 
     async createUser(dto: CreateUserDto): Promise<number> {
         const role = await this.roleService.getRoleByName('USER');
-        console.log(`test get role: ${JSON.stringify(role)}`);
+        // console.log(`test get role: ${JSON.stringify(role)}`);
 
         if (role === null) {
             throw new RpcException("Роль 'USER' не найдена, необходимо выполнение инициализации ресурса");
@@ -28,7 +28,7 @@ export class UsersService {
             await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
             return user.id;
         } catch (e) {
-            console.log(`\nError in userRepository.create:\n\n${JSON.stringify(e)}\n\n`);
+            // console.log(`\nError in userRepository.create:\n\n${JSON.stringify(e)}\n\n`);
             throw new RpcException("Пользователь уже существует");
         }
     }
