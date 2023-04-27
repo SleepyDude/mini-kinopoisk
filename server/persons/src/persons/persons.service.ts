@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PersonsFilms } from './persons.staff.m2m.model';
 import { Persons } from './persons.model';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class PersonsService {
@@ -11,21 +12,25 @@ export class PersonsService {
     @InjectModel(Persons) private personsRepository: typeof Persons,
   ) {}
 
-  async getStaffByFilmId(id) {
+  async getStaffByFilmIdPrevious(id) {
     const actors = [];
     const staff = await this.personsFilmsRepository.findAll({
-      where: { kinopoiskFilmId: id },
+      where: { filmId: id },
+      limit: 10,
     });
-    console.log('+++++', staff);
     for (const personId of staff) {
-      const person = await this.getPersonById(personId.personId);
       actors.push({
-        personId: personId.personId,
         professionText: personId.professionText,
         professionKey: personId.professionKey,
-        person: person,
+        person: await this.personsRepository.findOne({
+          attributes: {
+            exclude: ['createdAt', 'updatedAt'],
+          },
+          where: { personId: personId.staffId },
+        }),
       });
     }
+
     return actors;
   }
 
