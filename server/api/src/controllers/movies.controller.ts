@@ -1,6 +1,16 @@
 import {Controller, Get, Inject, Param, Query} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+    ApiExcludeEndpoint,
+    ApiOperation,
+    ApiParam,
+    ApiProperty,
+    ApiQuery,
+    ApiResponse,
+    ApiTags
+} from "@nestjs/swagger";
+import { NameQuery, PageQuery, SizeQuery } from "../types/pagination.query.enum";
+import { FiltersTypeQuery } from "../types/filters.query.enum";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -11,6 +21,9 @@ export class MoviesController {
         @Inject('PERSONS-SERVICE') private personsService: ClientProxy,
     ) {}
 
+    @ApiQuery({ name: 'name', enum: NameQuery })
+    @ApiQuery({ name: 'size' })
+    @ApiQuery({ name: 'page' })
     @ApiOperation({ summary: 'Каталог фильмов' })
     @ApiResponse({ status: 200, description: 'Список фильмов с пагинацией для каталога' })
     @Get()
@@ -18,6 +31,7 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-all-films' }, param);
     }
 
+    @ApiParam({name: 'id'})
     @ApiOperation({ summary: 'Все о фильме по айди' })
     @ApiResponse({ status: 200, description: 'Вся информация о фильме' })
     @Get('/about/:id')
@@ -25,6 +39,12 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-film-byId' }, id);
     }
 
+    @ApiQuery({ name: 'year' })
+    @ApiQuery({ name: 'genreId' })
+    @ApiQuery({ name: 'countryId' })
+    @ApiQuery({ name: 'type', enum: FiltersTypeQuery, description: 'Фильмы или сериалы' })
+    @ApiQuery({ name: 'ratingKinopoisk', description: 'Значения с точкой "8.1"' })
+    @ApiQuery({ name: 'ratingKinopoiskVoteCount', description: 'максимальные значения не достигают миллиона'})
     @ApiOperation({ summary: 'Фильтр по фильмам' })
     @ApiResponse({ status: 200, description: 'Фильтрация по квери строке' })
     @Get('/filters')
@@ -46,8 +66,9 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-all-countries' }, {})
     }
 
-    @ApiOperation({ summary: 'Полный список людей из фильма' })
-    @ApiResponse({ status: 200, description: 'Выводит полный список актеров по филь айди' })
+    @ApiParam({ name: 'id', description: 'Это долгий запрос' })
+    @ApiOperation({ summary: 'Полный список персонала фильма' })
+    @ApiResponse({ status: 200, description: 'Выводит полный список актеров по фильм айди' })
     @Get('/about/:id/staff')
     getStaffByFilmId(@Param('id') id) {
         return this.personsService.send({ cmd: 'get-staff-by-filmId' }, id)
