@@ -14,4 +14,8 @@ export class CountriesService {
   async getCountryById(countryId: number) {
     return await this.countriesRepository.findOne({ where: { id: countryId } });
   }
+
+  async getAllCountries() {
+    return await this.countriesRepository.findAll();
+  }
 }
