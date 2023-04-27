@@ -22,7 +22,12 @@ export class FilmsController {
   }
 
   @MessagePattern({ cmd: 'get-films-byFilters' })
-  getFilmsByFilters(@Payload() params) {
-    return this.filmsService.getFilmsByFilers(params);
+  async getFilmsByFilters(@Payload() params) {
+    return await this.filmsService.getFilmsByFilers(params);
+  }
+
+  @MessagePattern({ cmd: 'get-films-autosagest' })
+  async filmsAutosagest(@Payload() params) {
+    return await this.filmsService.filmsAutosagest(params);
   }
 }

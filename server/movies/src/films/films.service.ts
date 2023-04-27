@@ -78,6 +78,7 @@ export class FilmsService {
     const films = [];
     const genres = [];
     const countries = [];
+    const orderBy = [];
 
     const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);
@@ -97,9 +98,13 @@ export class FilmsService {
       if (key === 'countryId') {
         countries.push(value);
       }
+
+      if (key === 'orderBy') {
+        orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC']);
+      }
     }
 
-    return this.filmsRepository.findAndCountAll({
+    return await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
         'nameRu',
@@ -127,15 +132,17 @@ export class FilmsService {
       ],
       limit,
       offset,
+      order: orderBy,
     });
   }
 
   async getFilmsByIdPrevious(filmsId) {
     const films = [];
+    console.log(filmsId);
     for (const item of filmsId) {
       films.push(
         await this.filmsRepository.findAll({
-          where: item.id,
+          where: item.filmId,
           attributes: [
             'id',
             'year',
@@ -158,5 +165,13 @@ export class FilmsService {
     const offset = page ? page * limit : 0;
 
     return { limit, offset };
+  }
+
+  async filmsAutosagest(params) {
+    return await this.filmsRepository.findAll({
+      attributes: ['id', 'nameRu'],
+      where: { nameRu: { [Op.iLike]: `%${params}%` } },
+      limit: 10,
+    });
   }
 }
