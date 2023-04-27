@@ -132,10 +132,11 @@ export class FilmsService {
 
   async getFilmsByIdPrevious(filmsId) {
     const films = [];
+    console.log(filmsId);
     for (const item of filmsId) {
       films.push(
         await this.filmsRepository.findAll({
-          where: item.id,
+          where: item.filmId,
           attributes: [
             'id',
             'year',
