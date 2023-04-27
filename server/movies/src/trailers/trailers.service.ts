@@ -8,8 +8,10 @@ export class TrailersService {
     @InjectModel(Trailers) private trailersRepository: typeof Trailers,
   ) {}
   async createTrailer(trailerData) {
-    let isTrailer = await this.trailersRepository.findOne({where: {kinopoiskFilmId: trailerData.id } });
-    if ( !isTrailer ) {
+    const isTrailer = await this.trailersRepository.findOne({
+      where: { kinopoiskFilmId: trailerData.id },
+    });
+    if (!isTrailer) {
       return await this.trailersRepository.create(trailerData.trailer);
     }
     return isTrailer;

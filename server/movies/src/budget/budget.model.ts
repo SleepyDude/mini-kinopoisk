@@ -1,10 +1,11 @@
 import {
   BelongsToMany,
   Column,
-  DataType, ForeignKey,
+  DataType,
+  ForeignKey,
   Model,
-  Table
-} from "sequelize-typescript";
+  Table,
+} from 'sequelize-typescript';
 import { Films } from '../films/films.model';
 import { BudgetFilms } from './budget.m2m.model';
 
