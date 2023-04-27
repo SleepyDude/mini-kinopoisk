@@ -7,17 +7,22 @@ export class FilmsController {
   constructor(private filmsService: FilmsService) {}
 
   @MessagePattern({ cmd: 'get-all-films' })
-  getAllFilms(@Payload() params)  {
-    return this.filmsService.getAllFilms(params);
+  async getAllFilms(@Payload() params) {
+    return await this.filmsService.getAllFilms(params);
   }
 
   @MessagePattern({ cmd: 'get-film-byId' })
-  getFilmById(@Payload() id) {
-    return this.filmsService.getFilmById(id);
+  async getFilmById(@Payload() id) {
+    return await this.filmsService.getFilmById(id);
   }
 
-  @MessagePattern({ cmd: 'test-movies' })
-  test() {
-    return 'Test done';
+  @MessagePattern({ cmd: 'get-films-byId-previous' })
+  async getFilmsByIdPrevious(@Payload() filmsId) {
+    return await this.filmsService.getFilmsByIdPrevious(filmsId);
+  }
+
+  @MessagePattern({ cmd: 'get-films-byFilters' })
+  getFilmsByFilters(@Payload() params) {
+    return this.filmsService.getFilmsByFilers(params);
   }
 }
