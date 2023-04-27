@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import sequelize, { col, fn, literal, Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 
@@ -78,7 +78,7 @@ export class FilmsService {
     const films = [];
     const genres = [];
     const countries = [];
-    let orderBy = [];
+    const orderBy = [];
 
     const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);

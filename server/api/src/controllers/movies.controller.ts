@@ -7,9 +7,8 @@ import {
     ApiResponse,
     ApiTags
 } from "@nestjs/swagger";
-import { NameQuery, PageQuery, SizeQuery } from "../types/pagination.query.enum";
+import { NameQuery } from "../types/pagination.query.enum";
 import { FiltersOrderByQuery, FiltersTypeQuery } from "../types/filters.query.enum";
-import { raw } from "express";
 
 @ApiTags('Фильмы')
 @Controller('movies')
