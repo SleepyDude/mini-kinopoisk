@@ -160,4 +160,12 @@ export class FilmsService {
 
     return { limit, offset };
   }
+
+  async filmsAutosagest(params) {
+    return await this.filmsRepository.findAll({
+      attributes: ['id', 'nameRu'],
+      where: { nameRu: { [Op.iLike]: `%${params}%` } },
+      limit: 10,
+    });
+  }
 }

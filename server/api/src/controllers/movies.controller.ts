@@ -1,16 +1,15 @@
 import {Controller, Get, Inject, Param, Query} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
-    ApiExcludeEndpoint,
     ApiOperation,
     ApiParam,
-    ApiProperty,
     ApiQuery,
     ApiResponse,
     ApiTags
 } from "@nestjs/swagger";
 import { NameQuery, PageQuery, SizeQuery } from "../types/pagination.query.enum";
 import { FiltersTypeQuery } from "../types/filters.query.enum";
+import { raw } from "express";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -72,6 +71,13 @@ export class MoviesController {
     @Get('/about/:id/staff')
     getStaffByFilmId(@Param('id') id) {
         return this.personsService.send({ cmd: 'get-staff-by-filmId' }, id)
+    }
+
+    @ApiOperation({ summary: 'Автосаджест' })
+    @ApiResponse({ status: 200, description: 'выводит по 10 элементов из запроса' })
+    @Get('/:name')
+    getFilmsAutosagest(@Param('name') name: string) {
+        return this.moviesService.send({ cmd: 'get-films-autosagest' }, name)
     }
 
     //Сортировать по количеству оценок на кинопоиске, рейтинг, дата выхода(сперва свежие)
