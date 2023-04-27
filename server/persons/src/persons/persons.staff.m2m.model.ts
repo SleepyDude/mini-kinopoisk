@@ -11,10 +11,10 @@ export class PersonsFilms extends Model<PersonsFilms> {
   id: number;
 
   @Column({ type: DataType.INTEGER })
-  kinopoiskFilmId: number;
+  filmId: number;
 
   @Column({ type: DataType.INTEGER })
-  personId: number;
+  staffId: number;
 
   @Column({ type: DataType.STRING })
   professionText: string;

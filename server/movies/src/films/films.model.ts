@@ -1,19 +1,20 @@
 import {
   BelongsToMany,
   Column,
-  DataType, HasMany,
+  DataType,
+  HasMany,
   Model,
-  Table
-} from "sequelize-typescript";
+  Table,
+} from 'sequelize-typescript';
 import { Budget } from '../budget/budget.model';
 import { Countries } from '../countries/countries.model';
 import { Genres } from '../genres/genres.model';
 import { BudgetFilms } from '../budget/budget.m2m.model';
 import { CountriesFilms } from '../countries/countries.m2m.model';
 import { GenresFilms } from '../genres/genres.m2m.model';
-import { Trailers } from "../trailers/trailers.model";
-import { SimilarFilms } from "./films.similar.m2m.model";
-import { Similar } from "./films.similar.model";
+import { Trailers } from '../trailers/trailers.model';
+import { SimilarFilms } from './films.similar.m2m.model';
+import { Similar } from './films.similar.model';
 
 @Table({ tableName: 'films' })
 export class Films extends Model<Films> {

@@ -5,7 +5,7 @@ import { GenresModule } from './genres/genres.module';
 import { CountriesModule } from './countries/countries.module';
 import { BudgetModule } from './budget/budget.module';
 import { ReviewsModule } from './reviews/reviews.module';
-import { TrailersModule } from "./trailers/trailers.module";
+import { TrailersModule } from './trailers/trailers.module';
 
 @Module({
   imports: [

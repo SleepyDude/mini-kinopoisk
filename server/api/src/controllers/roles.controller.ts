@@ -21,7 +21,7 @@ export class RolesController {
       @Inject('USERS-SERVICE') private usersService: ClientProxy,
   ) {}
 
-  
+
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
   @ApiOperation({ summary: 'Создание новой роли' })
