@@ -10,7 +10,11 @@ export class GenresService {
     @InjectModel(GenresFilms) private genresFilmsRepository: typeof GenresFilms,
   ) {}
 
-  async getCountryById(genreId: number) {
+  async getGenreById(genreId: number) {
     return await this.genresRepository.findOne({ where: { id: genreId } });
+  }
+
+  async getAllGenres() {
+    return await this.genresRepository.findAll();
   }
 }

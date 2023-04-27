@@ -17,12 +17,12 @@ export class AuthController {
       @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
-  
+
   @ApiOperation({ summary: 'Регистрация' })
   @ApiResponse({ status: 201, type: TokenEmail, description: 'Регистрация, refresh token записывает в куки' })
   @Post('registration')
   async registration(
-      @Body(DtoValidationPipe) dto: CreateUserDto, 
+      @Body(DtoValidationPipe) dto: CreateUserDto,
       @Res({ passthrough: true }) response: Response
   ) {
       const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'registration'}, dto));
@@ -34,7 +34,7 @@ export class AuthController {
   @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
   @Post('login')
   async login(
-    @Body(DtoValidationPipe) dto: CreateUserDto, 
+    @Body(DtoValidationPipe) dto: CreateUserDto,
     @Res({ passthrough: true }) response: Response
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
@@ -53,8 +53,8 @@ export class AuthController {
         response.clearCookie('refreshToken');
         const success =  await firstValueFrom(this.authService.send({cmd: 'logout'}, refreshToken));
         return !!success;
-    }  
-    
+    }
+
     @ApiOperation({ summary: 'Получение нового токена доступа' })
     @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
     @Post('refresh')
