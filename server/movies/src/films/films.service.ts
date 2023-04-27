@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { Op } from 'sequelize';
+import sequelize, { col, fn, literal, Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 
@@ -78,6 +78,7 @@ export class FilmsService {
     const films = [];
     const genres = [];
     const countries = [];
+    let orderBy = [];
 
     const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);
@@ -97,9 +98,13 @@ export class FilmsService {
       if (key === 'countryId') {
         countries.push(value);
       }
+
+      if (key === 'orderBy') {
+        orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC']);
+      }
     }
 
-    return this.filmsRepository.findAndCountAll({
+    return await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
         'nameRu',
@@ -127,6 +132,7 @@ export class FilmsService {
       ],
       limit,
       offset,
+      order: orderBy,
     });
   }
 

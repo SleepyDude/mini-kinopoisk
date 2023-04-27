@@ -8,7 +8,7 @@ import {
     ApiTags
 } from "@nestjs/swagger";
 import { NameQuery, PageQuery, SizeQuery } from "../types/pagination.query.enum";
-import { FiltersTypeQuery } from "../types/filters.query.enum";
+import { FiltersOrderByQuery, FiltersTypeQuery } from "../types/filters.query.enum";
 import { raw } from "express";
 
 @ApiTags('Фильмы')
@@ -38,6 +38,7 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-film-byId' }, id);
     }
 
+    @ApiQuery({ name: 'orderBy', enum: FiltersOrderByQuery, description: 'Сортировка' })
     @ApiQuery({ name: 'year' })
     @ApiQuery({ name: 'genreId' })
     @ApiQuery({ name: 'countryId' })
