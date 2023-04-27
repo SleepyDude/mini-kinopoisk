@@ -35,6 +35,57 @@ export class PersonsService {
   }
 
   async getPersonById(id) {
-    return await this.personsRepository.findOne({ where: { personId: id } });
+    const filmsId = await this.personsFilmsRepository.findAll({
+      where: { staffId: id },
+    });
+    const person = await this.personsRepository.findOne({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+      where: { personId: id },
+    });
+    return {
+      filmsId: filmsId,
+      person: person,
+    };
+  }
+
+  async getAllPersons(params) {
+    const { page, size, name } = params;
+    const condition = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
+    const { limit, offset } = this.getPagination(page, size);
+
+    return await this.personsRepository.findAndCountAll({
+      where: condition,
+      limit,
+      offset,
+    });
+  }
+
+  async getStaffByFilmId(id) {
+    const actors = [];
+    const staff = await this.personsFilmsRepository.findAll({
+      where: { filmId: id },
+    });
+    for (const personId of staff) {
+      actors.push({
+        professionText: personId.professionText,
+        professionKey: personId.professionKey,
+        person: await this.personsRepository.findOne({
+          attributes: {
+            exclude: ['createdAt', 'updatedAt'],
+          },
+          where: { personId: personId.staffId },
+        }),
+      });
+    }
+    return actors;
+  }
+
+  private getPagination(page, size) {
+    const limit = size ? +size : 10;
+    const offset = page ? page * limit : 0;
+
+    return { limit, offset };
   }
 }
