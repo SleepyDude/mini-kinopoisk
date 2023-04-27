@@ -3,59 +3,57 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { RolesService } from "../roles/roles.service";
 import { User } from "./users.model";
 import { UsersService } from "./users.service";
-import { createMock, DeepMocked } from '@golevelup/ts-jest';
 
-class RoleServiceMock {
-    getRoleByName(name: string) {
-        return {
-            id: 9,
-            name: 'ROLENAME',
-            value: 4,
-            description: 'tesing role',
-        }
-    }
-}
+/*
+// Успешное создание пользователяя
+// 
+// 
+*/
 
 describe('UsersService', () => {
     let usersService: UsersService;
-    let rolesService: DeepMocked<RolesService>;
 
     beforeEach(async () => {
 
+        const mockRolesService = {
+            getRoleByName: async (_: string) => ({id: 9})
+        };
+
         const mockUserRepository = {
-            create: jest.fn(),
+            create: async (dto: any) => {
+                console.log(`[mock usrRep][create] dto: ${JSON.stringify(dto)}`);
+                return  { $set: () => jest.fn(), id: 13 };
+            },
         }
 
         const module: TestingModule = await Test.createTestingModule({
-            imports: [],
-            providers: [ 
+            providers: [
                 UsersService,
                 {
                     provide: RolesService,
-                    useValue: createMock<RolesService>(),
+                    useValue: mockRolesService,
                 },
                 { 
                     provide: getModelToken(User), 
-                    useValue: { mockUserRepository } 
+                    useValue: mockUserRepository,
                 },
             ],
         }).compile();
 
         usersService = module.get<UsersService>(UsersService);
-        rolesService = module.get(RolesService);
     });
 
     it('UsersService - should be defined', () => {
         expect(usersService).toBeDefined();
     })
 
-    // describe('createUser', () => {
+    describe('createUser', () => {
 
-    // it('Should return userId and create user in database', async () => {
-    //     const userDto = {email: "user@mail.ru", password: "password"};
-    //     console.log(`[test][users.service] userDto: ${JSON.stringify(userDto)}`);
-    //     expect(usersService.createUser(userDto)).toBe(13);
-    // });
+        it('Should return userId. Should call rolesService and get role. Should create object in db', async () => {
+            const userDto = {email: "user@mail.ru", password: "password"};
+            console.log(`[test][users.service] userDto: ${JSON.stringify(userDto)}`);
+            expect(await usersService.createUser(userDto)).toBe(13);
+        });
 
-    // });
+    });
 })
