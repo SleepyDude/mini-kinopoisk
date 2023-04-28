@@ -28,30 +28,30 @@ services:
     ports:
       - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
 
-  # auth:
-  #   container_name: auth-dns-movies
-  #   build: ./server/auth
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-  #     - users
-  #   volumes:
-  #     - ./server/auth:/app
-  #     - /app/node_modules
+  auth:
+    container_name: auth-dns-movies
+    build: ./server/auth
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - rabbitmq
+      - users
+    volumes:
+      - ./server/auth:/app
+      - /app/node_modules
 
-  # users:
-  #   container_name: users-dns-movies
-  #   build: ./server/users
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-  #   volumes:
-  #     - ./server/users:/app
-  #     - /app/node_modules
+  users:
+    container_name: users-dns-movies
+    build: ./server/users
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - ./server/users:/app
+      - /app/node_modules
 
   persons:
     container_name: persons-dns-movies
@@ -84,10 +84,10 @@ services:
       - ./.env
     depends_on:
       - rabbitmq
-      # - users
+      - users
       - persons
       - movies
-      # - auth
+      - auth
     volumes:
       - ./server/api:/app
       - /app/node_modules
