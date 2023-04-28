@@ -1,6 +1,6 @@
 import { RpcException } from "@nestjs/microservices";
 import { getModelToken } from "@nestjs/sequelize";
-import { Test, TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
 import { RolesService } from "../roles/roles.service";
 import { User } from "./users.model";
 import { UsersService } from "./users.service";
