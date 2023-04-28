@@ -5,9 +5,13 @@ import { RolesService } from "../roles/roles.service";
 import { User } from "./users.model";
 import { UsersService } from "./users.service";
 
+const role9Model = () => ({ 
+    id: 9,
+});
+
 const roleServiceMocks = {
-    role9: () => ({
-        getRoleByName: jest.fn( () => ({id: 9}) ),
+    role9: (roleModel: any = role9Model()) => ({
+        getRoleByName: jest.fn( () => roleModel ),
     }),
     roleNull: () => ({
         getRoleByName: jest.fn( () => null ),
@@ -16,7 +20,9 @@ const roleServiceMocks = {
 
 const user13Model = () => ({ 
     $set: jest.fn(),
+    $add: jest.fn(),
     update: jest.fn(),
+    destroy: jest.fn(),
     id: 13,
 });
 
@@ -29,10 +35,12 @@ const userRepMocks = {
         }),
         findAll: jest.fn( () => [userModel] ),
         findOne: jest.fn( () => userModel ),
+        findByPk: jest.fn( () => userModel ),
     }),
 
     userNull: () => ({
         findOne: jest.fn(() => null),
+        findByPk: jest.fn((val) => null),
     }),
 
     // "База" выдает ошибку
@@ -102,8 +110,7 @@ describe('UsersService', () => {
             const usersService = await getUsersService(role9, userThrow);
 
             await expect(usersService.createUser({email: 'a', password: 'b'}))
-                .rejects.toThrow(new RpcException("Пользователь уже существует"),
-            );
+                .rejects.toThrow(new RpcException("Пользователь уже существует"));
             expect(role9.getRoleByName).toHaveBeenCalled();
             expect(userThrow.create).toHaveBeenCalled();
         });
@@ -182,5 +189,141 @@ describe('UsersService', () => {
             expect(u13Model.update).toHaveBeenCalled();
         });
 
+        it('user not found => RpcError', async () => {
+            const userNull = userRepMocks.userNull();
+
+            const usersService = await getUsersService(undefined, userNull);
+
+            expect(usersService.updateUserByEmail('a@mail.ru', {}))
+                .rejects.toThrow(new RpcException("Пользователя с email a@mail.ru не существует"));
+
+            expect(userNull.findOne).toHaveBeenCalled();
+        });
+
     });
+
+    describe('Delete User by email', () => {
+
+        it('method defined', async () => {
+            const usersService = await getUsersService();
+            expect(usersService).toHaveProperty('deleteUserByEmail');
+        });
+
+        it('success delete', async () => {
+            const u13Model = user13Model();
+            const user13 = userRepMocks.user13(u13Model);
+
+            const usersService = await getUsersService(undefined, user13);
+
+            expect(await usersService.deleteUserByEmail('a')).toBe(undefined);
+            expect(user13.findOne).toHaveBeenCalled();
+            expect(u13Model.destroy).toHaveBeenCalled();
+        });
+
+        it('user not found => RpcError', async () => {
+            const userNull = userRepMocks.userNull();
+
+            const usersService = await getUsersService(undefined, userNull);
+
+            expect(usersService.deleteUserByEmail('a@mail.ru'))
+                .rejects.toThrow(new RpcException("Пользователя с email a@mail.ru не существует"));
+
+            expect(userNull.findOne).toHaveBeenCalled();
+        });
+
+    });
+
+    describe('Add role', () => {
+
+        it('method defined', async () => {
+            const usersService = await getUsersService();
+            expect(usersService).toHaveProperty('addRole');
+        });
+
+        it('success add role', async () => {
+            const u13Model = user13Model();
+            const r9Model = role9Model();
+            const user13 = userRepMocks.user13(u13Model);
+            const role9 = roleServiceMocks.role9(r9Model);
+
+            const usersService = await getUsersService(role9, user13);
+
+            expect(await usersService.addRole({roleName: 'a', userId: 1})).toBe(r9Model);
+
+            expect(user13.findByPk).toHaveBeenCalled();
+            expect(u13Model.$add).toHaveBeenCalled();
+            expect(role9.getRoleByName).toHaveBeenCalled();
+        });
+
+        it('user not found => RpcError', async () => {
+            const userNull = userRepMocks.userNull();
+
+            const usersService = await getUsersService(undefined, userNull);
+
+            await expect(usersService.addRole({roleName: 'a', userId: 1}))
+                .rejects.toThrow(new RpcException("Пользователь или роль не найдены"));
+            
+            expect(userNull.findByPk).toHaveBeenCalled();
+
+        });
+
+        it('role not found => RpcError', async () => {
+            const roleNull = roleServiceMocks.roleNull();
+
+            const usersService = await getUsersService(roleNull);
+
+            await expect(usersService.addRole({roleName: 'a', userId: 1}))
+                .rejects.toThrow(new RpcException("Пользователь или роль не найдены"));
+
+            expect(roleNull.getRoleByName).toHaveBeenCalled();
+        });
+
+    });
+
+    describe('Add role By Email', () => {
+
+        it('method defined', async () => {
+            const usersService = await getUsersService();
+            expect(usersService).toHaveProperty('addRoleByEmail');
+        });
+
+        it('success add role', async () => {
+            const u13Model = user13Model();
+            const user13 = userRepMocks.user13(u13Model);
+            const r9Model = role9Model();
+            const role9 = roleServiceMocks.role9(r9Model);
+
+            const usersService = await getUsersService(role9, user13);
+
+            expect(await usersService.addRoleByEmail({roleName: 'a', email: 'b'})).toBe(r9Model);
+
+            expect(user13.findOne).toHaveBeenCalled();
+            expect(u13Model.$add).toHaveBeenCalled();
+            expect(role9.getRoleByName).toHaveBeenCalled();
+        });
+
+        it('user not found => RpcError', async () => {
+            const userNull = userRepMocks.userNull();
+
+            const usersService = await getUsersService(undefined, userNull);
+
+            await expect(usersService.addRoleByEmail({roleName: 'a', email: 'b'}))
+                .rejects.toThrow(new RpcException("Пользователь или роль не найдены"));
+            
+            expect(userNull.findOne).toHaveBeenCalled();
+
+        });
+
+        it('role not found => RpcError', async () => {
+            const roleNull = roleServiceMocks.roleNull();
+
+            const usersService = await getUsersService(roleNull);
+
+            await expect(usersService.addRoleByEmail({roleName: 'a', email: 'b'}))
+                .rejects.toThrow(new RpcException("Пользователь или роль не найдены"));
+
+            expect(roleNull.getRoleByName).toHaveBeenCalled();
+        });
+
+    })
 })
