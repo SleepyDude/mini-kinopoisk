@@ -7,7 +7,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [process.env.CLOUDAMQP_URL],
-      queue: process.env.MOVIES_QUEUE,
+      queue: process.env.PERSONS_QUEUE,
       queueOptions: {
         durable: false,
       },

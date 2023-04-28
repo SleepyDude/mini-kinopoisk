@@ -11,13 +11,11 @@ export class CountriesService {
     private countriesFilmsRepository: typeof CountriesFilms,
   ) {}
 
-  async getCountriesByFilmId(id) {
-    return await this.countriesFilmsRepository.findAll({
-      where: { kinopoiskFilmId: id },
-    });
-  }
-
   async getCountryById(countryId: number) {
     return await this.countriesRepository.findOne({ where: { id: countryId } });
+  }
+
+  async getAllCountries() {
+    return await this.countriesRepository.findAll();
   }
 }

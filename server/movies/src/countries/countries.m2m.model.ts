@@ -1,6 +1,14 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { Films } from '../films/films.model';
+import { Countries } from './countries.model';
 
-@Table({ tableName: 'countries_films' })
+@Table({ tableName: 'films_countries' })
 export class CountriesFilms extends Model<CountriesFilms> {
   @Column({
     type: DataType.INTEGER,
@@ -10,9 +18,11 @@ export class CountriesFilms extends Model<CountriesFilms> {
   })
   id: number;
 
+  @ForeignKey(() => Films)
   @Column({ type: DataType.INTEGER })
-  kinopoiskFilmId: number;
+  filmId: number;
 
+  @ForeignKey(() => Countries)
   @Column({ type: DataType.INTEGER })
   countryId: number;
 }

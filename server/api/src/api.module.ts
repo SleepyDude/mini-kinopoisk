@@ -39,6 +39,15 @@ import { RolesController } from './controllers/roles.controller';
           queueOptions: { durable: false },
         },
       },
+      {
+        name: 'PERSONS-SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.CLOUDAMQP_URL],
+          queue: process.env.PERSONS_QUEUE,
+          queueOptions: { durable: false },
+        },
+      },
     ]),
     InitModule
   ],

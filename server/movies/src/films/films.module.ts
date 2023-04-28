@@ -3,30 +3,26 @@ import { FilmsController } from './films.controller';
 import { FilmsService } from './films.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Films } from './films.model';
-import { CountriesModule } from '../countries/countries.module';
-import { GenresModule } from '../genres/genres.module';
-import { BudgetModule } from '../budget/budget.module';
+import { SimilarFilms } from './films.similar.m2m.model';
+import { Similar } from './films.similar.model';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   controllers: [FilmsController],
   providers: [FilmsService],
   imports: [
+    SequelizeModule.forFeature([Films, Similar, SimilarFilms]),
     ClientsModule.register([
       {
         name: 'MOVIES-SERVICE',
         transport: Transport.RMQ,
         options: {
           urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.MOVIES_QUEUE,
+          queue: process.env.PERSONS_QUEUE,
           queueOptions: { durable: false },
         },
       },
     ]),
-    SequelizeModule.forFeature([Films]),
-    CountriesModule,
-    GenresModule,
-    BudgetModule,
   ],
 })
 export class FilmsModule {}
