@@ -82,6 +82,19 @@ export class PersonsService {
     return actors;
   }
 
+  async getPersonsAutosagest(params) {
+    const { profession, name } = params;
+    console.log(profession);
+    return await this.personsRepository.findAndCountAll({
+      attributes: ['personId', 'nameRu'],
+      where: [
+        { profession: { [Op.iLike]: `%${profession}%` } },
+        { nameRu: { [Op.iLike]: `%${name}%` } },
+      ],
+      limit: 10,
+    });
+  }
+
   private getPagination(page, size) {
     const limit = size ? +size : 10;
     const offset = page ? page * limit : 0;
