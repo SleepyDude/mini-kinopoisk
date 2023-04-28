@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateRoleDto } from './dto/create-role.dto';
-// import { CreateRoleDto } from 'y/shared/dto';
 import { DeleteRoleDto } from './dto/delete-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './roles.model';
@@ -13,7 +12,7 @@ export class RolesService {
     constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
 
     async createRole(dto: CreateRoleDto, userPerm: number = Infinity) {
-        console.log(`[roles.service][create-role] dto: ${JSON.stringify(dto)}`);
+        // console.log(`[roles.service][create-role] dto: ${JSON.stringify(dto)}`);
         if (userPerm <= dto.value) {
             throw new RpcException('Можно создать роль только с меньшими чем у Вас правами');
         }

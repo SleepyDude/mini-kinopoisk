@@ -120,6 +120,7 @@ export class FilmsService {
         'type',
       ],
       where: films,
+      order: orderBy,
       include: [
         {
           model: Genres,
@@ -132,7 +133,7 @@ export class FilmsService {
       ],
       limit,
       offset,
-      order: orderBy,
+      subQuery: false,
     });
   }
 
@@ -160,18 +161,18 @@ export class FilmsService {
     return films;
   }
 
-  private getPagination(page, size) {
-    const limit = size ? +size : 10;
-    const offset = page ? page * limit : 0;
-
-    return { limit, offset };
-  }
-
   async filmsAutosagest(params) {
     return await this.filmsRepository.findAll({
       attributes: ['id', 'nameRu'],
       where: { nameRu: { [Op.iLike]: `%${params}%` } },
       limit: 10,
     });
+  }
+
+  private getPagination(page, size) {
+    const limit = size ? +size : 10;
+    const offset = page ? page * limit : 0;
+
+    return { limit, offset };
   }
 }

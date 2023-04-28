@@ -40,9 +40,10 @@
     "sequelize-typescript": "^2.1.5"
   },
   "devDependencies": {
+    "@golevelup/ts-jest": "^0.3.5",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
-    "@nestjs/testing": "^9.0.0",
+    "@nestjs/testing": "^9.4.0",
     "@types/express": "^4.17.13",
     "@types/jest": "29.2.4",
     "@types/node": "18.11.18",

@@ -9,3 +9,8 @@ export enum FiltersOrderByQuery{
   voteCount = 'ratingKinopoiskVoteCount',
   rating = 'ratingKinopoisk',
 }
+
+export enum FiltersProfessionQuery{
+  director = 'режиссер',
+  actor = 'актер'
+}

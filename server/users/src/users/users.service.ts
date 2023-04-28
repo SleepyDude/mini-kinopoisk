@@ -1,8 +1,6 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
-import { SequelizeScopeError } from 'sequelize';
-// import { AddRoleDto, AddRoleDtoEmail, CreateUserDto, UpdateUserDto } from 'y/shared/dto';
 import { RolesService } from '../roles/roles.service';
 import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -19,6 +17,7 @@ export class UsersService {
 
     async createUser(dto: CreateUserDto): Promise<number> {
         const role = await this.roleService.getRoleByName('USER');
+        // console.log(`test get role: ${JSON.stringify(role)}`);
 
         if (role === null) {
             throw new RpcException("Роль 'USER' не найдена, необходимо выполнение инициализации ресурса");
@@ -29,6 +28,7 @@ export class UsersService {
             await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
             return user.id;
         } catch (e) {
+            // console.log(`\nError in userRepository.create:\n\n${JSON.stringify(e)}\n\n`);
             throw new RpcException("Пользователь уже существует");
         }
     }
@@ -74,7 +74,7 @@ export class UsersService {
 
         if (role && user) {
             await user.$add('roles', role.id);
-            return user;
+            return role;
         }
         
         throw new RpcException('Пользователь или роль не найдены');
