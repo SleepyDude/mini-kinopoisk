@@ -120,6 +120,7 @@ export class FilmsService {
         'type',
       ],
       where: films,
+      order: orderBy,
       include: [
         {
           model: Genres,
@@ -132,7 +133,7 @@ export class FilmsService {
       ],
       limit,
       offset,
-      order: orderBy,
+      subQuery: false,
     });
   }
 

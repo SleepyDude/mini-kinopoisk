@@ -39,6 +39,8 @@ export class MoviesController {
 
     @ApiQuery({ name: 'orderBy', enum: FiltersOrderByQuery, description: 'Сортировка' })
     @ApiQuery({ name: 'year' })
+    @ApiQuery({ name: 'size' })
+    @ApiQuery({ name: 'page' })
     @ApiQuery({ name: 'genreId' })
     @ApiQuery({ name: 'countryId' })
     @ApiQuery({ name: 'type', enum: FiltersTypeQuery, description: 'Фильмы или сериалы' })
