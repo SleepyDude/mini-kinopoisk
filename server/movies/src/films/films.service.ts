@@ -20,7 +20,7 @@ export class FilmsService {
 
     return await this.filmsRepository.findAndCountAll({
       attributes: [
-        'id',
+        'kinopoiskId',
         'nameRu',
         'nameOriginal',
         'posterUrl',
@@ -63,7 +63,7 @@ export class FilmsService {
         ],
       },
       include: { all: true },
-      where: { id: id.id },
+      where: { kinopoiskId: id.id },
     });
     const currentStaff = await lastValueFrom(
       this.moviesClient.send({ cmd: 'get-staff-previous' }, currentFilm.id),

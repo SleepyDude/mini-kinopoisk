@@ -1,4 +1,4 @@
-import {Controller, Get, Inject, Param, Query} from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import {
     ApiOperation,
@@ -9,6 +9,7 @@ import {
 } from "@nestjs/swagger";
 import { NameQuery } from "../types/pagination.query.enum";
 import { FiltersOrderByQuery, FiltersTypeQuery } from "../types/filters.query.enum";
+import { UpdateCountryDto, UpdateGenreDto } from "@hotels2023nestjs/shared";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -25,7 +26,7 @@ export class MoviesController {
     @ApiOperation({ summary: 'Каталог фильмов' })
     @ApiResponse({ status: 200, description: 'Список фильмов с пагинацией для каталога' })
     @Get()
-    async getAllFilms(@Query() param) {
+    getAllFilms(@Query() param) {
         return this.moviesService.send({ cmd: 'get-all-films' }, param);
     }
 
@@ -33,7 +34,7 @@ export class MoviesController {
     @ApiOperation({ summary: 'Все о фильме по айди' })
     @ApiResponse({ status: 200, description: 'Вся информация о фильме' })
     @Get('/about/:id')
-    async getFilmById(@Param() id: number) {
+    getFilmById(@Param() id: number) {
         return this.moviesService.send({ cmd: 'get-film-byId' }, id);
     }
 
@@ -49,14 +50,14 @@ export class MoviesController {
     @ApiOperation({ summary: 'Фильтр по фильмам' })
     @ApiResponse({ status: 200, description: 'Фильтрация по квери строке' })
     @Get('/filters')
-    async getFilmsByFilters(@Query() params) {
+    getFilmsByFilters(@Query() params) {
         return this.moviesService.send({ cmd: 'get-films-byFilters' }, params);
     }
 
     @ApiOperation({ summary: 'Получение списка жанров' })
     @ApiResponse( { status: 200, description: 'Выводит список всех жанров' })
     @Get('/genres')
-    async getAllGenres() {
+    getAllGenres() {
         return this.moviesService.send({ cmd: 'get-all-genres' }, {})
     }
 
@@ -82,6 +83,28 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-autosagest' }, name)
     }
 
-    //Сортировать по количеству оценок на кинопоиске, рейтинг, дата выхода(сперва свежие)
-    // и алфавит
+
+    @ApiOperation({ summary: 'Апдейт жанров по айди' })
+    @ApiResponse({ status: 201, description: 'Обновление жанорв' })
+    @Post('/genres/:id')
+    updateGenreById(
+      @Body() genre: UpdateGenreDto,
+      @Param('id') id,
+    ) {
+        return this.moviesService.send(
+          { cmd: 'update-genre-byId' },
+          { id: id, genre: genre }
+        );
+    }
+
+    @Post('/countries/:id')
+    updateCountryById(
+      @Body() country: UpdateCountryDto,
+      @Param('id') id,
+    ) {
+        return this.moviesService.send(
+          { cmd: 'update-country-byId' },
+          { id: id, country: country },
+        );
+    }
 }
