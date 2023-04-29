@@ -83,6 +83,9 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-autosagest' }, name)
     }
 
+
+    @ApiOperation({ summary: 'Апдейт жанров по айди' })
+    @ApiResponse({ status: 201, description: 'Обновление жанорв' })
     @Post('/genres/:id')
     updateGenreById(
       @Body() genre: UpdateGenreDto,
