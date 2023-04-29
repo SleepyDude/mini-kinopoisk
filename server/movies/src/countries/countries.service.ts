@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Countries } from './countries.model';
 import { CountriesFilms } from './countries.m2m.model';
-import { UpdateCountryDto } from './dto/update.country.dto';
+import { UpdateCountryDto } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class CountriesService {
