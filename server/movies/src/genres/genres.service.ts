@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Genres } from './genres.model';
 import { GenresFilms } from './genres.m2m.model';
-import { UpdateGenreDto } from './gto/update.genre.dto';
+import { UpdateGenreDto } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class GenresService {
