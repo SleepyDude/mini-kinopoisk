@@ -1,4 +1,4 @@
-import {Controller, Get, Inject, Param, Query} from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import {
     ApiOperation,
@@ -82,6 +82,25 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-autosagest' }, name)
     }
 
-    //Сортировать по количеству оценок на кинопоиске, рейтинг, дата выхода(сперва свежие)
-    // и алфавит
+    @Post('/genres/:id')
+    updateGenreById(
+      @Body() genre,
+      @Param('id') id,
+    ) {
+        return this.moviesService.send(
+          { cmd: 'update-genre-byId' },
+          { id: id, genre: genre }
+        );
+    }
+
+    @Post('/countries/:id')
+    updateCountryById(
+      @Body() country,
+      @Param('id') id,
+    ) {
+        return this.moviesService.send(
+          { cmd: 'update-country-byId' },
+          { id: id, country: country },
+        );
+    }
 }
