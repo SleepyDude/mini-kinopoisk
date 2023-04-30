@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post, Query, Req } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import {
     ApiOperation,
@@ -10,6 +10,7 @@ import {
 import { NameQuery } from "../types/pagination.query.enum";
 import { FiltersOrderByQuery, FiltersTypeQuery } from "../types/filters.query.enum";
 import { UpdateCountryDto, UpdateGenreDto } from "@hotels2023nestjs/shared";
+import { Request } from "express";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -106,5 +107,17 @@ export class MoviesController {
           { cmd: 'update-country-byId' },
           { id: id, country: country },
         );
+    }
+
+    @Post('/about/:id/reviews')
+    createReview(
+      @Body() review,
+      @Param('id') filmId: number,
+      @Req() req: Request,
+    ) {
+        return this.moviesService.send(
+          { cmd: 'create-review' },
+          {review: review, filmId: filmId, req: req.cookies},
+          );
     }
 }
