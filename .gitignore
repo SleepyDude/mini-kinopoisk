@@ -137,3 +137,6 @@ pgdata
 #Persons
 /server/persons/package-lock.json
 /server/persons/node_modules
+
+#client auth branch local
+/client

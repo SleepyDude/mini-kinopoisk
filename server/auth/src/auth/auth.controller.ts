@@ -6,6 +6,7 @@ import { TokensService } from 'src/tokens/tokens.service';
 import { AuthVK } from 'src/vk/vk.model';
 import { VkService } from 'src/vk/vk.service';
 import { ExceptionFilter } from '../rpc-exception.filter';
+import { InitService } from '../init/init.service';
 
 @UseFilters(ExceptionFilter)
 @Controller('auth')
@@ -14,62 +15,48 @@ export class AuthController {
     constructor(
         private authService: AuthService,
         private tokenService: TokensService,
-        private vkService: VkService
-        // private readonly sharedService: SharedService,
+        private vkService: VkService,
+        private initService: InitService
     ) {}
+
+    @MessagePattern({ cmd: 'init' })
+    async init(
+    ) {
+        return await this.initService.createAdminAndRoles();
+    }
 
     @MessagePattern({ cmd: 'vk' })
     async loginVk(
-        // @Ctx() context: RmqContext,
         @Payload() auth: AuthVK,
     ) {
-        // this.sharedService.acknowledgeMessage(context);
-        // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
-
         return await this.vkService.loginVk(auth); 
     }
 
 
     @MessagePattern({ cmd: 'login' })
     async login(
-        // @Ctx() context: RmqContext,
         @Payload() dto: LoginDto, 
-        // @Payload('response') response // Женя: закомментил респонс и убрал его из всей цепочки
     ){
-        // this.sharedService.acknowledgeMessage(context);
-        // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
-
         return await this.authService.login(dto); 
     }
 
     @MessagePattern({ cmd: 'registration' })
     async registration(
-        // @Ctx() context: RmqContext,
-        // @Payload('dto') dto: LoginDto,
-        // @Payload('response') response
-        @Payload() obj: LoginDto
+        @Payload() dto: LoginDto
     ) {
-        return await this.authService.registration(obj)
-        // this.sharedService.acknowledgeMessage(context);
-        // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
-
-        // return await this.authService.registration(dto, response);
+        return await this.authService.registration(dto)
     }
 
     @MessagePattern({ cmd: 'logout' })
     async logout(
-        // @Ctx() context: RmqContext,
-        @Payload() refreshToken,
+        @Payload() refreshToken
     ) {
-        // this.sharedService.acknowledgeMessage(context);
-        // console.log(`[auth][users.controller][createUser] +`);
-
         return await this.authService.logout(refreshToken);
     }
 
     @MessagePattern({ cmd: 'refresh' })
     async refresh(
-        @Payload() refreshToken,
+        @Payload() refreshToken
     ) {
         return await this.tokenService.refresh(refreshToken);
     }

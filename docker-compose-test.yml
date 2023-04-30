@@ -36,19 +36,6 @@ services:
     depends_on:
       - postgres
       - rabbitmq
-      - users
     volumes:
       - ./server/auth:/app
-      - /app/node_modules
-
-  users:
-    container_name: users-dns-movies
-    build: ./server/users
-    env_file:
-      - ./.env
-    depends_on:
-      - postgres
-      - rabbitmq
-    volumes:
-      - ./server/users:/app
       - /app/node_modules

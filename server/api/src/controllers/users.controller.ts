@@ -5,8 +5,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
-import { initRoles } from '../init/init.roles';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { initRoles } from '../guards/init.roles';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с пользователями')

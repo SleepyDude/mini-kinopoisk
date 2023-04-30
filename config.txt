@@ -76,6 +76,7 @@ REACT_APP_CLIENT_ID=51619671
     - Запустить команду `npm run test`
 
 Для запуска e2e тестов:
-    - Запустить тестовый стенд из корневой директории проекта `docker compose -f docker-compose-test.yml'
+    - Создать тестовый стенд из корневой директории проекта `docker compose -f docker-compose-test.yml build'
+    - Затем запустить его 'docker compose -f docker-compose-test.yml up'
     - Зайти в корневую папку сервиса api
     - Запустить команду `npm run test:e2e`

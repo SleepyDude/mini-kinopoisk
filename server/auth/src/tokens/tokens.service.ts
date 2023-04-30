@@ -13,10 +13,8 @@ export class TokensService {
     ){}
 
 async generateAndSaveToken(payload : UserDto) {
-  console.log(`[tokens][service][generate][refresh]: `)
-    const refreshToken = this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
-    console.log(`[tokens][service][generate][refresh]: ${refreshToken}`)
-    const accessToken = this.jwtService.sign(payload, {secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign({...payload}, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
+    const accessToken = this.jwtService.sign({...payload}, {secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' });
     await this.saveToken(payload.id, refreshToken);
    
     return {refreshToken, accessToken}

@@ -38,8 +38,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
+    // console.log(`[api][auth][login] refreshToken: ${refreshToken}`);
     response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-    console.log(`[api][auth][login] response.cookie: ${JSON.stringify(response.cookie)}`);
     return {token: accessToken};
   }
 
@@ -51,7 +51,9 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response
     ) {
         const { refreshToken } = request.cookies;
+        console.log(`[api][auth][login] request.cookies: ${JSON.stringify(request.cookies)}`);
         response.clearCookie('refreshToken');
+        console.log(`[api][auth][login] refreshToken: ${refreshToken}`);
         const success =  await firstValueFrom(this.authService.send({cmd: 'logout'}, refreshToken));
         return !!success;
     }

@@ -8,7 +8,7 @@ import { UserPermission } from '../decorators/user-permission.decorator';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
-import { initRoles } from '../init/init.roles';
+import { initRoles } from '../guards/init.roles'
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { UpdateRoleDto } from '../types/update-role.model';
 
@@ -18,7 +18,7 @@ import { UpdateRoleDto } from '../types/update-role.model';
 export class RolesController {
 
   constructor(
-      @Inject('USERS-SERVICE') private usersService: ClientProxy,
+    @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
 
@@ -32,14 +32,14 @@ export class RolesController {
       @UserPermission() maxRoleValue: number,
   ) {
     //   console.log(`[api][create-role] maxRoleValue: ${maxRoleValue}`);
-      return await firstValueFrom(this.usersService.send({cmd: 'create-role'}, {dto, maxRoleValue}));
+      return await firstValueFrom(this.authService.send({cmd: 'create-role'}, {dto, maxRoleValue}));
   }
 
   @ApiOperation({ summary: 'Получение всех ролей' })
   @ApiResponse({ status: 200, type: [Role], description: 'Выводит все роли, незащищенный endpoint' })
   @Get()
   async getAllRoles() {
-      return await firstValueFrom(this.usersService.send({cmd: 'get-all-roles'}, {}));
+      return await firstValueFrom(this.authService.send({cmd: 'get-all-roles'}, {}));
   }
 
   @UseGuards(RolesGuard)
@@ -53,7 +53,7 @@ export class RolesController {
       @UserPermission() maxRoleValue: number,
   ) {
     //   console.log(`[api][delete-role] maxRoleValue: ${maxRoleValue}`);
-      return await firstValueFrom(this.usersService.send({cmd: 'delete-role-by-name'}, {name, maxRoleValue}));
+      return await firstValueFrom(this.authService.send({cmd: 'delete-role-by-name'}, {name, maxRoleValue}));
   }
 
   @UseGuards(RolesGuard)
@@ -67,7 +67,7 @@ export class RolesController {
       @Body(DtoValidationPipe) dto: UpdateRoleDto
   ) {
     //   console.log(`[api][delete-role] maxRoleValue: ${maxRoleValue}`);
-      return await firstValueFrom(this.usersService.send({cmd: 'update-role-by-name'}, {name, maxRoleValue, dto}));
+      return await firstValueFrom(this.authService.send({cmd: 'update-role-by-name'}, {name, maxRoleValue, dto}));
   }
 
 }

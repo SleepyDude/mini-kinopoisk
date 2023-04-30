@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
 import { TokensService } from 'src/tokens/tokens.service';
 import { UsersService } from 'src/users/users.service';
+import { UserDto } from 'src/tokens/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,9 +22,11 @@ export class AuthService {
     if (!isRightPassword && !skipPasswordCheck) {
       throw new RpcException("Invalid credentials");
     }
-    const tokens = await this.tokenService.generateAndSaveToken({...user});
-    console.log(`[auth][service][tokens]: ${tokens}`)
+    const tokenData = new UserDto(user);
+    const tokens = await this.tokenService.generateAndSaveToken(tokenData);
+
     return tokens;
+
   }
 
   async defineUserExists(email: string) : Promise<any> {
