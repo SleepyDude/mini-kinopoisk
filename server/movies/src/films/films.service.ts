@@ -154,7 +154,6 @@ export class FilmsService {
       ],
       limit,
       offset,
-      subQuery: false,
     });
   }
 
