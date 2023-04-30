@@ -81,15 +81,14 @@ export class FilmsService {
           model: Reviews,
           limit: 15,
           attributes: { exclude: ['updatedAt', 'userId', 'filmIdFK'] },
+          where: { parentId: { [Op.is]: null } },
         },
       ],
       where: { kinopoiskId: id.id },
     });
-
     const currentStaff = await lastValueFrom(
       this.moviesClient.send({ cmd: 'get-staff-previous' }, currentFilm.id),
     );
-
     return {
       currentFilm,
       currentStaff,

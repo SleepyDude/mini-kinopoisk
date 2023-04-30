@@ -13,8 +13,8 @@ import { Op } from 'sequelize';
 комментарий, и устанавливаем для него дочерний коментарий.
 Это нужно что бы в массиве было правильное отображение
 принадлежности.
-Функция вывода коментариев работает по пагинации, что бы
-коментарии повторно не отображались стоит дополнительный 
+Функция вывода коментариев работает по лимиту, что бы
+коментарии повторно не отображались стоит дополнительный
 поиск по полю parentId = is null.
 ***`;
 
@@ -67,7 +67,6 @@ export class ReviewsService {
 
   async getReviewsByFilmId(filmIdQuery) {
     const { filmId, query } = filmIdQuery;
-    const { limit, offset } = this.getPagination(query.page, query.size);
 
     return await this.parentReviewsRepository.findAll({
       attributes: { exclude: ['filmIdFK', 'updatedAt', 'parentId', 'userId'] },
@@ -76,8 +75,7 @@ export class ReviewsService {
         model: Reviews,
         attributes: { exclude: ['updatedAt', 'filmIdFK', 'userId'] },
       },
-      limit,
-      offset,
+      limit: query.size,
     });
   }
 
