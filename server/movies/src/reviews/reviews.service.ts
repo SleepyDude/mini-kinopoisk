@@ -68,7 +68,7 @@ export class ReviewsService {
   async getReviewsByFilmId(filmIdQuery) {
     const { filmId, query } = filmIdQuery;
 
-    return await this.parentReviewsRepository.findAll({
+    return await this.parentReviewsRepository.findAndCountAll({
       attributes: { exclude: ['filmIdFK', 'updatedAt', 'parentId', 'userId'] },
       where: [{ filmId: filmId.filmId }, { parentId: { [Op.is]: null } }],
       include: {
