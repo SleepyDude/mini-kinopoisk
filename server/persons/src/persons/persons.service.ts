@@ -84,13 +84,14 @@ export class PersonsService {
 
   async getPersonsAutosagest(params) {
     const { profession, name } = params;
-    console.log(profession);
     return await this.personsRepository.findAndCountAll({
       attributes: ['personId', 'nameRu'],
-      where: [
-        { profession: { [Op.iLike]: `%${profession}%` } },
-        { nameRu: { [Op.iLike]: `%${name}%` } },
-      ],
+      where: {
+        [Op.and]: [
+          { profession: { [Op.iLike]: `%${profession}%` } },
+          { nameRu: { [Op.iLike]: `%${name}%` } },
+        ],
+      },
       limit: 10,
     });
   }

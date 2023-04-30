@@ -7,13 +7,13 @@ import {
     ApiResponse,
     ApiTags
 } from "@nestjs/swagger";
-import { NameQuery } from "../types/pagination.query.enum";
 import { FiltersOrderByQuery, FiltersTypeQuery } from "../types/filters.query.enum";
-import { UpdateCountryDto, UpdateGenreDto } from "@hotels2023nestjs/shared";
+import { UpdateCountryDto, UpdateGenreDto, CreateReviewDto } from "@hotels2023nestjs/shared";
 import { Request } from "express";
 import { RolesGuard } from "../guards/roles.guard";
 import { RoleAccess } from "../guards/roles.decorator";
 import { initRoles } from "../init/init.roles";
+import { GenreQuery, PageQuery } from "../types/pagination.query.enum";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -24,9 +24,8 @@ export class MoviesController {
         @Inject('PERSONS-SERVICE') private personsService: ClientProxy,
     ) {}
 
-    @ApiQuery({ name: 'name', enum: NameQuery })
-    @ApiQuery({ name: 'size' })
-    @ApiQuery({ name: 'page' })
+    @ApiQuery({name: 'page', enum: PageQuery, isArray: true,
+        description: 'Доступные квери: page, size, name'})
     @ApiOperation({ summary: 'Каталог фильмов' })
     @ApiResponse({ status: 200, description: 'Список фильмов с пагинацией для каталога' })
     @Get()
@@ -43,14 +42,9 @@ export class MoviesController {
     }
 
     @ApiQuery({ name: 'orderBy', enum: FiltersOrderByQuery, description: 'Сортировка' })
-    @ApiQuery({ name: 'year' })
-    @ApiQuery({ name: 'size' })
-    @ApiQuery({ name: 'page' })
-    @ApiQuery({ name: 'genreId' })
-    @ApiQuery({ name: 'countryId' })
+    @ApiQuery({ name: 'genreId', enum: GenreQuery, isArray: true,
+    description: 'Квери: genreId, countryId, page, size, year, ratingKinopoisk, ratingKinopoiskVoteCount'})
     @ApiQuery({ name: 'type', enum: FiltersTypeQuery, description: 'Фильмы или сериалы' })
-    @ApiQuery({ name: 'ratingKinopoisk', description: 'Значения с точкой "8.1"' })
-    @ApiQuery({ name: 'ratingKinopoiskVoteCount', description: 'максимальные значения не достигают миллиона'})
     @ApiOperation({ summary: 'Фильтр по фильмам' })
     @ApiResponse({ status: 200, description: 'Фильтрация по квери строке' })
     @Get('/filters')
@@ -80,11 +74,13 @@ export class MoviesController {
         return this.personsService.send({ cmd: 'get-staff-by-filmId' }, id)
     }
 
-    @ApiOperation({ summary: 'Автосаджест' })
+    @ApiQuery({ name: 'nameRu', required: false })
+    @ApiQuery({ name: 'nameOriginal', required: false })
+    @ApiOperation({ summary: 'Автосаджест фильмов' })
     @ApiResponse({ status: 200, description: 'выводит по 10 элементов из запроса' })
-    @Get('/:name')
-    getFilmsAutosagest(@Param('name') name: string) {
-        return this.moviesService.send({ cmd: 'get-films-autosagest' }, name)
+    @Get('/name')
+    getFilmsAutosagest(@Query() query: string) {
+        return this.moviesService.send({ cmd: 'get-films-autosagest' }, query)
     }
 
 
@@ -101,6 +97,8 @@ export class MoviesController {
         );
     }
 
+    @ApiOperation({ summary: 'Апдейт стран по айди' })
+    @ApiResponse({ status: 201, description: 'Обновление стран' })
     @Post('/countries/:id')
     updateCountryById(
       @Body() country: UpdateCountryDto,
@@ -112,9 +110,11 @@ export class MoviesController {
         );
     }
 
+    @ApiOperation({ summary: 'Создание комментария' })
+    @ApiResponse({ status: 201, description: 'Комментарий создан' })
     @Post('/about/:filmId/reviews')
     createReview(
-      @Body() review,
+      @Body() review: CreateReviewDto,
       @Param('filmId') filmId: number,
       @Req() req: Request,
     ) {
@@ -124,6 +124,8 @@ export class MoviesController {
           );
     }
 
+    @ApiOperation({ summary: 'Получить коментарии по kinopoiskId фильма' })
+    @ApiResponse({ status: 200, description: 'Копентарии к фильму' })
     @Get('/about/:filmId/reviews')
     getReviewsByFilmId(
       @Param() filmId: number,

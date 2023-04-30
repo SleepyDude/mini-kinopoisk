@@ -76,7 +76,7 @@ export class FilmsService {
         ],
       },
       include: [
-        { all: true },
+        { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
         {
           model: Reviews,
           limit: 15,
@@ -128,6 +128,7 @@ export class FilmsService {
     return await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
+        'kinopoiskId',
         'nameRu',
         'nameOriginal',
         'ratingKinopoiskVoteCount',
@@ -146,10 +147,12 @@ export class FilmsService {
         {
           model: Genres,
           where: { id: { [Op.or]: genres } },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
         {
           model: Countries,
           where: { id: { [Op.or]: countries } },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
       ],
       limit,
@@ -183,9 +186,12 @@ export class FilmsService {
   }
 
   async filmsAutosagest(params) {
+    const search = params.nameRu
+      ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
+      : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
     return await this.filmsRepository.findAll({
-      attributes: ['kinopoiskId', 'nameRu'],
-      where: { nameRu: { [Op.iLike]: `%${params}%` } },
+      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal'],
+      where: search,
       limit: 10,
     });
   }
