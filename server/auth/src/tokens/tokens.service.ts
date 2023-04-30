@@ -1,21 +1,21 @@
-import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Token } from './tokens.model';
 import { JwtService } from '@nestjs/jwt';
 import { UserDto } from './dto/user.dto';
-import { ClientProxy } from '@nestjs/microservices';
-import { catchError, firstValueFrom, switchMap, of } from 'rxjs';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class TokensService { 
     constructor(@InjectModel(Token) private tokenRepo: typeof Token,
-    @Inject('USERS-SERVICE') private readonly userService: ClientProxy,
+    private userService: UsersService,
     private jwtService: JwtService
     ){}
 
 async generateAndSaveToken(payload : UserDto) {
-    
+  console.log(`[tokens][service][generate][refresh]: `)
     const refreshToken = this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
+    console.log(`[tokens][service][generate][refresh]: ${refreshToken}`)
     const accessToken = this.jwtService.sign(payload, {secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' });
     await this.saveToken(payload.id, refreshToken);
    
@@ -91,21 +91,11 @@ async getUserIdByRefreshToken(refreshToken) {
       throw UnauthorizedException;
     }
   
-    const user$ = this.userService.send( {cmd: 'get-user-by-id' }, userId ).pipe(
-        switchMap((user) => {
-          if (user) return of(user);
-          return of(null);
-        }),
-        catchError( (error) => {
-          console.log(error)
-          throw new BadRequestException;
-        })
-      );
-    const user = await firstValueFrom(user$);
+    const user = await this.userService.getUserById(userId);
     const userDto = new UserDto(user);
     const tokens = await this.generateAndSaveToken({...userDto});
   
-    return {accessToken: tokens.accessToken, newRefreshToken: tokens.refreshToken}; // думаю пару удобнее возвращать со стандартными именами (Женя)
+    return {accessToken: tokens.accessToken, newRefreshToken: tokens.refreshToken};
   }
 
 }

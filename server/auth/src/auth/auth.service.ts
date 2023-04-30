@@ -1,15 +1,15 @@
 import { CreateUserDto } from '@hotels2023nestjs/shared';
-import { BadRequestException, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
-import {catchError, firstValueFrom, lastValueFrom, switchMap, of, throwError} from 'rxjs';
 import { TokensService } from 'src/tokens/tokens.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-  @Inject('USERS-SERVICE') private readonly userService: ClientProxy,
+  private userService: UsersService,
   private tokenService: TokensService) {}
 
   async login(userDto: CreateUserDto | any, skipPasswordCheck: boolean = false) {
@@ -22,22 +22,13 @@ export class AuthService {
       throw new RpcException("Invalid credentials");
     }
     const tokens = await this.tokenService.generateAndSaveToken({...user});
+    console.log(`[auth][service][tokens]: ${tokens}`)
     return tokens;
   }
 
   async defineUserExists(email: string) : Promise<any> {
 
-    const user$ = this.userService.send( {cmd: 'get-user-by-email' }, email ).pipe(
-      switchMap((user) => { 
-        if (user) return of(user);
-        return of(null);
-      }),
-      catchError( (error) => {
-        console.log(error)
-        throw new BadRequestException;
-      })
-    );
-    const user = await firstValueFrom(user$);
+    const user = await this.userService.getUserByEmail(email);
     return user;
   }
 
@@ -47,7 +38,7 @@ export class AuthService {
     }
     const hashedPassword = await bcrypt.hash(userDto.password, +process.env.SALT);
 
-    const id = await firstValueFrom(this.userService.send( {cmd: 'create-user'}, {email: userDto.email, password: hashedPassword}))
+    const id = await this.userService.createUser({email: userDto.email, password: hashedPassword})
 
     // createProfile(userDto)
 

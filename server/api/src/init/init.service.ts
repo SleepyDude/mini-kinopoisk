@@ -8,13 +8,12 @@ import { initRoles } from './init.roles';
 export class InitService {
 
     constructor(
-        @Inject('USERS-SERVICE') private usersService: ClientProxy,
         @Inject('AUTH-SERVICE')  private authService: ClientProxy,
     ) {}
 
     async createAdminAndRoles(initDto: InitDto): Promise<{refreshToken: string, accessToken: string}> {
         // Метод должен быть вызван только единожды, поэтому проверяем, есть ли уже роль OWNER и как следствие главный админ
-        const ownerRole = await firstValueFrom(this.usersService.send({ cmd: 'get-role-by-name' }, 'OWNER').pipe(
+        const ownerRole = await firstValueFrom(this.authService.send({ cmd: 'get-role-by-name' }, 'OWNER').pipe(
             map((value) => {
                 // console.log(`[init] got value: ${JSON.stringify(value)}`);
                 return value;
@@ -29,11 +28,11 @@ export class InitService {
 
         // Создаём 3 базовые роли - USER, ADMIN и OWNER
         // console.log(`before USER creation`)
-        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['USER']} ));
+        await firstValueFrom(this.authService.send({ cmd: 'create-role' }, {dto: initRoles['USER']} ));
         // console.log(`before ADMIN creation`)
-        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['ADMIN']} ));
+        await firstValueFrom(this.authService.send({ cmd: 'create-role' }, {dto: initRoles['ADMIN']} ));
         // console.log(`before OWNER creation`)    
-        await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['OWNER']} ));
+        await firstValueFrom(this.authService.send({ cmd: 'create-role' }, {dto: initRoles['OWNER']} ));
 
         // Зарегистрируем владельца ресурса
         const tokens = await firstValueFrom(this.authService.send({ cmd: 'registration' }, initDto).pipe(
@@ -42,16 +41,16 @@ export class InitService {
             }),
             catchError(val => {
                 // Удалю созданные роли
-                this.usersService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['USER'] });
-                this.usersService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['ADMIN']});
-                this.usersService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['OWNER']});
+                this.authService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['USER'] });
+                this.authService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['ADMIN']});
+                this.authService.send({ cmd: 'delete-role-by-name' }, {name: initRoles['OWNER']});
 
                 return throwError( () => new HttpException(val.message, HttpStatus.BAD_REQUEST));
             })
         ));
         
         // Присвоим владельцу ресурса соответствующую роль
-        await firstValueFrom(this.usersService.send({ cmd: 'add-role-to-user-by-email' }, {email: initDto.email, roleName: initRoles.OWNER.name}));
+        await firstValueFrom(this.authService.send({ cmd: 'add-role-to-user-by-email' }, {email: initDto.email, roleName: initRoles.OWNER.name}));
         
         // старый токен уже ее не содержит, обновим
         const { accessToken, newRefreshToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, tokens.refreshToken) );
