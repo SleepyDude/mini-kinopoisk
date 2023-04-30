@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Query, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import {
     ApiOperation,
@@ -11,6 +11,9 @@ import { NameQuery } from "../types/pagination.query.enum";
 import { FiltersOrderByQuery, FiltersTypeQuery } from "../types/filters.query.enum";
 import { UpdateCountryDto, UpdateGenreDto } from "@hotels2023nestjs/shared";
 import { Request } from "express";
+import { RolesGuard } from "../guards/roles.guard";
+import { RoleAccess } from "../guards/roles.decorator";
+import { initRoles } from "../init/init.roles";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -109,15 +112,33 @@ export class MoviesController {
         );
     }
 
-    @Post('/about/:id/reviews')
+    @Post('/about/:filmId/reviews')
     createReview(
       @Body() review,
-      @Param('id') filmId: number,
+      @Param('filmId') filmId: number,
       @Req() req: Request,
     ) {
         return this.moviesService.send(
           { cmd: 'create-review' },
           {review: review, filmId: filmId, req: req.cookies},
           );
+    }
+
+    @Get('/about/:filmId/reviews')
+    getReviewsByFilmId(
+      @Param() filmId: number,
+      @Query() query,
+      ) {
+        return this.moviesService.send({ cmd: 'get-reviews-byFilmId' },
+          { filmId: filmId, query: query });
+    }
+
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
+    @Delete('/about/:filmId/reviews/:reviewId')
+    deleteReview(
+      @Param('reviewId') reviewId: number,
+    ) {
+        return this.moviesService.send({ cmd: 'delete-review' }, reviewId);
     }
 }

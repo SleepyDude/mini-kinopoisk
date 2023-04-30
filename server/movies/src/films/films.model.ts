@@ -15,7 +15,7 @@ import { GenresFilms } from '../genres/genres.m2m.model';
 import { Trailers } from '../trailers/trailers.model';
 import { SimilarFilms } from './films.similar.m2m.model';
 import { Similar } from './films.similar.model';
-import { Reviews } from "../reviews/reviews.model";
+import { Reviews } from '../reviews/reviews.model';
 
 @Table({ tableName: 'films' })
 export class Films extends Model<Films> {

@@ -3,6 +3,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
@@ -20,10 +21,14 @@ export class Reviews extends Model<Reviews> {
 
   @ForeignKey(() => Films)
   @Column({ type: DataType.INTEGER })
-  filmId: number;
+  filmIdFK: number;
 
+  @ForeignKey(() => Reviews)
   @Column({ type: DataType.INTEGER })
   parentId: number;
+
+  @Column({ type: DataType.INTEGER })
+  filmId: number;
 
   @Column({ type: DataType.INTEGER })
   userId: number;
@@ -36,4 +41,7 @@ export class Reviews extends Model<Reviews> {
 
   @BelongsTo(() => Films)
   film: Films[];
+
+  @HasMany(() => Reviews)
+  reviews: Reviews[];
 }
