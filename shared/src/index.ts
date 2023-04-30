@@ -7,6 +7,7 @@ export * from './dto/users/add-role.ip.dto';
 export * from './dto/users/add-role.email.dto';
 export * from './dto/movies/update-genre.dto';
 export * from './dto/movies/update-country.dto';
+export * from './dto/movies/create-review.dto';
 
 export * from './dto/roles/create-role.dto';
 export * from './dto/roles/delete-role.dto';
