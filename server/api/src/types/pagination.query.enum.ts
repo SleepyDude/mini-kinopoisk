@@ -1,6 +1,7 @@
 export enum PageQuery{
-  first = '0',
-  two = '1'
+  first = 1,
+  two = 2,
+  three = 3
 }
 
 export enum SizeQuery{
@@ -8,7 +9,8 @@ export enum SizeQuery{
   two = '20',
 }
 
-export enum NameQuery {
-  first = 'гарри',
-  two = 'злой'
+export enum GenreQuery {
+  first = 1,
+  two = 2,
+  three = 3,
 }

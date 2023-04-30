@@ -16,7 +16,11 @@ export class GenresService {
   }
 
   async getAllGenres() {
-    return await this.genresRepository.findAll();
+    return await this.genresRepository.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+    });
   }
 
   async updateGenreById(genre) {

@@ -6,6 +6,19 @@ import { lastValueFrom } from 'rxjs';
 import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
+import { Reviews } from '../reviews/reviews.model';
+
+`***
+У получения списка фильмов есть пагинация и поиск по русскому имени.
+В получении фильма по айди стоит строгое ограничение на получение
+комментариев, для показа остальных реализована другая функция.
+Все связи с моделью фильмов реализовывать через поле kinopoiskId.
+Функция фильтра работает с квери строкой, поля жанров и стран
+могут быть накопительными, работают с оператором ИЛИ. В нем же
+реализована сортировка и пагинация. Есть функция превью фильмов,
+она нужна для модели персон. Отдельно есть функция для использования
+автосаджеста на поиск по имени фильма.
+***`;
 
 @Injectable()
 export class FilmsService {
@@ -62,7 +75,15 @@ export class FilmsService {
           'updatedAt',
         ],
       },
-      include: { all: true },
+      include: [
+        { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: Reviews,
+          limit: 15,
+          attributes: { exclude: ['updatedAt', 'userId', 'filmIdFK'] },
+          where: { parentId: { [Op.is]: null } },
+        },
+      ],
       where: { kinopoiskId: id.id },
     });
     const currentStaff = await lastValueFrom(
@@ -107,6 +128,7 @@ export class FilmsService {
     return await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
+        'kinopoiskId',
         'nameRu',
         'nameOriginal',
         'ratingKinopoiskVoteCount',
@@ -125,27 +147,28 @@ export class FilmsService {
         {
           model: Genres,
           where: { id: { [Op.or]: genres } },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
         {
           model: Countries,
           where: { id: { [Op.or]: countries } },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
       ],
       limit,
       offset,
-      subQuery: false,
     });
   }
 
   async getFilmsByIdPrevious(filmsId) {
     const films = [];
-    console.log(filmsId);
+
     for (const item of filmsId) {
       films.push(
         await this.filmsRepository.findAll({
           where: item.filmId,
           attributes: [
-            'id',
+            'kinopoiskId',
             'year',
             'nameRu',
             'nameOriginal',
@@ -158,13 +181,17 @@ export class FilmsService {
         }),
       );
     }
+
     return films;
   }
 
   async filmsAutosagest(params) {
+    const search = params.nameRu
+      ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
+      : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
     return await this.filmsRepository.findAll({
-      attributes: ['id', 'nameRu'],
-      where: { nameRu: { [Op.iLike]: `%${params}%` } },
+      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal'],
+      where: search,
       limit: 10,
     });
   }

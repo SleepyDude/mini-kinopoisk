@@ -17,7 +17,11 @@ export class CountriesService {
   }
 
   async getAllCountries() {
-    return await this.countriesRepository.findAll();
+    return await this.countriesRepository.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+    });
   }
 
   async updateCountryById(country) {
