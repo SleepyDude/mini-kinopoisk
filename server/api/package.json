@@ -21,7 +21,7 @@
     "test:e2e": "cross-env NODE_ENV=./../../.env NODE_ENV_LOCAL=.env.api.test jest --config ./test/jest-e2e.json --detectOpenHandles"
   },
   "dependencies": {
-    "@hotels2023nestjs/shared": "^1.1.0",
+    "@hotels2023nestjs/shared": "^1.2.3",
     "@nestjs/class-transformer": "^0.4.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",

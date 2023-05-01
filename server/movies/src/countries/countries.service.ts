@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Countries } from './countries.model';
 import { CountriesFilms } from './countries.m2m.model';
+import { UpdateCountryDto } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class CountriesService {
@@ -16,6 +17,19 @@ export class CountriesService {
   }
 
   async getAllCountries() {
-    return await this.countriesRepository.findAll();
+    return await this.countriesRepository.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+    });
+  }
+
+  async updateCountryById(country) {
+    const countryDto: UpdateCountryDto = country.country;
+    const currentCountry = await this.countriesRepository.findOne({
+      where: { id: country.id },
+    });
+    await currentCountry.update(countryDto);
+    return currentCountry;
   }
 }

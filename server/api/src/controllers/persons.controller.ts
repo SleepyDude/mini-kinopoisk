@@ -2,6 +2,7 @@ import { Controller, Get, Inject, Param, Query } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from "rxjs";
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FiltersProfessionQuery } from "../types/filters.query.enum";
 
 @ApiTags('Актеры и прочий состав')
 @Controller('persons')
@@ -29,5 +30,14 @@ export class PersonsController {
         let person = await lastValueFrom(this.personsClient.send({ cmd: 'get-person-byId' }, id));
         let films = await lastValueFrom(this.moviesService.send({ cmd: 'get-films-byId-previous' }, person.filmsId));
         return {person: person.person, films};
+    }
+
+    @ApiQuery({ name: 'profession', enum: FiltersProfessionQuery, description: 'Актер или режиссер' })
+    @ApiQuery({ name: 'name', description: 'Только русское имя' })
+    @ApiOperation({ summary: 'Автосаджест по персонам' })
+    @ApiResponse({ status: 200, description: 'Выводит имена и айди актеров по квери параметрам' })
+    @Get('/search')
+    async getPersonsAutosagest(@Query() params) {
+        return this.personsClient.send({ cmd: 'get-persons-autosagest' }, params);
     }
 }
