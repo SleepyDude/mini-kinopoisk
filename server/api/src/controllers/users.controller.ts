@@ -2,12 +2,11 @@ import { AddRoleDto, AddRoleDtoEmail, Role, User } from '@hotels2023nestjs/share
 import { Body, Controller, Get, Inject, Param, Post, UseFilters, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserPermission } from 'src/decorators/user-permission.decorator';
-import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
-import { RoleAccess } from 'src/guards/roles.decorator';
-import { RolesGuard } from 'src/guards/roles.guard';
-import { initRoles } from 'src/init/init.roles';
-import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
+import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
+import { RoleAccess } from '../guards/roles.decorator';
+import { RolesGuard } from '../guards/roles.guard';
+import { initRoles } from '../init/init.roles';
+import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с пользователями')

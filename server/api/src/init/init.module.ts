@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 // import { JwtModule } from '@nestjs/jwt';
 // import { SharedModule } from 'y/shared';
@@ -14,6 +15,9 @@ import { InitService } from './init.service';
     imports: [
         // RolesModule, // для создания и проверки ролей
         // UsersModule, // для addRole
+        // ConfigModule.forFeature({
+        //     // envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+        // }),
         ClientsModule.register([
             {
                 name: 'USERS-SERVICE',

@@ -1,5 +1,6 @@
 import { Controller, UseFilters } from "@nestjs/common";
 import { Ctx, MessagePattern, Payload, RmqContext } from "@nestjs/microservices";
+import { ExceptionFilter } from "../rpc-exception.filter";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { DeleteRoleDto } from "./dto/delete-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
@@ -8,6 +9,7 @@ import { UpdateRoleDto } from "./dto/update-role.dto";
 // import { DtoValidationPipe } from "y/shared/pipes/dto-validation.pipe";
 import { RolesService } from "./roles.service";
 
+@UseFilters(ExceptionFilter)
 @Controller('roles')
 export class RolesController {
 
@@ -36,6 +38,7 @@ export class RolesController {
         // @Ctx() context: RmqContext,
         @Payload() roleName: string
     ) {
+        console.log(`[roles.controller][get-role-by-name] name: ${roleName}`);
         return this.rolesService.getRoleByName(roleName);
     }
 

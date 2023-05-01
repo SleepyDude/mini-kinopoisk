@@ -4,9 +4,9 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from "express";
 import { firstValueFrom } from "rxjs";
-import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
-import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
-import { Token, TokenEmail } from 'src/types/token.return.type';
+import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
+import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { Token, TokenEmail } from '../types/token.return.type';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Авторизация')
