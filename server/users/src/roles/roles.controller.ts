@@ -27,7 +27,7 @@ export class RolesController {
         @Payload('maxRoleValue') maxRoleValue: number,
     ) {
         // this.sharedService.acknowledgeMessage(context);
-        console.log(`[roles.controller][create-dto] dto: ${JSON.stringify(dto)} maxRoleValue: ${maxRoleValue}`);
+        // console.log(`[roles.controller][create-dto] dto: ${JSON.stringify(dto)} maxRoleValue: ${maxRoleValue}`);
 
         return await this.rolesService.createRole(dto, maxRoleValue);
     }

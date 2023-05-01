@@ -12,9 +12,9 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    // ConfigModule.forRoot({
-    //   envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
-    // }),
+    ConfigModule.forRoot({
+      envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+    }),
     ClientsModule.register([
       {
         name: 'USERS-SERVICE',

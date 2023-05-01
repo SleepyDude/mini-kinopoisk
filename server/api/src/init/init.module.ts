@@ -15,9 +15,9 @@ import { InitService } from './init.service';
     imports: [
         // RolesModule, // для создания и проверки ролей
         // UsersModule, // для addRole
-        // ConfigModule.forFeature({
-        //     // envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
-        // }),
+        ConfigModule.forRoot({
+            envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+        }),
         ClientsModule.register([
             {
                 name: 'USERS-SERVICE',

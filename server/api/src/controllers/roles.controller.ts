@@ -31,7 +31,7 @@ export class RolesController {
       @Body(DtoValidationPipe) dto: CreateRoleDto,
       @UserPermission() maxRoleValue: number,
   ) {
-      console.log(`[api][create-role] maxRoleValue: ${maxRoleValue}`);
+    //   console.log(`[api][create-role] maxRoleValue: ${maxRoleValue}`);
       return await firstValueFrom(this.usersService.send({cmd: 'create-role'}, {dto, maxRoleValue}));
   }
 
