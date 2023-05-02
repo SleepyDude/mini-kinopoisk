@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
+// import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
+import { HttpRpcException } from '../exceptions/http.rpc.exception';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { DeleteRoleDto } from './dto/delete-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -14,14 +15,14 @@ export class RolesService {
     async createRole(dto: CreateRoleDto, userPerm: number = Infinity) {
         // console.log(`[roles.service][create-role] dto: ${JSON.stringify(dto)}`);
         if (userPerm <= dto.value) {
-            throw new RpcException('Можно создать роль только с меньшими чем у Вас правами');
+            throw new HttpRpcException('Можно создать роль только с меньшими чем у Вас правами', HttpStatus.FORBIDDEN);
         }
 
         try {
             const role = await this.roleRepository.create(dto);
             return role;
         } catch (error) {
-            throw new RpcException('Ошибка при создании роли (роль уже существует)');
+            throw new HttpRpcException('Ошибка при создании роли (роль уже существует)', HttpStatus.CONFLICT);
         }
     }
 
@@ -40,12 +41,12 @@ export class RolesService {
         if (role) {
             // Проверим, что пользователь вправе удалить роль
             if (userPerm <= role.value) {
-                throw new RpcException('Недостаточно прав');
+                throw new HttpRpcException('Недостаточно прав', HttpStatus.FORBIDDEN);
             }
             role.destroy();
             return;
         }
-        throw new RpcException('Роли с таким именем не существует');
+        throw new HttpRpcException('Роли с таким именем не существует', HttpStatus.NOT_FOUND);
     }
 
     async updateByName(name: string, dto: UpdateRoleDto, userPerm: number) {
@@ -54,12 +55,12 @@ export class RolesService {
         // console.log(`find role ${JSON.stringify(role)}`)
         if (role) {
             if (userPerm <= role.value || dto.value && dto.value >= userPerm) {
-                throw new RpcException('Недостаточно прав');
+                throw new HttpRpcException('Недостаточно прав', HttpStatus.FORBIDDEN);
             }
             role.update(dto);
             return role;
         }
-        throw new RpcException('Роли с таким именем не существует');
+        throw new HttpRpcException('Роли с таким именем не существует', HttpStatus.NOT_FOUND);
     }
 
 }

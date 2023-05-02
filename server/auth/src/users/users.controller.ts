@@ -36,9 +36,12 @@ export class UsersController {
 
     @MessagePattern({ cmd: 'add-role-to-user-by-email' })
     async addRoleByEmail(
-        @Payload() dto: AddRoleDtoEmail
+        @Payload('dto') dto: AddRoleDtoEmail,
+        @Payload('maxRoleValue') maxRoleValue: number,
     ) {
-        return await this.usersService.addRoleByEmail(dto);
+        console.log(`[users][add-role-by-email] dto: ${JSON.stringify(dto)}`);
+        console.log(`[users][add-role-by-email] maxRoleValue: ${maxRoleValue}`);
+        return await this.usersService.addRoleByEmail(dto, maxRoleValue);
     }
 
     @MessagePattern({ cmd: 'add-role-to-user-by-id' })
