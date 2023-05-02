@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Genres } from './genres.model';
 import { GenresFilms } from './genres.m2m.model';
+import { UpdateGenreDto } from './dto/update.genre.dto';
 
 @Injectable()
 export class GenresService {
@@ -15,6 +16,19 @@ export class GenresService {
   }
 
   async getAllGenres() {
-    return await this.genresRepository.findAll();
+    return await this.genresRepository.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+    });
+  }
+
+  async updateGenreById(genre) {
+    const genreDto: UpdateGenreDto = genre.genre;
+    const currentGenre = await this.genresRepository.findOne({
+      where: { id: genre.id },
+    });
+    await currentGenre.update(genreDto);
+    return currentGenre;
   }
 }
