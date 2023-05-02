@@ -51,7 +51,11 @@ export class InitService {
         ));
         
         // Присвоим владельцу ресурса соответствующую роль
-        await firstValueFrom(this.usersService.send({ cmd: 'add-role-to-user-by-email' }, {email: initDto.email, roleName: initRoles.OWNER.name}));
+        await firstValueFrom(this.usersService.send({ cmd: 'add-role-to-user-by-email' },
+            { 
+                dto: {email: initDto.email, roleName: initRoles.OWNER.name}
+            }
+        ));
         
         // старый токен уже ее не содержит, обновим
         const { accessToken, newRefreshToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, tokens.refreshToken) );

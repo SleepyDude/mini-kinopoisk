@@ -145,7 +145,7 @@ describe('Access e2e', () => {
             return await request(app.getHttpServer())
                 .post('/auth/registration')
                 .send({email: 'bob@mail.ru', password: '123456' })
-                .expect(400)
+                .expect(409)
                 .expect( (resp: any) => {
                     expect(resp).toHaveProperty('text');
                     const body = JSON.parse(resp.text);
@@ -237,7 +237,7 @@ describe('Access e2e', () => {
                 .post('/roles')
                 .send({name: 'USER', value: 3, description: 'R' })
                 .auth(ownerAccess, { type: "bearer" })
-                .expect(400)
+                .expect(409)
                 .expect( (resp: any) => {
                     // console.log(`resp: ${JSON.stringify(resp)}`);
                     expect(resp).toHaveProperty('text');
@@ -319,103 +319,138 @@ describe('Access e2e', () => {
         });
     });
 
-    describe('Обновление токенов пользователей (так как им обновили роли)', () => {
-        it('Обновляем', async () => {
+    describe('/auth/refresh (За одно обновляем роли)', () => {
+        it('Alice, Eva, Carol', async () => {
             await request(app.getHttpServer())
                 .post('/auth/refresh')
                 .set('Cookie', aliceRefresh)
                 .expect(201)
                 .expect( (resp: any) => {
-                    // console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
+                    expect(resp).toHaveProperty('header');
+                    const header = resp.header;
+                    expect(header).toHaveProperty('set-cookie');
+                    const setCookie = header['set-cookie'];
+                    expect(setCookie).toHaveLength(1);
+                    const refreshCookie = setCookie[0];
+                    expect(validateRefresh(refreshCookie)).toBeTruthy();
+                    expect(resp).toHaveProperty('text');
+                    const body = JSON.parse(resp.text);
+                    expect(body).toHaveProperty('token');
+                    expect(body.token.length).toBeGreaterThan(1);
+                    aliceAccess = body.token;
+                    aliceRefresh = header['set-cookie'];
+                });
+
+            await request(app.getHttpServer())
+                .post('/auth/refresh')
+                .set('Cookie', evaRefresh)
+                .expect(201)
+                .expect( (resp: any) => {
+                    const body = JSON.parse(resp.text);
+                    evaAccess = body.token;
+                    evaRefresh = resp.header['set-cookie'];
+                });
+
+            await request(app.getHttpServer())
+                .post('/auth/refresh')
+                .set('Cookie', carolRefresh)
+                .expect(201)
+                .expect( (resp: any) => {
+                    const body = JSON.parse(resp.text);
+                    carolAccess = body.token;
+                    carolRefresh = resp.header['set-cookie'];
                 });
         });
     });
 
-    // describe('Проверка прав на создание ролей', () => {
+    describe('Проверка прав на создание ролей', () => {
         
-    //     it('Error | Eva SMALLADMIN(3) не может создать новую роль с value (1)', async () => {
-    //         return await request(app.getHttpServer())
-    //             .post('/roles')
-    //             .send({name: 'Q', value: 1, description: 'R' })
-    //             .auth(evaAccess, { type: "bearer" })
-    //             .expect(403)
-    //             .expect( (resp: any) => {
-    //                 expect(resp).toHaveProperty('text');
-    //                 const body = JSON.parse(resp.text);
-    //                 expect(body).toHaveProperty('error');
-    //                 expect(body.error).toBe('Недостаточно прав');
-    //             });
-    //     });
+        it('Error | Eva SMALLADMIN(3) не может создать новую роль с value (1)', async () => {
+            return await request(app.getHttpServer())
+                .post('/roles')
+                .send({name: 'Q', value: 1, description: 'R' })
+                .auth(evaAccess, { type: "bearer" })
+                .expect(403)
+                .expect( (resp: any) => {
+                    expect(resp).toHaveProperty('text');
+                    const body = JSON.parse(resp.text);
+                    expect(body).toHaveProperty('error');
+                    expect(body.error).toBe('Недостаточно прав');
+                });
+        });
 
-    //     it('Error | Alice ADMIN(10) не может создать новую роль с value (10) и с value (11)', async () => {
-    //         await request(app.getHttpServer())
-    //             .post('/roles')
-    //             .send({name: 'Q', value: 10, description: 'R' })
-    //             .auth(aliceAccess, { type: "bearer" })
-    //             .expect(403)
-    //             .expect( (resp: any) => {
-    //                 expect(resp).toHaveProperty('text');
-    //                 const body = JSON.parse(resp.text);
-    //                 expect(body).toHaveProperty('error');
-    //                 expect(body.error).toBe('Недостаточно прав');
-    //             });
+        it('Error | Alice ADMIN(10) не может создать новую роль с value (10) и с value (11)', async () => {
+            await request(app.getHttpServer())
+                .post('/roles')
+                .send({name: 'Q', value: 10, description: 'R' })
+                .auth(aliceAccess, { type: "bearer" })
+                .expect(403)
+                .expect( (resp: any) => {
+                    expect(resp).toHaveProperty('text');
+                    const body = JSON.parse(resp.text);
+                    expect(body).toHaveProperty('error');
+                    expect(body.error).toBe('Можно создать роль только с меньшими чем у Вас правами');
+                });
 
-    //         await request(app.getHttpServer())
-    //             .post('/roles')
-    //             .send({name: 'Q', value: 11, description: 'R' })
-    //             .auth(aliceAccess, { type: "bearer" })
-    //             .expect(403)
-    //             .expect( (resp: any) => {
-    //                 expect(resp).toHaveProperty('text');
-    //                 const body = JSON.parse(resp.text);
-    //                 expect(body).toHaveProperty('error');
-    //                 expect(body.error).toBe('Недостаточно прав');
-    //             });
-    //     });
+            await request(app.getHttpServer())
+                .post('/roles')
+                .send({name: 'Q', value: 11, description: 'R' })
+                .auth(aliceAccess, { type: "bearer" })
+                .expect(403)
+                .expect( (resp: any) => {
+                    expect(resp).toHaveProperty('text');
+                    const body = JSON.parse(resp.text);
+                    expect(body).toHaveProperty('error');
+                    expect(body.error).toBe('Можно создать роль только с меньшими чем у Вас правами');
+                });
+        });
 
-    //     it('Success | Alice ADMIN(10) может создать новую роль с value = 9 и с value = 2', async () => {
-    //         await request(app.getHttpServer())
-    //             .post('/roles')
-    //             .send({name: 'AliceCreated', value: 9, description: 'R' })
-    //             .auth(aliceAccess, { type: "bearer" })
-    //             .expect(201);
+        it('Success | Alice ADMIN(10) может создать новую роль с value = 9 и с value = 2', async () => {
+            await request(app.getHttpServer())
+                .post('/roles')
+                .send({name: 'AliceCreated', value: 9, description: 'R' })
+                .auth(aliceAccess, { type: "bearer" })
+                .expect(201);
 
-    //         await request(app.getHttpServer())
-    //             .post('/roles')
-    //             .send({name: 'TINYADMIN', value: 2, description: 'R' })
-    //             .auth(aliceAccess, { type: "bearer" })
-    //             .expect(201);
-    //     });
+            await request(app.getHttpServer())
+                .post('/roles')
+                .send({name: 'TINYADMIN', value: 2, description: 'R' })
+                .auth(aliceAccess, { type: "bearer" })
+                .expect(201);
+        });
 
-    // });
+    });
 
-    // describe('Проверка прав на присвоение роли', () => {
+    describe('Проверка прав на присвоение роли', () => {
 
-    //     it('Error | Eva SMALLADMIN(3) не может присвоить роль с value (2) пешке Pawn', async () => {
-    //         return await request(app.getHttpServer())
-    //             .post('/users/add_role')
-    //             .send({email: 'pawn@mail.ru', roleName: 'TINYADMIN'})
-    //             .auth(evaAccess, { type: "bearer" })
-    //             .expect(403);
-    //     });
+        it('Error | Eva SMALLADMIN(3) не может присвоить роль с value (2) пешке Pawn', async () => {
+            return await request(app.getHttpServer())
+                .post('/users/add_role')
+                .send({email: 'pawn@mail.ru', roleName: 'TINYADMIN'})
+                .auth(evaAccess, { type: "bearer" })
+                .expect(403);
+        });
 
-    //     it('Success | Alice ADMIN(10) может присвоить роль с value (2) пешке Pawn', async () => {
-    //         return await request(app.getHttpServer())
-    //             .post('/users/add_role')
-    //             .send({email: 'pawn@mail.ru', roleName: 'TINYADMIN'})
-    //             .auth(aliceAccess, { type: "bearer" })
-    //             .expect(201);
-    //     });
+        it('Success | Alice ADMIN(10) может присвоить роль с value (2) пешке Pawn', async () => {
+            return await request(app.getHttpServer())
+                .post('/users/add_role')
+                .send({email: 'pawn@mail.ru', roleName: 'TINYADMIN'})
+                .auth(aliceAccess, { type: "bearer" })
+                .expect(201);
+        });
 
-    //     it('Error | Alice ADMIN(10) не может присвоить роль с value (10) пешке Pawn', async () => {
-    //         return await request(app.getHttpServer())
-    //             .post('/users/add_role')
-    //             .send({email: 'pawn@mail.ru', roleName: 'ADMIN'})
-    //             .auth(aliceAccess, { type: "bearer" })
-    //             .expect(403);
-    //     });
+        it('Error | Alice ADMIN(10) не может присвоить роль с value (10) пешке Pawn', async () => {
+            return await request(app.getHttpServer())
+                .post('/users/add_role')
+                .send({email: 'pawn@mail.ru', roleName: 'ADMIN'})
+                .auth(aliceAccess, { type: "bearer" })
+                .expect( (resp: any) => {
+                    console.log(`add_user resp: ${JSON.stringify(resp, undefined, 2)}`);
+                })
+                .expect(403);
+        });
 
-    // });
+    });
 
     afterAll(async () => {
 
