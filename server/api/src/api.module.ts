@@ -8,9 +8,13 @@ import { InitModule } from './init/init.module';
 import { AuthController } from './controllers/auth.controller';
 import {ApiController} from "./api.controller";
 import { RolesController } from './controllers/roles.controller';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+    }),
     ClientsModule.register([
       {
         name: 'USERS-SERVICE',

@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, firstValueFrom, map, of, switchMap, throwError } from 'rxjs';
-import { rpcToHttp } from 'src/filters/proxy.error';
+import { catchError, firstValueFrom, map, throwError } from 'rxjs';
 import { InitDto } from './dto/init.dto';
 import { initRoles } from './init.roles';
 
@@ -17,22 +16,23 @@ export class InitService {
         // Метод должен быть вызван только единожды, поэтому проверяем, есть ли уже роль OWNER и как следствие главный админ
         const ownerRole = await firstValueFrom(this.usersService.send({ cmd: 'get-role-by-name' }, 'OWNER').pipe(
             map((value) => {
+                // console.log(`[init] got value: ${JSON.stringify(value)}`);
                 return value;
             }),
             // rpcToHttp()
         ));
 
-        console.log(`[init.service][init] ownerRole: ${JSON.stringify(ownerRole)}`);
+        // console.log(`[init.service][init] ownerRole: ${JSON.stringify(ownerRole)}`);
         if (ownerRole) {
             throw new HttpException('Инициализация уже была выполнена, невозможен повторный вызов', HttpStatus.FORBIDDEN);
         }
 
         // Создаём 3 базовые роли - USER, ADMIN и OWNER
-        console.log(`before USER creation`)
+        // console.log(`before USER creation`)
         await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['USER']} ));
-        console.log(`before ADMIN creation`)
+        // console.log(`before ADMIN creation`)
         await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['ADMIN']} ));
-        console.log(`before OWNER creation`)    
+        // console.log(`before OWNER creation`)    
         await firstValueFrom(this.usersService.send({ cmd: 'create-role' }, {dto: initRoles['OWNER']} ));
 
         // Зарегистрируем владельца ресурса

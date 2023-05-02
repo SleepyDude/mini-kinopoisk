@@ -4,9 +4,9 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from "express";
 import { firstValueFrom } from "rxjs";
-import { AllExceptionsFilter } from 'src/filters/all.exceptions.filter';
-import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
-import { Token, TokenEmail } from 'src/types/token.return.type';
+import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
+import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { Token, TokenEmail } from '../types/token.return.type';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Авторизация')
@@ -38,6 +38,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
+    console.log(`[api][auth][login] response.cookie: ${JSON.stringify(response.cookie)}`);
     response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
     return {token: accessToken};
   }
@@ -62,6 +63,8 @@ export class AuthController {
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response
     ) {
+        // console.log(`[api][auth][refresh] request.signedCookies: ${JSON.stringify(request.signedCookies)}`);
+        // console.log(`[api][auth][refresh] request.cookies: ${JSON.stringify(request.cookies)}`);
         const { refreshToken } = request.cookies;
         const { accessToken, newRefreshToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, refreshToken) );
         response.cookie('refreshToken', newRefreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
