@@ -28,26 +28,27 @@ export class RolesGuard implements CanActivate {
         const authHeader = request.headers['authorization'];
 
         if (!authHeader) {
-            throw new UnauthorizedException('Нет заголовка авторизации');
+            throw new HttpException('Нет заголовка авторизации', HttpStatus.UNAUTHORIZED);
         } 
         
         const authHeaderParts = (authHeader as string).split(' ');
 
         if (authHeaderParts.length !== 2 || authHeaderParts[0].toLowerCase() != 'bearer') {
-            throw new UnauthorizedException('Неверный формат заголовка авторизации');
+            // console.log('Неверный формат заголовка авторизации');
+            throw new HttpException('Неверный формат заголовка авторизации', HttpStatus.UNAUTHORIZED);
         }
 
         const jwt = authHeaderParts[1];
 
         return this.authService.send({ cmd: 'verify-access-token' }, jwt).pipe(
             switchMap((value) => {
-                console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
+                // console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
                 const { email, id, roles } = value as { email: string, id: number, roles: Array<any>};
 
                 const { error } = value;
 
                 if (error) {
-                    throw new UnauthorizedException(error);
+                    throw new HttpException(error, HttpStatus.UNAUTHORIZED);
                 }
 
                 // Проверяем роли. Необходимость роли находится в метаданных гарда
@@ -63,12 +64,12 @@ export class RolesGuard implements CanActivate {
                         context.getClass(),
                     )
                 }
-                console.log(`[api][roles.guard] roleParams in meta: ${JSON.stringify(roleParams)}`);
+                // console.log(`[api][roles.guard] roleParams in meta: ${JSON.stringify(roleParams)}`);
                 // Если их нет, то гард проходит проверку (авторизация уже прошла)
                 if (!roleParams) return of(true);
 
                 // Теперь используем объект пользователя для проверки ролей
-                console.log(`[api][roles.guard] request.params: ${JSON.stringify(request.params)}`)
+                // console.log(`[api][roles.guard] request.params: ${JSON.stringify(request.params)}`)
                 
                 // Как узнать, что пользователь собирается взять параметры о себе? Если мы договоримся, что
                 // берем данные о пользователе только как параметры и что эти данные только email либо id.

@@ -1,9 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
+import { ExceptionFilter } from '../rpc-exception.filter';
 
+@UseFilters(ExceptionFilter)
 @Controller('users')
 export class UsersController {
 
