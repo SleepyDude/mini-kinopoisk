@@ -9,6 +9,7 @@ import {ApiController} from "./api.controller";
 import { RolesController } from './controllers/roles.controller';
 import { ConfigModule } from '@nestjs/config';
 import { InitController } from './controllers/init.controller';
+import { GoogleStrategy } from './controllers/google.strategy';
 
 @Module({
   imports: [
@@ -54,6 +55,6 @@ import { InitController } from './controllers/init.controller';
       MoviesController,
       InitController
   ],
-  providers: [],
+  providers: [GoogleStrategy],
 })
 export class ApiModule {}

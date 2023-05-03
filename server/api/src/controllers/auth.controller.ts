@@ -1,5 +1,5 @@
 import { CreateUserDto } from '@hotels2023nestjs/shared';
-import { Body, Controller, Inject, Post, Req, Res, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from "express";
@@ -7,6 +7,7 @@ import { firstValueFrom } from "rxjs";
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { Token, TokenEmail } from '../types/token.return.type';
+import { AuthGuard } from '@nestjs/passport'
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Авторизация')
@@ -77,6 +78,23 @@ export class AuthController {
     @Post('vk')
     async vkLogin(
         @Body() auth: any) {
-        return this.authService.send( { cmd: 'vk' }, auth)
+        return this.authService.send( { cmd: 'login-vk' }, auth)
+    }
+
+    @UseGuards(AuthGuard('google'))
+    @ApiOperation({ summary: `Вход через google ` })
+    @ApiResponse({ status: 200, type: TokenEmail, description: ''})
+    @Get('google')
+    async googleLogin(
+        ) {
+    }
+
+    @UseGuards(AuthGuard('google'))
+    @ApiOperation({ summary: `` })
+    @ApiResponse({ status: 200, type: TokenEmail, description: ''})
+    @Get('google/callback')
+    async googleCallback(
+        @Req() request: Request) {
+        return this.authService.send( { cmd: 'google-callback' }, request['user'])
     }
 }
