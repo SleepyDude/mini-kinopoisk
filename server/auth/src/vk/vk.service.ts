@@ -1,16 +1,15 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthVK } from './vk.model';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, switchMap } from 'rxjs';
 import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class VkService {
     constructor(
         private http: HttpService,  
         private authService: AuthService,
-        @Inject('USERS-SERVICE') private readonly userService: ClientProxy,) {}
+        private userService: UsersService) {}
 
     async getUserDataFromVk(userId: number, token: string): Promise<any> {
         return this.http
@@ -46,8 +45,8 @@ export class VkService {
     
         const hasEmail = authData.data.hasOwnProperty("email");
 
-        const user = (hasEmail)? await this.userService.send( {cmd: 'get-user-by-email'}, authData.data.email) 
-        : await this.userService.send( {cmd: 'get-user-by-vk-id'}, authData.data.user_id)
+        const user = (hasEmail)? await this.userService.getUserByEmail(authData.data.email) 
+        : await this.userService.getUserById(authData.data.user_id);
 
         if (user) {
           return await this.authService.login({...user}, true);
@@ -67,7 +66,7 @@ export class VkService {
             roles: []
           };
 
-          const id = await firstValueFrom(this.userService.send( {cmd: 'create-user'}, {...userData}))
+          const id = await this.userService.createUser({...userData});
 
           let profileData = {
             id: id,

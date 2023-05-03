@@ -5,22 +5,13 @@ import { Token } from './tokens.model';
 import { TokensController } from './tokens.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   providers: [TokensService],
   exports: [TokensService],
   imports: [SequelizeModule.forFeature([ Token ]),
-            ClientsModule.register([
-              {
-                name: 'USERS-SERVICE',
-                transport: Transport.RMQ,
-                options: {
-                  urls: [process.env.CLOUDAMQP_URL],
-                  queue: process.env.USERS_QUEUE,
-                  queueOptions: { durable: false },
-                },
-              },  
-  ]),
+            UsersModule,
   JwtModule.register({})],
   controllers: [TokensController]
 })

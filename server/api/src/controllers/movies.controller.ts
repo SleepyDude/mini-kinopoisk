@@ -12,8 +12,8 @@ import { UpdateCountryDto, UpdateGenreDto, CreateReviewDto } from "@hotels2023ne
 import { Request } from "express";
 import { RolesGuard } from "../guards/roles.guard";
 import { RoleAccess } from "../guards/roles.decorator";
-import { initRoles } from "../init/init.roles";
 import { GenreQuery, PageQuery } from "../types/pagination.query.enum";
+import { initRoles } from '../guards/init.roles'
 
 @ApiTags('Фильмы')
 @Controller('movies')

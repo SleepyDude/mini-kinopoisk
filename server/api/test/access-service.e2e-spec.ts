@@ -51,8 +51,15 @@ describe('Access e2e', () => {
 
         // Инициализируем сервер
         await request(app.getHttpServer())
-            .post('/init')
-            .send({email: 'admin@mail.ru', password: 'Adm1nPa$$' })
+            .get('/init')
+            .expect(200);
+
+        const users = (await poolClient.query('SELECT * from users')).rows;
+
+        // получаем токены админа
+        await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({email: process.env.OWNER_MAIL, password: process.env.OWNER_PASSWORD })
             .expect( (resp: any) => {
                 ownerAccess = JSON.parse(resp.text).token;
             });
