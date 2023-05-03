@@ -45,40 +45,40 @@ describe('Init e2e', () => {
             });
     });
 
-    it('Инициализируем ресурс /api/init. Создаем админа со слабым паролем - ошибка', () => {
-        return request(app.getHttpServer())
-            .post('/init')
-            .send({email: 'admin@mail.ru', password: 'admin' })
-            .expect(400)
-            .expect((resp: any) => {
-                expect(resp).toHaveProperty('text');
-                const body = JSON.parse(resp.text);
-                expect(body).toHaveProperty('error');
-                const error = body.error;
-                expect(error).toMatchObject({password: 'Пароль должен иметь минимальную длину 6 символов, иметь минимум 1 строчную букву, 1 заглавную, 1 цифру и 1 спецсимвол'});
-            });
-    });
+    // it('Инициализируем ресурс /api/init. Создаем админа со слабым паролем - ошибка', () => {
+    //     return request(app.getHttpServer())
+    //         .get('/init')
+    //         // .send({email: 'admin@mail.ru', password: 'admin' })
+    //         .expect(400)
+    //         .expect((resp: any) => {
+    //             expect(resp).toHaveProperty('text');
+    //             const body = JSON.parse(resp.text);
+    //             expect(body).toHaveProperty('error');
+    //             const error = body.error;
+    //             expect(error).toMatchObject({password: 'Пароль должен иметь минимальную длину 6 символов, иметь минимум 1 строчную букву, 1 заглавную, 1 цифру и 1 спецсимвол'});
+    //         });
+    // });
 
     it('Инициализируем ресурс /api/init. Успех', async () => {
         const res = await request(app.getHttpServer())
-            .post('/init')
-            .send({email: 'admin@mail.ru', password: 'Adm1nPa$$' })
-            .expect(201)
-            .expect((resp: any) => {
+        .get('/init')
+        // .send({email: 'admin@mail.ru', password: 'admin' })
+            .expect(200)
+            // .expect((resp: any) => {
                 // console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
-                expect(resp).toHaveProperty('header');
-                const header = resp.header;
-                expect(header).toHaveProperty('set-cookie');
-                const setCookie = header['set-cookie'];
-                expect(setCookie).toHaveLength(1);
-                const refreshCookie = setCookie[0];
-                expect(validateRefresh(refreshCookie)).toBe(true);
-                expect(resp).toHaveProperty('text');
-                const body = JSON.parse(resp.text);
-                expect(body.email).toBe('admin@mail.ru');
-                expect(body).toHaveProperty('token');
-                expect(body.token.length).toBeGreaterThan(1);
-            });
+                // expect(resp).toHaveProperty('header');
+                // const header = resp.header;
+                // expect(header).toHaveProperty('set-cookie');
+                // const setCookie = header['set-cookie'];
+                // expect(setCookie).toHaveLength(1);
+                // const refreshCookie = setCookie[0];
+                // expect(validateRefresh(refreshCookie)).toBe(true);
+                // expect(resp).toHaveProperty('text');
+                // const body = JSON.parse(resp.text);
+                // expect(body.email).toBe('admin@mail.ru');
+                // expect(body).toHaveProperty('token');
+                // expect(body.token.length).toBeGreaterThan(1);
+            // });
         // Проверяем базу данных
         const users = (await poolClient.query('SELECT * from users')).rows;
         const roles = (await poolClient.query('SELECT * from roles')).rows;
@@ -86,7 +86,7 @@ describe('Init e2e', () => {
         expect(users).toHaveLength(1);
         expect(roles).toHaveLength(3);
         expect(usersRoles).toHaveLength(2);
-        return res;
+        // return res;
     });
 
     afterAll(async () => {

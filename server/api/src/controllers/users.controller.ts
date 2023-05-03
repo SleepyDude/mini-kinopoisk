@@ -5,8 +5,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
-import { initRoles } from '../init/init.roles';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { initRoles } from '../guards/init.roles';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с пользователями')
@@ -14,7 +14,7 @@ import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 export class UsersController {
 
   constructor(
-      @Inject('USERS-SERVICE') private usersService: ClientProxy,
+    @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
 
@@ -26,7 +26,7 @@ export class UsersController {
     async getUserByEmail(
         @Param('email') email: string,
     ) {
-        return this.usersService.send(
+        return this.authService.send(
             {
                 cmd: 'get-user-by-email',
             },
@@ -42,7 +42,7 @@ export class UsersController {
     async addRole(
         @Body(DtoValidationPipe) dto: AddRoleDtoEmail
     ) {
-        return this.usersService.send(
+        return this.authService.send(
             {
                 cmd: 'add-role-to-user-by-email',
             },
