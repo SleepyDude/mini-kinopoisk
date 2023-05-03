@@ -102,4 +102,11 @@ export class PersonsService {
 
     return { limit, offset };
   }
+
+  async getFilmsIdByPersonId(personId) {
+    return await this.personsFilmsRepository.findAll({
+      attributes: [['filmId', 'id']],
+      where: personId,
+    });
+  }
 }

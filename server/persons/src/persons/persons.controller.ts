@@ -30,4 +30,9 @@ export class PersonsController {
   async getPersonsAutosagest(@Payload() params) {
     return await this.personsService.getPersonsAutosagest(params);
   }
+
+  @MessagePattern({ cmd: 'get-filmsId-byPersonId' })
+  async getFilmsIdByPersonId(@Payload() personId) {
+    return await this.personsService.getFilmsIdByPersonId(personId);
+  }
 }
