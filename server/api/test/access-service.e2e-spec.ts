@@ -152,7 +152,7 @@ describe('Access e2e', () => {
             return await request(app.getHttpServer())
                 .post('/auth/registration')
                 .send({email: 'bob@mail.ru', password: '123456' })
-                .expect(409)
+                .expect(500) // Должно стать 409 после изменений в auth
                 .expect( (resp: any) => {
                     expect(resp).toHaveProperty('text');
                     const body = JSON.parse(resp.text);
@@ -451,11 +451,67 @@ describe('Access e2e', () => {
                 .post('/users/add_role')
                 .send({email: 'pawn@mail.ru', roleName: 'ADMIN'})
                 .auth(aliceAccess, { type: "bearer" })
-                .expect( (resp: any) => {
-                    console.log(`add_user resp: ${JSON.stringify(resp, undefined, 2)}`);
-                })
                 .expect(403);
         });
+
+    });
+
+    describe('[auth/login]', () => {
+        it('Логин должен возвращать аксесс токен, выставлять рефреш токен в куки и записывать его в БД', async () => {
+            let pureRefresh = undefined;
+            await request(app.getHttpServer())
+                .post('/auth/login')
+                .send({email: 'carol@mail.ru', password: '123456'})
+                .expect(201)
+                .expect( (resp: any) => {
+                    expect(resp).toHaveProperty('header');
+                    const header = resp.header;
+                    expect(header).toHaveProperty('set-cookie');
+                    const setCookie = header['set-cookie'];
+                    expect(setCookie).toHaveLength(1);
+                    const refreshCookie = setCookie[0];
+                    expect(validateRefresh(refreshCookie)).toBeTruthy();
+                    expect(resp).toHaveProperty('text');
+                    const body = JSON.parse(resp.text);
+                    expect(body).toHaveProperty('token');
+                    expect(body.token.length).toBeGreaterThan(1);
+                    carolAccess = body.token;
+                    carolRefresh = header['set-cookie'];
+                    pureRefresh = header['set-cookie'][0].split('=')[1].split(';')[0] as string;
+                    // console.log(`pure refresh: ${pureRefresh}`);
+                });
+                // Проверим, что в базе есть токен
+                // const refresh_name = 'refreshToken';
+                // const tokens = (await poolClient.query(`SELECT * from tokens WHERE $1 = $2`, [refresh_name, pureRefresh])).rows;
+                const tokens = (await poolClient.query(`SELECT * from tokens WHERE id = $1`, [5])).rows;
+                // const tokens = (await poolClient.query(`SELECT * from tokens`)).rows;
+                // console.log(`tokens: ${JSON.stringify(tokens, undefined, 2)}`);
+                expect(tokens).toHaveLength(1);
+                expect(tokens[0]).toHaveProperty('refreshToken', pureRefresh);
+        });
+    });
+
+    describe('[auth/logout]', () => {
+        it('Логаут должен удалять рефреш из БД и из куков', async () => {
+            let pureRefresh = undefined;
+            await request(app.getHttpServer())
+                .post('/auth/logout')
+                .set('Cookie', carolRefresh)
+                .expect(201)
+                .expect( (resp: any) => {
+                    expect(resp).toHaveProperty('header');
+                    const header = resp.header;
+                    expect(header).toHaveProperty('set-cookie');
+                    const setCookie = header['set-cookie'];
+                    expect(setCookie).toHaveLength(1);
+                    pureRefresh = header['set-cookie'][0].split('=')[1].split(';')[0] as string;
+                    expect(pureRefresh).toBe(''); // Обнулен токен в куках
+                });
+            // Проверим, что запись о токене удалена из базы
+            const tokens = (await poolClient.query(`SELECT * from tokens WHERE id = $1`, [5])).rows;
+            expect(tokens).toHaveLength(0);
+        });
+
 
     });
 

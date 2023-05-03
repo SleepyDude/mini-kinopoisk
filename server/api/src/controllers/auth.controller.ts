@@ -38,7 +38,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
-    // console.log(`[api][auth][login] refreshToken: ${refreshToken}`);
+    // console.log(`[api][auth][login] response.cookie: ${JSON.stringify(response.cookie)}`);
     response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
     return {token: accessToken};
   }
