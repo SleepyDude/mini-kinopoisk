@@ -17,7 +17,6 @@ export class AuthController {
       @Inject('AUTH-SERVICE') private authService: ClientProxy,
   ) {}
 
-
   @ApiOperation({ summary: 'Регистрация' })
   @ApiResponse({ status: 201, type: TokenEmail, description: 'Регистрация, refresh token записывает в куки' })
   @Post('registration')
