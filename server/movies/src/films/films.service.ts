@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 import { Reviews } from '../reviews/reviews.model';
@@ -155,7 +155,22 @@ export class FilmsService {
         ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: films };
 
-    return await this.filmsRepository.findAndCountAll({
+    const result = await this.filmsRepository.findAll({
+      group: [
+        'id',
+        'kinopoiskId',
+        'nameRu',
+        'nameOriginal',
+        'ratingKinopoiskVoteCount',
+        'posterUrl',
+        'posterUrlPreview',
+        'coverUrl',
+        'logoUrl',
+        'ratingKinopoisk',
+        'year',
+        'filmLength',
+        'type',
+      ],
       attributes: [
         'id',
         'kinopoiskId',
@@ -188,6 +203,7 @@ export class FilmsService {
       limit,
       offset,
     });
+    return { count: result.length, result };
   }
 
   async getFilmsByIdPrevious(filmsId) {
