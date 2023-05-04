@@ -152,7 +152,7 @@ describe('Access e2e', () => {
             return await request(app.getHttpServer())
                 .post('/auth/registration')
                 .send({email: 'bob@mail.ru', password: '123456' })
-                .expect(500) // Должно стать 409 после изменений в auth
+                .expect(409) // Должно стать 404 после изменений в auth
                 .expect( (resp: any) => {
                     expect(resp).toHaveProperty('text');
                     const body = JSON.parse(resp.text);

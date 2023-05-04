@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-// import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
-import { HttpRpcException } from '../exceptions/http.rpc.exception';
+import { HttpRpcException } from '@hotels2023nestjs/shared';
 import { RolesService } from '../roles/roles.service';
 import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
 import { CreateUserDto } from './dto/create-user.dto';

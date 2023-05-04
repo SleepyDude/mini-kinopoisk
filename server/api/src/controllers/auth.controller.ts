@@ -51,9 +51,7 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response
     ) {
         const { refreshToken } = request.cookies;
-        console.log(`[api][auth][login] request.cookies: ${JSON.stringify(request.cookies)}`);
         response.clearCookie('refreshToken');
-        console.log(`[api][auth][login] refreshToken: ${refreshToken}`);
         const success =  await firstValueFrom(this.authService.send({cmd: 'logout'}, refreshToken));
         return !!success;
     }
