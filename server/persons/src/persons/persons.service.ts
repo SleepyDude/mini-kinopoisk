@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { PersonsFilms } from './persons.staff.m2m.model';
 import { Persons } from './persons.model';
 import { Op } from 'sequelize';
+import { firstValueFrom, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class PersonsService {
@@ -103,10 +104,13 @@ export class PersonsService {
     return { limit, offset };
   }
 
-  async getFilmsIdByPersonId(personId) {
+  async getFilmsIdByPersonId(personQuery) {
     return await this.personsFilmsRepository.findAll({
       attributes: [['filmId', 'id']],
-      where: personId,
+      where: {
+        [Op.and]: personQuery[0],
+        [Op.and]: personQuery[1],
+      },
     });
   }
 }

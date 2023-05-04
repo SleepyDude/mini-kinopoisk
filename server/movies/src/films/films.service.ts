@@ -100,9 +100,10 @@ export class FilmsService {
     const genres = [];
     const countries = [];
     const orderBy = [];
+    const personQuery = [];
     let filmsIdByPerson = [];
 
-    const { page, size, personId, profession } = params;
+    const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);
 
     for (const [key, value] of Object.entries(params)) {
@@ -129,25 +130,22 @@ export class FilmsService {
           'ASC',
         ]);
       }
-    }
-    // Если в квери есть айди персоны
-    if (personId) {
-      // Получаем массив айди фильмов принадлежащих этой персоне с проверкой на профессию
-      // проверка происходит в функции персон. Если персона не соответствует запросу то
-      // мы получим null
-      filmsIdByPerson = await lastValueFrom(
-        this.moviesClient.send(
-          { cmd: 'get-filmsId-byPersonId' },
-          { staffId: personId, professionKey: profession },
-        ),
-      );
-      //Если не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
-      if (filmsIdByPerson.length === 0) {
-        return new HttpException(
-          'Данная персона не соответствует профессии. Если вы уверены что это не так, данные отсутствуют в базе данных, сообщите об этом',
-          HttpStatus.NOT_FOUND,
-        );
+      //Если ключ - это профессия актера
+      if (key === 'DIRECTOR' || key === 'ACTOR') {
+        personQuery.push({ professionKey: key, staffId: value });
       }
+    }
+    console.log('ПЕРСОН КВЕРИ: ', personQuery);
+    filmsIdByPerson = await lastValueFrom(
+      this.moviesClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
+    );
+    console.log('FINAL MOVIES: ', filmsIdByPerson);
+    //Если не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
+    if (filmsIdByPerson.length === 0) {
+      return new HttpException(
+        'Данная персона не соответствует профессии. Если вы уверены что это не так, данные отсутствуют в базе данных, сообщите об этом',
+        HttpStatus.NOT_FOUND,
+      );
     }
     // Фильмы полученные от персон должны быть с оператором ИЛИ
     const whereQuery =
