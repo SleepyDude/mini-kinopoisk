@@ -142,4 +142,4 @@ pgdata
 /client
 
 # shared
-# /shared/package-lock.json
+/shared/package-lock.json
