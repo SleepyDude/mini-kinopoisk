@@ -140,3 +140,6 @@ pgdata
 
 #client auth branch local
 /client
+
+# shared
+/shared/package-lock.json

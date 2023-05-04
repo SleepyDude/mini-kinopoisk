@@ -1,9 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserDto } from './dto/user.dto';
 import { Token } from './tokens.model';
+import { ExceptionFilter } from '../rpc-exception.filter';
 
+@UseFilters(ExceptionFilter)
 @Controller('tokens')
 export class TokensController {
     constructor(private tokenService: TokensService) {}

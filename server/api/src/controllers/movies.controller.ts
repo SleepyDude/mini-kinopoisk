@@ -14,6 +14,7 @@ import { RolesGuard } from "../guards/roles.guard";
 import { RoleAccess } from "../guards/roles.decorator";
 import { GenreQuery, PageQuery } from "../types/pagination.query.enum";
 import { initRoles } from '../guards/init.roles'
+import { lastValueFrom } from "rxjs";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -71,7 +72,7 @@ export class MoviesController {
     @ApiResponse({ status: 200, description: 'Выводит полный список актеров по фильм айди' })
     @Get('/about/:id/staff')
     getStaffByFilmId(@Param('id') id) {
-        return this.personsService.send({ cmd: 'get-staff-by-filmId' }, id)
+        return this.personsService.send({ cmd: 'get-staff-by-filmId' }, id);
     }
 
     @ApiQuery({ name: 'nameRu', required: false })

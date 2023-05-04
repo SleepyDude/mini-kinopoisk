@@ -2,6 +2,7 @@ import { AddRoleDto, AddRoleDtoEmail, Role, User } from '@hotels2023nestjs/share
 import { Body, Controller, Get, Inject, Param, Post, UseFilters, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserPermission } from '../decorators/user-permission.decorator';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
@@ -40,13 +41,14 @@ export class UsersController {
     @ApiResponse({ status: 201, type: Role, description: 'Добавить роль может только пользователь не ниже ранга 10 (ADMIN), только роль с рангом меньшим, чем у него' })
     @Post('/add_role')
     async addRole(
-        @Body(DtoValidationPipe) dto: AddRoleDtoEmail
+        @Body(DtoValidationPipe) dto: AddRoleDtoEmail,
+        @UserPermission() maxRoleValue: number,
     ) {
         return this.authService.send(
             {
                 cmd: 'add-role-to-user-by-email',
             },
-            dto,
+            {dto, maxRoleValue},
         )
     }
 }

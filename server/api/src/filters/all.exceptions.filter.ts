@@ -25,12 +25,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
             }
         } else {
             // console.log(`Получена ошибка отличная от HttpException:\n\n${JSON.stringify(exception)}\n\n`);
-            const { message } = exception as {message: string};
+            const { message, statusCode } = exception as {message: string, statusCode: number};
             if (message) {
                 errorMessage = message;
-                status = HttpStatus.BAD_REQUEST;
             } else {
                 errorMessage = 'Произошла неизвестная ошибка отличная от HttpException';
+            }
+
+            if (statusCode) {
+                status = statusCode;
+            } else {
                 status = HttpStatus.INTERNAL_SERVER_ERROR;
             }
         }
