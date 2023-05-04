@@ -142,10 +142,7 @@ export class FilmsService {
     if (personQuery.length > 0) {
       //не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
       if (filmsIdByPerson.length === 0) {
-        return new HttpException(
-          'Данная персона не соответствует профессии. Если вы уверены что это не так, данные отсутствуют в базе данных, сообщите об этом',
-          HttpStatus.NOT_FOUND,
-        );
+        return []; // Возвращаем пустой массив как говорил Евгений с фронта
       }
     }
     // Фильмы полученные от персон должны быть с оператором ИЛИ
@@ -154,7 +151,7 @@ export class FilmsService {
         ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: films };
 
-    return await this.filmsRepository.findAndCountAll({
+    const resFilms = await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
         'kinopoiskId',
@@ -188,6 +185,9 @@ export class FilmsService {
       offset,
       distinct: true,
     });
+
+    // return {count: resFilms.count, films: resFilms.rows.map(x => x.nameRu)};
+    return resFilms;
   }
 
   async getFilmsByIdPrevious(filmsId) {

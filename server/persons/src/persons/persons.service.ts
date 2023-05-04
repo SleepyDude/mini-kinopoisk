@@ -103,7 +103,12 @@ export class PersonsService {
     return { limit, offset };
   }
 
-  async getFilmsIdByPersonId(personQuery) {
+  async getFilmsIdByPersonId(personQuery: Array<any>) {
+
+    personQuery.map( el => ( {[Op.and]: el} ) );
+
+    // console.log(`new personQuery: ${JSON.stringify(personQuery)}`);
+
     const res: Array<{ id: number }> =
       await this.personsFilmsRepository.findAll({
         attributes: [['filmId', 'id']],
@@ -112,7 +117,7 @@ export class PersonsService {
         },
       });
 
-    if (personQuery > 1) {
+    if (personQuery.length > 1) {
       const temp = new Map<number, number>();
       return res.filter((val) => {
         if (temp.has(val.id)) {
