@@ -103,10 +103,25 @@ export class PersonsService {
     return { limit, offset };
   }
 
-  async getFilmsIdByPersonId(personId) {
-    return await this.personsFilmsRepository.findAll({
-      attributes: [['filmId', 'id']],
-      where: personId,
-    });
+  async getFilmsIdByPersonId(personQuery) {
+    const res: Array<{ id: number }> =
+      await this.personsFilmsRepository.findAll({
+        attributes: [['filmId', 'id']],
+        where: {
+          [Op.or]: personQuery,
+        },
+      });
+
+    if (personQuery > 1) {
+      const temp = new Map<number, number>();
+      return res.filter((val) => {
+        if (temp.has(val.id)) {
+          return true;
+        }
+        temp.set(val.id, 1);
+        return false;
+      });
+    }
+    return res;
   }
 }

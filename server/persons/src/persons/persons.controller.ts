@@ -32,7 +32,7 @@ export class PersonsController {
   }
 
   @MessagePattern({ cmd: 'get-filmsId-byPersonId' })
-  async getFilmsIdByPersonId(@Payload() personId) {
-    return await this.personsService.getFilmsIdByPersonId(personId);
+  async getFilmsIdByPersonId(@Payload() personQuery) {
+    return await this.personsService.getFilmsIdByPersonId(personQuery);
   }
 }
