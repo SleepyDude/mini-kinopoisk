@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import sequelize, { Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 import { Reviews } from '../reviews/reviews.model';
