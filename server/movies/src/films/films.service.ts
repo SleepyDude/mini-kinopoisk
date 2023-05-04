@@ -155,22 +155,7 @@ export class FilmsService {
         ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: films };
 
-    const result = await this.filmsRepository.findAll({
-      group: [
-        'id',
-        'kinopoiskId',
-        'nameRu',
-        'nameOriginal',
-        'ratingKinopoiskVoteCount',
-        'posterUrl',
-        'posterUrlPreview',
-        'coverUrl',
-        'logoUrl',
-        'ratingKinopoisk',
-        'year',
-        'filmLength',
-        'type',
-      ],
+    return await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
         'kinopoiskId',
@@ -202,8 +187,8 @@ export class FilmsService {
       ],
       limit,
       offset,
+      distinct: true,
     });
-    return { count: result.length, result };
   }
 
   async getFilmsByIdPrevious(filmsId) {
