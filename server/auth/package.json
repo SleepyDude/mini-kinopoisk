@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@hotels2023nestjs/shared": "^1.1.0",
+    "@hotels2023nestjs/shared": "^1.2.4",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^2.3.1",

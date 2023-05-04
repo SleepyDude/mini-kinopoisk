@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthVK } from './vk.model';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { HttpRpcException } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class VkService {
@@ -40,7 +41,8 @@ export class VkService {
         try {
           authData = await this.getVkToken(auth.code);
         } catch (err) {
-          throw new BadRequestException("Wrong VK code");
+          throw new HttpRpcException('Wrong VK code', HttpStatus.BAD_REQUEST);
+          // throw new BadRequestException("Wrong VK code");
         }
     
         const hasEmail = authData.data.hasOwnProperty("email");
@@ -79,7 +81,8 @@ export class VkService {
     
           return this.authService.login(userData, true);
         } catch (err) {
-          throw new BadRequestException(err);
+          throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);
+          // throw new BadRequestException(err);
         }
       }
     

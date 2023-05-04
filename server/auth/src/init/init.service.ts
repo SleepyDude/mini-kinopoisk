@@ -1,8 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { initRoles } from './init.roles';
 import { RolesService } from 'src/roles/roles.service';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs'
+import { HttpRpcException } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class InitService {
@@ -16,7 +17,7 @@ export class InitService {
         // Метод должен быть вызван только единожды, поэтому проверяем, есть ли уже роль OWNER и как следствие главный админ
         const ownerRole = await this.roleService.getRoleByName('OWNER')
         if (ownerRole) {
-            throw new HttpException('Инициализация уже была выполнена, невозможен повторный вызов', HttpStatus.FORBIDDEN);
+            throw new HttpRpcException('Инициализация уже была выполнена, невозможен повторный вызов', HttpStatus.FORBIDDEN);
         }
 
         // Создаём 3 базовые роли - USER, ADMIN и OWNER
