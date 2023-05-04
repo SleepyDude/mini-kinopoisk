@@ -41,9 +41,4 @@ export class PersonsController {
     async getPersonsAutosagest(@Query() params) {
         return this.personsClient.send({ cmd: 'get-persons-autosagest' }, params);
     }
-
-    @Get('/test')
-    getFilmsByPersonId(@Query() id) {
-        return this.personsClient.send({ cmd: 'get-filmsId-byPersonId' }, id)
-    }
 }
