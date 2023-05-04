@@ -3,7 +3,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from "rxjs";
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FiltersProfessionQuery } from "../types/filters.query.enum";
-import { annotateModelWithIndex } from "sequelize-typescript";
 
 @ApiTags('Актеры и прочий состав')
 @Controller('persons')

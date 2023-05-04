@@ -148,7 +148,6 @@ export class FilmsService {
         );
       }
     }
-    console.log('id films', filmsIdByPerson);
     // Фильмы полученные от персон должны быть с оператором ИЛИ
     const whereQuery =
       filmsIdByPerson.length > 0
