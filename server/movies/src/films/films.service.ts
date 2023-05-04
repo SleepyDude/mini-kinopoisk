@@ -135,18 +135,20 @@ export class FilmsService {
         personQuery.push({ professionKey: key, staffId: value });
       }
     }
-    console.log('ПЕРСОН КВЕРИ: ', personQuery);
     filmsIdByPerson = await lastValueFrom(
       this.moviesClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
     );
-    console.log('FINAL MOVIES: ', filmsIdByPerson);
-    //Если не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
-    if (filmsIdByPerson.length === 0) {
-      return new HttpException(
-        'Данная персона не соответствует профессии. Если вы уверены что это не так, данные отсутствуют в базе данных, сообщите об этом',
-        HttpStatus.NOT_FOUND,
-      );
+    // если запрос на персону был, но:
+    if (personQuery.length > 0) {
+      //не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
+      if (filmsIdByPerson.length === 0) {
+        return new HttpException(
+          'Данная персона не соответствует профессии. Если вы уверены что это не так, данные отсутствуют в базе данных, сообщите об этом',
+          HttpStatus.NOT_FOUND,
+        );
+      }
     }
+    console.log('id films', filmsIdByPerson);
     // Фильмы полученные от персон должны быть с оператором ИЛИ
     const whereQuery =
       filmsIdByPerson.length > 0
