@@ -109,6 +109,7 @@ dist
 #main:
 /.env
 pgdata
+pgdata-test
 
 #api
 /server/api/package-lock.json
