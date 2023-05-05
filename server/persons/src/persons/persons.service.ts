@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { PersonsFilms } from './persons.staff.m2m.model';
 import { Persons } from './persons.model';
 import { Op } from 'sequelize';
+import { PersonsQueryDto } from './dto/persons.query.dto';
 
 @Injectable()
 export class PersonsService {
@@ -47,7 +48,7 @@ export class PersonsService {
     };
   }
 
-  async getAllPersons(params) {
+  async getAllPersons(params: PersonsQueryDto) {
     const { page, size, name } = params;
     const condition = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
