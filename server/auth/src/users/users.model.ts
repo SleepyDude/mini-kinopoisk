@@ -20,12 +20,19 @@ export class User extends Model<User, UserCreateAttrs> {
   })
   id: number;
 
+  @ApiProperty({example: '1', description: 'Unique identifier'}) 
+  @Column({
+    type: DataType.INTEGER,
+    unique: true
+  })
+  vk_id: number;
+
   @ApiProperty({example: 'name@post.ru', description: 'E-mail address'}) 
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
   email: string;
 
   @ApiProperty({example: '********', description: 'Secure password'}) 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true })
   password: string;
 
   // @ApiProperty({example: 'false', description: 'Is account activated?'}) 

@@ -7,6 +7,7 @@ import { AuthVK } from 'src/vk/vk.model';
 import { VkService } from 'src/vk/vk.service';
 import { ExceptionFilter } from '../rpc-exception.filter';
 import { InitService } from '../init/init.service';
+import { GoogleService } from 'src/google/google.service';
 
 @UseFilters(ExceptionFilter)
 @Controller('auth')
@@ -16,7 +17,9 @@ export class AuthController {
         private authService: AuthService,
         private tokenService: TokensService,
         private vkService: VkService,
-        private initService: InitService
+        private initService: InitService,
+        private googleService: GoogleService,
+        // private readonly sharedService: SharedService,
     ) {}
 
     @MessagePattern({ cmd: 'init' })
@@ -26,16 +29,29 @@ export class AuthController {
     }
 
     @MessagePattern({ cmd: 'vk' })
-    async loginVk(
+    async vkAuth(
+        // @Ctx() context: RmqContext,
         @Payload() auth: AuthVK,
     ) {
+        console.log(`[auth][controller][vkAuth][run]`)
+
         return await this.vkService.loginVk(auth); 
     }
 
+    @MessagePattern({ cmd: 'google-callback' })
+    async googleAuthRedirect(
+        // @Ctx() context: RmqContext,
+        @Payload() user 
+    ) {
+        // this.sharedService.acknowledgeMessage(context);
+        // console.log(`[auth][users.controller][getUserByEmail] email: ${JSON.stringify(email)}`);
+
+        return await this.googleService.googleLogin(user);
+    }
 
     @MessagePattern({ cmd: 'login' })
     async login(
-        @Payload() dto: LoginDto, 
+        @Payload() dto: LoginDto
     ){
         return await this.authService.login(dto); 
     }

@@ -6,6 +6,7 @@ import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.model';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService {
@@ -28,8 +29,8 @@ export class UsersService {
             await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
             return user.id;
         } catch (e) {
-            // console.log(`\nError in userRepository.create:\n\n${JSON.stringify(e)}\n\n`);
-            throw new HttpRpcException("Пользователь уже существует", HttpStatus.CONFLICT);
+            console.log(`\nError in userRepository.create:\n\n${JSON.stringify(e)}\n\n`);
+            throw new RpcException("Пользователь уже существует");
         }
     }
 
@@ -44,6 +45,11 @@ export class UsersService {
 
     async getUserById(id: number) {
         const user = await this.userRepository.findOne({ where: {id: id}, include: {all: true} });
+        return user;
+    }
+
+    async getUserByVkId(id: number) {
+        const user = await this.userRepository.findOne({ where: {vk_id: id}, include: {all: true} });
         return user;
     }
 

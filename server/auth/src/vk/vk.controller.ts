@@ -17,8 +17,8 @@ export class VkController {
     ) {}
 
     @MessagePattern({ cmd: 'login-vk' })
-    async vk(@Body(new ValidationPipe()) auth: AuthVK) {
-
+    async loginVk(@Body(new ValidationPipe()) auth: AuthVK) {
+        this.vkService.loginVk(auth);
      }
   
 }

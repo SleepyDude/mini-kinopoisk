@@ -9,11 +9,14 @@ import {ApiController} from "./api.controller";
 import { RolesController } from './controllers/roles.controller';
 import { ConfigModule } from '@nestjs/config';
 import { InitController } from './controllers/init.controller';
+import { GoogleStrategy } from './controllers/google.strategy';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+      // envFilePath: './.env',
+
     }),
     ClientsModule.register([
       {
@@ -54,6 +57,6 @@ import { InitController } from './controllers/init.controller';
       MoviesController,
       InitController
   ],
-  providers: [],
+  providers: [GoogleStrategy],
 })
 export class ApiModule {}
