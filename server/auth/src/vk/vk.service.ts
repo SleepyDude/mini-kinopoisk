@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthVK } from './vk.model';
 import { AuthService } from 'src/auth/auth.service';
@@ -27,28 +27,32 @@ export class VkService {
         };
     
         const host = process.env.HOST
+        console.log(`https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}/login&code=${code}`
+        )
     
         return this.http
           .get(
-            `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}/signin&code=${code}`
+            `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}/login&code=${code}`
           )
           .toPromise();
       }
 
       async loginVk(auth: AuthVK) {
         let authData;
+        console.log(`[vk][service][loginVk][run]`)
     
         try {
           authData = await this.getVkToken(auth.code);
+          console.log(`[vk][service][loginVk][run]`)
         } catch (err) {
-          throw new HttpRpcException('Wrong VK code', HttpStatus.BAD_REQUEST);
-          // throw new BadRequestException("Wrong VK code");
+          console.log(`[vk][service][loginVk][ошибка] ${err}`)
+          throw new BadRequestException("Wrong VK code");
         }
     
         const hasEmail = authData.data.hasOwnProperty("email");
 
         const user = (hasEmail)? await this.userService.getUserByEmail(authData.data.email) 
-        : await this.userService.getUserById(authData.data.user_id);
+        : await this.userService.getUserByVkId(authData.data.user_id);
 
         if (user) {
           return await this.authService.login({...user}, true);
@@ -79,7 +83,7 @@ export class VkService {
 
           // создать профиль
     
-          return this.authService.login(userData, true);
+          return await this.authService.login(userData, true);
         } catch (err) {
           throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);
           // throw new BadRequestException(err);

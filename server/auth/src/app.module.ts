@@ -4,11 +4,13 @@ import { AuthModule } from './auth/auth.module';
 import { TokensModule } from './tokens/tokens.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
       // ConfigModule.forRoot({
-      //   envFilePath: `.${process.env.NODE_ENV}.env`
+      // envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+      // // envFilePath: './.env',
       // }),
     SequelizeModule.forRoot({
       dialect: 'postgres',

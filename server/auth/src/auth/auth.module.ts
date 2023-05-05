@@ -7,10 +7,11 @@ import { InitService } from '../init/init.service';
 import { VkService } from 'src/vk/vk.service';
 import { HttpModule } from '@nestjs/axios';
 import { RolesModule } from 'src/roles/roles.module';
+import { GoogleService } from 'src/google/google.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, InitService, VkService],
+  providers: [AuthService, InitService, VkService, GoogleService],
   imports: [TokensModule,
             UsersModule,
             RolesModule,
