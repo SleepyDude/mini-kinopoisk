@@ -25,6 +25,7 @@ export class MoviesController {
         @Inject('PERSONS-SERVICE') private personsService: ClientProxy,
     ) {}
 
+    // ФИЛЬМЫ:
     @ApiQuery({name: 'page', enum: PageQuery, isArray: true,
         description: 'Доступные квери: page, size, name'})
     @ApiOperation({ summary: 'Каталог фильмов' })
@@ -53,31 +54,6 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-byFilters' }, params);
     }
 
-    @ApiOperation({ summary: 'Получение списка жанров' })
-    @ApiResponse( { status: 200, description: 'Выводит список всех жанров' })
-    @Get('/genres')
-    getAllGenres() {
-        return this.moviesService.send({ cmd: 'get-all-genres' }, {})
-    }
-
-    @ApiOperation({ summary: 'Получение списка стран' })
-    @ApiResponse({ status: 200, description: 'Выводит список всех стран' })
-    @Get('/countries')
-    getAllCountries() {
-        return this.moviesService.send({ cmd: 'get-all-countries' }, {})
-    }
-
-    @ApiParam({ name: 'id', description: 'Это долгий запрос' })
-    @ApiOperation({ summary: 'Полный список персонала фильма' })
-    @ApiResponse({ status: 200, description: 'Выводит полный список актеров по фильм айди' })
-    @Get('/about/:id/staff')
-    getStaffByFilmId(
-      @Param('id') id: number,
-      @Query() params,
-      ) {
-        return this.personsService.send({ cmd: 'get-staff-by-filmId' }, { id, ...params });
-    }
-
     @ApiQuery({ name: 'nameRu', required: false })
     @ApiQuery({ name: 'nameOriginal', required: false })
     @ApiOperation({ summary: 'Автосаджест фильмов' })
@@ -87,6 +63,26 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-autosagest' }, query)
     }
 
+    //ЖАНРЫ:
+    @ApiOperation({ summary: 'Получение списка жанров' })
+    @ApiResponse( { status: 200, description: 'Выводит список всех жанров' })
+    @Get('/genres')
+    getAllGenres() {
+        return this.moviesService.send({ cmd: 'get-all-genres' }, {})
+    }
+
+    @ApiOperation({ summary: 'Получение жанра по айди' })
+    @ApiResponse( { status: 200, description: 'Выводит один жанр' })
+    @Get('/genres/:id')
+    getGenreById(@Param('id') id) {
+        return this.moviesService.send({ cmd: 'get-genre-byId' }, id);
+    }
+
+    @ApiOperation({ summary: 'Удаление жанра по айди' })
+    @Delete('/genres/:id')
+    deleteGenreById(@Param('id') id) {
+        return this.moviesService.send({ cmd: 'delete-genre-byId' }, id);
+    }
 
     @ApiOperation({ summary: 'Апдейт жанров по айди' })
     @ApiResponse({ status: 201, description: 'Обновление жанорв' })
@@ -99,6 +95,14 @@ export class MoviesController {
           { cmd: 'update-genre-byId' },
           { id: id, genre: genre }
         );
+    }
+
+    //СТРАНЫ:
+    @ApiOperation({ summary: 'Получение списка стран' })
+    @ApiResponse({ status: 200, description: 'Выводит список всех стран' })
+    @Get('/countries')
+    getAllCountries() {
+        return this.moviesService.send({ cmd: 'get-all-countries' }, {})
     }
 
     @ApiOperation({ summary: 'Апдейт стран по айди' })
@@ -114,6 +118,19 @@ export class MoviesController {
         );
     }
 
+    //ПЕРСОНЫ:
+    @ApiParam({ name: 'id', description: 'Это долгий запрос' })
+    @ApiOperation({ summary: 'Полный список персонала фильма' })
+    @ApiResponse({ status: 200, description: 'Выводит полный список актеров по фильм айди' })
+    @Get('/about/:id/staff')
+    getStaffByFilmId(
+      @Param('id') id: number,
+      @Query() params,
+      ) {
+        return this.personsService.send({ cmd: 'get-staff-by-filmId' }, { id, ...params });
+    }
+
+    //КОММЕНТАРИИ:
     @ApiOperation({ summary: 'Создание комментария' })
     @ApiResponse({ status: 201, description: 'Комментарий создан' })
     @Post('/about/:filmId/reviews')
