@@ -6,6 +6,7 @@ import { AddRoleDto, AddRoleDtoEmail } from './dto/add-role.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.model';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService {

@@ -14,8 +14,8 @@ import { GoogleStrategy } from './controllers/google.strategy';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      // envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
-      envFilePath: './.env',
+      envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
+      // envFilePath: './.env',
 
     }),
     ClientsModule.register([

@@ -21,6 +21,6 @@ export class GoogleService {
     //create profile with firstName and lastName
     const tokens = await this.authService.login({email: email, password: null}, true);
 
-    return {accessTpken: tokens.accessToken, refreshToken: tokens.refreshToken, email: email};
+    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: email};
   }
 }
