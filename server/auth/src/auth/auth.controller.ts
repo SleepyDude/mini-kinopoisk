@@ -33,6 +33,8 @@ export class AuthController {
         // @Ctx() context: RmqContext,
         @Payload() auth: AuthVK,
     ) {
+        console.log(`[auth][controller][vkAuth][run]`)
+
         return await this.vkService.loginVk(auth); 
     }
 
@@ -49,9 +51,9 @@ export class AuthController {
 
     @MessagePattern({ cmd: 'login' })
     async login(
-        @Payload() dto: LoginDto, 
+        @Payload() dto: LoginDto, skipPasswordCheck=false
     ){
-        return await this.authService.login(dto); 
+        return await this.authService.login(dto, skipPasswordCheck); 
     }
 
     @MessagePattern({ cmd: 'registration' })

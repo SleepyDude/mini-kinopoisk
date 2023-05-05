@@ -77,13 +77,18 @@ export class AuthController {
     @ApiResponse({ status: 200, type: TokenEmail, description: 'refresh token записывает в куки'})
     @Post('vk')
     async vkLogin(
-        @Body() auth: any) {
-        return this.authService.send( { cmd: 'login-vk' }, auth)
+        @Body() auth: any,
+        @Res({ passthrough: true }) response: Response) {
+            console.log(`[auth][controller][vkAuth][run]`)
+            const tokens = await firstValueFrom(this.authService.send( { cmd: 'vk' }, auth));
+
+            response.cookie('refreshToken', tokens.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+            return {token: tokens.accessToken};
     }
 
     @UseGuards(AuthGuard('google'))
-    @ApiOperation({ summary: `Вход через google ` })
-    @ApiResponse({ status: 200, type: TokenEmail, description: ''})
+    @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
+    @ApiResponse({ status: 200})
     @Get('google')
     async googleLogin(
         ) {
@@ -91,10 +96,13 @@ export class AuthController {
 
     @UseGuards(AuthGuard('google'))
     @ApiOperation({ summary: `` })
-    @ApiResponse({ status: 200, type: TokenEmail, description: ''})
+    @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
     @Get('google/callback')
     async googleCallback(
-        @Req() request: Request) {
-        return this.authService.send( { cmd: 'google-callback' }, request['user'])
+        @Req() request: Request,
+        @Res({ passthrough: true }) response: Response) {
+        const googleResponseData = await firstValueFrom(this.authService.send( { cmd: 'google-callback' }, request['user']));
+        response.cookie('refreshToken', googleResponseData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+        return {token: googleResponseData.accessToken, email: googleResponseData.email};    
     }
 }

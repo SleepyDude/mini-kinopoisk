@@ -17,8 +17,11 @@ export class AuthService {
 
     const user = await this.defineUserExists(userDto.email);
     const userPassword = user?.password;
-    const isRightPassword = await bcrypt.compare(userDto.password, userPassword);
-
+    let isRightPassword;
+    if (userPassword) {
+      isRightPassword = await bcrypt.compare(userDto.password, userPassword);
+    }
+    
     if (!isRightPassword && !skipPasswordCheck) {
       throw new RpcException("Invalid credentials");
     }
@@ -26,7 +29,6 @@ export class AuthService {
     const tokens = await this.tokenService.generateAndSaveToken(tokenData);
 
     return tokens;
-
   }
 
   async defineUserExists(email: string) : Promise<any> {
