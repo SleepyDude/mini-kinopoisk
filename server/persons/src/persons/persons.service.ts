@@ -19,7 +19,6 @@ export class PersonsService {
       where: { filmId: id },
       limit: 10,
     });
-    console.log(staff);
     return await this.personsRepository.findAll({
       attributes: {
         exclude: ['createdAt', 'updatedAt'],
