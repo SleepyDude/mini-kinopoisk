@@ -12,26 +12,22 @@ export class PersonsService {
     @InjectModel(Persons) private personsRepository: typeof Persons,
   ) {}
 
-  async getStaffByFilmIdPrevious(id) {
-    const actors = [];
-    const staff = await this.personsFilmsRepository.findAll({
+  async getPreviousStaffByFilmId(id) {
+    const staff: any[] = await this.personsFilmsRepository.findAll({
+      raw: true,
+      attributes: [['staffId', 'personId']],
       where: { filmId: id },
       limit: 10,
     });
-    for (const personId of staff) {
-      actors.push({
-        professionText: personId.professionText,
-        professionKey: personId.professionKey,
-        person: await this.personsRepository.findOne({
-          attributes: {
-            exclude: ['createdAt', 'updatedAt'],
-          },
-          where: { personId: personId.staffId },
-        }),
-      });
-    }
-
-    return actors;
+    console.log(staff);
+    return await this.personsRepository.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+      where: {
+        [Op.or]: staff,
+      },
+    });
   }
 
   async getPersonById(id) {
@@ -104,8 +100,7 @@ export class PersonsService {
   }
 
   async getFilmsIdByPersonId(personQuery: Array<any>) {
-
-    personQuery.map( el => ( {[Op.and]: el} ) );
+    personQuery.map((el) => ({ [Op.and]: el }));
 
     // console.log(`new personQuery: ${JSON.stringify(personQuery)}`);
 

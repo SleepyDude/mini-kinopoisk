@@ -13,7 +13,7 @@ export class PersonsController {
 
   @MessagePattern({ cmd: 'get-staff-previous' })
   async getStaffByFilmIdPrevious(@Payload() id) {
-    return await this.personsService.getStaffByFilmIdPrevious(id);
+    return await this.personsService.getPreviousStaffByFilmId(id);
   }
 
   @MessagePattern({ cmd: 'get-person-byId' })
