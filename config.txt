@@ -75,8 +75,8 @@ REACT_APP_CLIENT_ID=51619671
     - Зайти в каталог сервиса, который хотите протестировать (докер запускать не нужно)
     - Запустить команду `npm run test`
 
-Для запуска e2e тестов:
-    - Создать тестовый стенд из корневой директории проекта `docker compose -f docker-compose-test.yml build'
-    - Затем запустить его 'docker compose -f docker-compose-test.yml up'
+Для запуска auth e2e тестов:
+    - Создать тестовый стенд сервиса Auth из корневой директории проекта `docker compose -f docker-compose-test-auth.yml build'
+    - Затем запустить его 'docker compose -f docker-compose-test-auth.yml up'
     - Зайти в корневую папку сервиса api
     - Запустить команду `npm run test:e2e`
