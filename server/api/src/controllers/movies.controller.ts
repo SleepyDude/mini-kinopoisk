@@ -105,6 +105,13 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-all-countries' }, {})
     }
 
+    @ApiOperation({ summary: 'Получение страны по айди' })
+    @ApiResponse({ status: 200, description: 'Выводит страны по айди' })
+    @Get('/countries/:id')
+    getCountriesById(@Param('id') countryId) {
+        return this.moviesService.send({ cmd: 'get-country-byId' }, countryId);
+    }
+
     @ApiOperation({ summary: 'Апдейт стран по айди' })
     @ApiResponse({ status: 201, description: 'Обновление стран' })
     @Post('/countries/:id')
@@ -116,6 +123,12 @@ export class MoviesController {
           { cmd: 'update-country-byId' },
           { id: id, country: country },
         );
+    }
+
+    @ApiOperation({ summary: 'Удаление страны по айди' })
+    @Delete('/countries/:id')
+    deleteCountriesById(@Param('id') countryId) {
+        return this.moviesService.send({ cmd: 'get-country-byId' }, countryId);
     }
 
     //ПЕРСОНЫ:
