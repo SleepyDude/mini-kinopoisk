@@ -24,7 +24,7 @@ import { FilmsQueryDto } from './dto/films.query.dto';
 @Injectable()
 export class FilmsService {
   constructor(
-    @Inject('MOVIES-SERVICE') private moviesClient: ClientProxy,
+    @Inject('PERSONS-SERVICE') private personsClient: ClientProxy,
     @InjectModel(Films) private filmsRepository: typeof Films,
   ) {}
   async getAllFilms(params: FilmsQueryDto) {
@@ -89,7 +89,7 @@ export class FilmsService {
       where: { kinopoiskId: filmId.id },
     });
     const staff = await lastValueFrom(
-      this.moviesClient.send(
+      this.personsClient.send(
         { cmd: 'get-staff-by-filmId' },
         { id: film.id, size: 10 },
       ),
@@ -135,7 +135,7 @@ export class FilmsService {
       }
     }
     filmsIdByPerson = await lastValueFrom(
-      this.moviesClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
+      this.personsClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
     );
     if (personQuery.length > 0) {
       if (filmsIdByPerson.length === 0) {
