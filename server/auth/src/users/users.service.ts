@@ -23,15 +23,16 @@ export class UsersService {
         if (role === null) {
             throw new HttpRpcException("Роль 'USER' не найдена, необходимо выполнение инициализации ресурса", HttpStatus.I_AM_A_TEAPOT);
         }
-        
-        try {
-            let user = await this.userRepository.create(dto);
-            await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
-            return user.id;
-        } catch (e) {
-            console.log(`\nError in userRepository.create:\n\n${JSON.stringify(e)}\n\n`);
+
+        const candidate = await this.getUserByEmail(dto.email);
+        if (candidate) {
             throw new RpcException("Пользователь уже существует");
         }
+
+        let user = await this.userRepository.create(dto);
+        await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+        return user.id;
+
     }
 
     async getAllUsers() {
