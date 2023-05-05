@@ -28,11 +28,14 @@ export class UsersService {
         if (candidate) {
             throw new RpcException("Пользователь уже существует");
         }
-
-        let user = await this.userRepository.create(dto);
-        await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
-        return user.id;
-
+        
+        try {
+            let user = await this.userRepository.create(dto);
+            await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+            return user.id;
+        } catch (e) {
+            throw new RpcException("Ошибка при создании пользователя");
+        }
     }
 
     async getAllUsers() {
