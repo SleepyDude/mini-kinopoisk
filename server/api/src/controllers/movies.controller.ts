@@ -39,8 +39,8 @@ export class MoviesController {
     @ApiOperation({ summary: 'Все о фильме по айди' })
     @ApiResponse({ status: 200, description: 'Вся информация о фильме' })
     @Get('/about/:id')
-    getFilmById(@Param() id: number) {
-        return this.moviesService.send({ cmd: 'get-film-byId' }, id);
+    getFilmById(@Param() filmId: number) {
+        return this.moviesService.send({ cmd: 'get-film-byId' }, filmId);
     }
 
     @ApiQuery({ name: 'orderBy', enum: FiltersOrderByQuery, description: 'Сортировка' })

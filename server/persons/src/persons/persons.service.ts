@@ -19,6 +19,7 @@ export class PersonsService {
 
   async getPersonById(id: number) {
     const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
+      attributes: [['filmId', 'id']],
       where: { staffId: id },
     });
     const person: Persons = await this.personsRepository.findOne({
