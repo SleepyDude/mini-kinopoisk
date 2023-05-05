@@ -12,7 +12,7 @@ export class PersonsService {
     @InjectModel(Persons) private personsRepository: typeof Persons,
   ) {}
 
-  async getPreviousStaffByFilmId(id) {
+  async getPreviousStaffByFilmId(id: number): Promise<Persons[]> {
     const staff: any[] = await this.personsFilmsRepository.findAll({
       raw: true,
       attributes: [['staffId', 'personId']],
