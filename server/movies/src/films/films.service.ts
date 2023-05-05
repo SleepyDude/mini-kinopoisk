@@ -101,12 +101,12 @@ export class FilmsService {
   }
 
   async getFilmsByFilers(params) {
+    console.log('params: ', params);
     const films = [];
     const genres = [];
     const countries = [];
     const orderBy = [];
     const personQuery = [];
-    let filmsIdByPerson = [];
 
     const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);
@@ -134,7 +134,7 @@ export class FilmsService {
         personQuery.push({ professionKey: key, staffId: value });
       }
     }
-    filmsIdByPerson = await lastValueFrom(
+    const filmsIdByPerson = await lastValueFrom(
       this.personsClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
     );
     if (personQuery.length > 0) {

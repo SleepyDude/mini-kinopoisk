@@ -14,7 +14,6 @@ import { RolesGuard } from "../guards/roles.guard";
 import { RoleAccess } from "../guards/roles.decorator";
 import { GenreQuery, PageQuery } from "../types/pagination.query.enum";
 import { initRoles } from '../guards/init.roles'
-import { lastValueFrom } from "rxjs";
 
 @ApiTags('Фильмы')
 @Controller('movies')
