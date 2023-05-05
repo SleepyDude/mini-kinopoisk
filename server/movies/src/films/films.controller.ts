@@ -12,8 +12,8 @@ export class FilmsController {
   }
 
   @MessagePattern({ cmd: 'get-film-byId' })
-  async getFilmById(@Payload() id) {
-    return await this.filmsService.getFilmById(id);
+  async getFilmById(@Payload() filmId) {
+    return await this.filmsService.getFilmById(filmId);
   }
 
   @MessagePattern({ cmd: 'get-films-byId-previous' })
@@ -29,5 +29,10 @@ export class FilmsController {
   @MessagePattern({ cmd: 'get-films-autosagest' })
   async filmsAutosagest(@Payload() params) {
     return await this.filmsService.filmsAutosagest(params);
+  }
+
+  @MessagePattern({ cmd: 'update-film-byId' })
+  async updateFilmById(@Payload() film) {
+    return await this.filmsService.updateFilmById(film);
   }
 }

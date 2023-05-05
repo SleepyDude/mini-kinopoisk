@@ -15,4 +15,14 @@ export class GenresController {
   async updateGenreById(@Payload() genre) {
     return await this.genresService.updateGenreById(genre);
   }
+
+  @MessagePattern({ cmd: 'get-genre-byId' })
+  async getGenreById(@Payload() id) {
+    return await this.genresService.getGenreById(id);
+  }
+
+  @MessagePattern({ cmd: 'delete-genre-byId' })
+  async deleteGenreById(@Payload() id) {
+    return await this.genresService.deleteGenreById(id);
+  }
 }

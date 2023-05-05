@@ -14,7 +14,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     SequelizeModule.forFeature([Films, Similar, SimilarFilms]),
     ClientsModule.register([
       {
-        name: 'MOVIES-SERVICE',
+        name: 'PERSONS-SERVICE',
         transport: Transport.RMQ,
         options: {
           urls: [process.env.CLOUDAMQP_URL],
