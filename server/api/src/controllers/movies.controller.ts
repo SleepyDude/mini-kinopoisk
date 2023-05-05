@@ -62,6 +62,15 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-autosagest' }, query)
     }
 
+    @ApiParam({ name: 'id' })
+    @ApiOperation({ summary: 'Обновление имени фильма по айди' })
+    @Post('/about/:id')
+    updateFilmById(@Param('id') id,
+                   @Body() filmData
+    ) {
+        return this.moviesService.send({ cmd: 'update-film-byId' }, { id: id, film: filmData })
+    }
+
     //ЖАНРЫ:
     @ApiOperation({ summary: 'Получение списка жанров' })
     @ApiResponse( { status: 200, description: 'Выводит список всех жанров' })

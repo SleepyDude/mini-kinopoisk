@@ -30,4 +30,9 @@ export class FilmsController {
   async filmsAutosagest(@Payload() params) {
     return await this.filmsService.filmsAutosagest(params);
   }
+
+  @MessagePattern({ cmd: 'update-film-byId' })
+  async updateFilmById(@Payload() film) {
+    return await this.filmsService.updateFilmById(film);
+  }
 }

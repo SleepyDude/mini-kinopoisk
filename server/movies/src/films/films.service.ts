@@ -8,6 +8,7 @@ import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 import { Reviews } from '../reviews/reviews.model';
 import { FilmsQueryDto } from './dto/films.query.dto';
+import { FilmsUpdateDto } from './dto/films.update.dto';
 
 `***
 У получения списка фильмов есть пагинация и поиск по русскому имени.
@@ -220,5 +221,13 @@ export class FilmsService {
     const offset = page ? page * limit : 0;
 
     return { limit, offset };
+  }
+
+  async updateFilmById(film) {
+    const filmData: FilmsUpdateDto = film.film;
+    const currentFilm = await this.filmsRepository.findOne({
+      where: { kinopoiskId: film.id },
+    });
+    return await currentFilm.update(filmData);
   }
 }
