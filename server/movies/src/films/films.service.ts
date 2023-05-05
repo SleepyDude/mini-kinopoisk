@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
@@ -100,32 +100,61 @@ export class FilmsService {
     const genres = [];
     const countries = [];
     const orderBy = [];
+    const personQuery = [];
+    let filmsIdByPerson = [];
 
     const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);
 
     for (const [key, value] of Object.entries(params)) {
+      // если квери "год" или "тип" пушим ключ - значение с оператором И по умолчанию
       if (key === 'year' || key === 'type') {
         films.push({ [key]: value });
       }
+      // Если "рейтинг" или "число голосов" то пушим с оператором >=
       if (key === 'ratingKinopoisk' || key === 'ratingKinopoiskVoteCount') {
         films.push({ [key]: { [Op.gte]: value } });
       }
-
+      // жанры пушим чистым значением, в поиске подставим оператор Or
       if (key === 'genreId') {
         genres.push(value);
       }
-
+      // Так же как и с жанрами
       if (key === 'countryId') {
         countries.push(value);
       }
-
+      // ключ сортировки. Если поле nameRu - то пушим сортировку как по алфавиту, в других случая от большего к меньшему + сортировку по алфавиту
       if (key === 'orderBy') {
-        orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC']);
+        orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC'], [
+          'nameRu',
+          'ASC',
+        ]);
+      }
+      //Если ключ - это профессия актера
+      if (key === 'DIRECTOR' || key === 'ACTOR') {
+        personQuery.push({ professionKey: key, staffId: value });
       }
     }
+    filmsIdByPerson = await lastValueFrom(
+      this.moviesClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
+    );
+    // если запрос на персону был, но:
+    if (personQuery.length > 0) {
+      //не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
+      if (filmsIdByPerson.length === 0) {
+        return {
+          count: 0,
+          rows: [],
+        }; // Возвращаем пустой массив как говорил Евгений с фронта
+      }
+    }
+    // Фильмы полученные от персон должны быть с оператором ИЛИ
+    const whereQuery =
+      filmsIdByPerson.length > 0
+        ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
+        : { [Op.and]: films };
 
-    return await this.filmsRepository.findAndCountAll({
+    const resFilms = await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
         'kinopoiskId',
@@ -141,7 +170,7 @@ export class FilmsService {
         'filmLength',
         'type',
       ],
-      where: films,
+      where: whereQuery,
       order: orderBy,
       include: [
         {
@@ -157,7 +186,11 @@ export class FilmsService {
       ],
       limit,
       offset,
+      distinct: true,
     });
+
+    // return {count: resFilms.count, films: resFilms.rows.map(x => x.nameRu)};
+    return resFilms;
   }
 
   async getFilmsByIdPrevious(filmsId) {

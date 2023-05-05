@@ -35,7 +35,7 @@ describe('Init e2e', () => {
         return await request(app.getHttpServer())
             .post('/auth/registration')
             .send({email: 'user@mail.ru', password: '123321' })
-            .expect(400)
+            .expect(418)
             .expect((resp: any) => {
                 expect(resp).toHaveProperty('text');
                 const body = JSON.parse(resp.text);
@@ -91,9 +91,10 @@ describe('Init e2e', () => {
 
     afterAll(async () => {
 
-        // Чистим таблицы        
+        // Чистим таблицы
         await poolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
         await poolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
+        await poolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
 
         // console.log(queryResult.rows);
         

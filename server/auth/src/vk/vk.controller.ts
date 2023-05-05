@@ -1,11 +1,12 @@
-import { BadRequestException, Body, Controller, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Body, Controller, UseFilters, ValidationPipe } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { TokensService } from 'src/tokens/tokens.service';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { AuthVK } from './vk.model';
 import { VkService } from './vk.service';
+import { ExceptionFilter } from '../rpc-exception.filter';
 
-
+@UseFilters(ExceptionFilter)
 @Controller("/login/vk")
 export class VkController {
 

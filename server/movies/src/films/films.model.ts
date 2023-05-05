@@ -60,8 +60,8 @@ export class Films extends Model<Films> {
   @Column({ type: DataType.STRING })
   ratingKinopoisk: string;
 
-  @Column({ type: DataType.STRING })
-  ratingKinopoiskVoteCount: string;
+  @Column({ type: DataType.INTEGER })
+  ratingKinopoiskVoteCount: number;
 
   @Column({ type: DataType.STRING })
   ratingFilmCritics: string;

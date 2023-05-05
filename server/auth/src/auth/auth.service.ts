@@ -1,6 +1,5 @@
-import { CreateUserDto } from '@hotels2023nestjs/shared';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
+import { CreateUserDto, HttpRpcException } from '@hotels2023nestjs/shared';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
 import { TokensService } from 'src/tokens/tokens.service';
@@ -23,7 +22,7 @@ export class AuthService {
     }
     
     if (!isRightPassword && !skipPasswordCheck) {
-      throw new RpcException("Invalid credentials");
+      throw new HttpRpcException("Invalid credentials", HttpStatus.UNAUTHORIZED);
     }
     const tokenData = new UserDto(user);
     const tokens = await this.tokenService.generateAndSaveToken(tokenData);
@@ -39,7 +38,7 @@ export class AuthService {
 
   async registration(userDto: LoginDto) {
     if (await this.defineUserExists(userDto.email)) {
-      throw new HttpException(`Пользователь с таким e-mail уже существует`, HttpStatus.NOT_FOUND);
+      throw new HttpRpcException(`Пользователь с таким e-mail уже существует`, HttpStatus.CONFLICT);
     }
     const hashedPassword = await bcrypt.hash(userDto.password, +process.env.SALT);
 

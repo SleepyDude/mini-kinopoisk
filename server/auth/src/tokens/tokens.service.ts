@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Token } from './tokens.model';
 import { JwtService } from '@nestjs/jwt';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from 'src/users/users.service';
+import { HttpRpcException } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class TokensService { 
@@ -72,7 +73,7 @@ async tokenFromDB(refreshToken) {
 
 async getUserIdByRefreshToken(refreshToken) {
     if (!refreshToken) {
-      throw UnauthorizedException;
+      throw new HttpRpcException('Не авторизован', HttpStatus.UNAUTHORIZED);
     }
     const userData = await this.validateRefreshToken(refreshToken);
     return (userData) ? userData.id : null
@@ -81,12 +82,12 @@ async getUserIdByRefreshToken(refreshToken) {
 
   async refresh(refreshToken) {
     if (!refreshToken) {
-      throw UnauthorizedException;
+      throw new HttpRpcException('Не авторизован', HttpStatus.UNAUTHORIZED);
     }
     const userId = await this.getUserIdByRefreshToken(refreshToken);
     const tokenFromDb = await this.tokenFromDB(refreshToken);
     if (!userId || !tokenFromDb) {
-      throw UnauthorizedException;
+      throw new HttpRpcException('Не авторизован', HttpStatus.UNAUTHORIZED);
     }
   
     const user = await this.userService.getUserById(userId);

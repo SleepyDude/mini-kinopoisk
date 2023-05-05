@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthVK } from './vk.model';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { HttpRpcException } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class VkService {
@@ -84,7 +85,8 @@ export class VkService {
     
           return await this.authService.login(userData, true);
         } catch (err) {
-          throw new BadRequestException(err);
+          throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);
+          // throw new BadRequestException(err);
         }
       }
     
