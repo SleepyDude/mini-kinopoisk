@@ -71,8 +71,11 @@ export class MoviesController {
     @ApiOperation({ summary: 'Полный список персонала фильма' })
     @ApiResponse({ status: 200, description: 'Выводит полный список актеров по фильм айди' })
     @Get('/about/:id/staff')
-    getStaffByFilmId(@Param('id') id) {
-        return this.personsService.send({ cmd: 'get-staff-by-filmId' }, id);
+    getStaffByFilmId(
+      @Param('id') id: number,
+      @Query() params,
+      ) {
+        return this.personsService.send({ cmd: 'get-staff-by-filmId' }, { id, ...params });
     }
 
     @ApiQuery({ name: 'nameRu', required: false })

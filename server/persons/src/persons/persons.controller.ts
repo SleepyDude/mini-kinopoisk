@@ -1,19 +1,19 @@
 import { Controller } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  PersonsAutosagestGto,
+  PersonsQueryDto,
+  StaffQueryDto,
+} from './dto/persons.query.dto';
 
 @Controller('persons')
 export class PersonsController {
   constructor(private personsService: PersonsService) {}
 
   @MessagePattern({ cmd: 'get-all-persons' })
-  async getAllPersons(@Payload() params) {
+  async getAllPersons(@Payload() params: PersonsQueryDto) {
     return await this.personsService.getAllPersons(params);
-  }
-
-  @MessagePattern({ cmd: 'get-staff-previous' })
-  async getPreviousStaffByFilmId(@Payload() id: number) {
-    return await this.personsService.getPreviousStaffByFilmId(id);
   }
 
   @MessagePattern({ cmd: 'get-person-byId' })
@@ -22,12 +22,12 @@ export class PersonsController {
   }
 
   @MessagePattern({ cmd: 'get-staff-by-filmId' })
-  async getStaffByFilmId(@Payload() id) {
-    return await this.personsService.getStaffByFilmId(id);
+  async getStaffByFilmId(@Payload() params: StaffQueryDto) {
+    return await this.personsService.getStaffByFilmId(params);
   }
 
   @MessagePattern({ cmd: 'get-persons-autosagest' })
-  async getPersonsAutosagest(@Payload() params) {
+  async getPersonsAutosagest(@Payload() params: PersonsAutosagestGto) {
     return await this.personsService.getPersonsAutosagest(params);
   }
 

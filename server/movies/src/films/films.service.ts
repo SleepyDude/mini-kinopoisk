@@ -87,7 +87,10 @@ export class FilmsService {
       where: { kinopoiskId: id.id },
     });
     const currentStaff = await lastValueFrom(
-      this.moviesClient.send({ cmd: 'get-staff-previous' }, currentFilm.id),
+      this.moviesClient.send(
+        { cmd: 'get-staff-by-filmId' },
+        { id: currentFilm.id, size: 10 },
+      ),
     );
     return {
       currentFilm,

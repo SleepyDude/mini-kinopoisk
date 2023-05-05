@@ -3,7 +3,11 @@ import { InjectModel } from '@nestjs/sequelize';
 import { PersonsFilms } from './persons.staff.m2m.model';
 import { Persons } from './persons.model';
 import { Op } from 'sequelize';
-import { PersonsQueryDto } from './dto/persons.query.dto';
+import {
+  PersonsAutosagestGto,
+  PersonsQueryDto,
+  StaffQueryDto,
+} from './dto/persons.query.dto';
 
 @Injectable()
 export class PersonsService {
@@ -13,26 +17,7 @@ export class PersonsService {
     @InjectModel(Persons) private personsRepository: typeof Persons,
   ) {}
 
-  async getPreviousStaffByFilmId(id: number): Promise<Persons[]> {
-    const staff: any[] = await this.personsFilmsRepository.findAll({
-      raw: true,
-      attributes: [['staffId', 'personId']],
-      where: { filmId: id },
-      limit: 10,
-    });
-    return await this.personsRepository.findAll({
-      attributes: {
-        exclude: ['createdAt', 'updatedAt'],
-      },
-      where: {
-        [Op.or]: staff,
-      },
-    });
-  }
-
-  async getPersonById(
-    id: number,
-  ): Promise<{ filmsId: PersonsFilms[]; person: Persons }> {
+  async getPersonById(id: number) {
     const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
       where: { staffId: id },
     });
@@ -60,28 +45,8 @@ export class PersonsService {
     });
   }
 
-  async getStaffByFilmId(id) {
-    const actors = [];
-    const staff = await this.personsFilmsRepository.findAll({
-      where: { filmId: id },
-    });
-    for (const personId of staff) {
-      actors.push({
-        professionText: personId.professionText,
-        professionKey: personId.professionKey,
-        person: await this.personsRepository.findOne({
-          attributes: {
-            exclude: ['createdAt', 'updatedAt'],
-          },
-          where: { personId: personId.staffId },
-        }),
-      });
-    }
-    return actors;
-  }
-
-  async getPersonsAutosagest(params) {
-    const { profession, name } = params;
+  async getPersonsAutosagest(params: PersonsAutosagestGto) {
+    const { profession, name, size = 10 } = params;
     return await this.personsRepository.findAndCountAll({
       attributes: ['personId', 'nameRu'],
       where: {
@@ -90,7 +55,24 @@ export class PersonsService {
           { nameRu: { [Op.iLike]: `%${name}%` } },
         ],
       },
-      limit: 10,
+      limit: size,
+    });
+  }
+
+  async getStaffByFilmId(params: StaffQueryDto): Promise<Persons[]> {
+    const staff: any[] = await this.personsFilmsRepository.findAll({
+      raw: true,
+      attributes: [['staffId', 'personId']],
+      where: { filmId: params.id },
+      limit: params.size,
+    });
+    return await this.personsRepository.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+      where: {
+        [Op.or]: staff,
+      },
     });
   }
 
@@ -102,10 +84,6 @@ export class PersonsService {
   }
 
   async getFilmsIdByPersonId(personQuery: Array<any>) {
-    personQuery.map((el) => ({ [Op.and]: el }));
-
-    // console.log(`new personQuery: ${JSON.stringify(personQuery)}`);
-
     const res: Array<{ id: number }> =
       await this.personsFilmsRepository.findAll({
         attributes: [['filmId', 'id']],
