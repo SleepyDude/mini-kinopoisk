@@ -62,6 +62,7 @@ export class FilmsService {
   }
 
   async getFilmById(filmId) {
+    console.log(filmId);
     const film: Films = await this.filmsRepository.findOne({
       attributes: {
         exclude: [
@@ -206,10 +207,11 @@ export class FilmsService {
     const search = params.nameRu
       ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
       : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
+    const { size = 10 } = params;
     return await this.filmsRepository.findAll({
-      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal'],
+      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
       where: search,
-      limit: 10,
+      limit: size,
     });
   }
 
