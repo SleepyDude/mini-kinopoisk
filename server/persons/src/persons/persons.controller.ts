@@ -12,12 +12,12 @@ export class PersonsController {
   }
 
   @MessagePattern({ cmd: 'get-staff-previous' })
-  async getStaffByFilmIdPrevious(@Payload() id) {
+  async getPreviousStaffByFilmId(@Payload() id: number) {
     return await this.personsService.getPreviousStaffByFilmId(id);
   }
 
   @MessagePattern({ cmd: 'get-person-byId' })
-  async getPersonById(@Payload() id) {
+  async getPersonById(@Payload() id: number) {
     return await this.personsService.getPersonById(id);
   }
 

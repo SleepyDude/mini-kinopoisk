@@ -29,11 +29,13 @@ export class PersonsService {
     });
   }
 
-  async getPersonById(id) {
-    const filmsId = await this.personsFilmsRepository.findAll({
+  async getPersonById(
+    id: number,
+  ): Promise<{ filmsId: PersonsFilms[]; person: Persons }> {
+    const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
       where: { staffId: id },
     });
-    const person = await this.personsRepository.findOne({
+    const person: Persons = await this.personsRepository.findOne({
       attributes: {
         exclude: ['createdAt', 'updatedAt'],
       },
