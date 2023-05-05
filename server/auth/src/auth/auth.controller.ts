@@ -51,9 +51,9 @@ export class AuthController {
 
     @MessagePattern({ cmd: 'login' })
     async login(
-        @Payload() dto: LoginDto, skipPasswordCheck=false
+        @Payload() dto: LoginDto
     ){
-        return await this.authService.login(dto, skipPasswordCheck); 
+        return await this.authService.login(dto); 
     }
 
     @MessagePattern({ cmd: 'registration' })
