@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
@@ -7,6 +7,8 @@ import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 import { Reviews } from '../reviews/reviews.model';
+import { FilmsQueryDto } from './dto/films.query.dto';
+import { FilmsUpdateDto } from './dto/films.update.dto';
 
 `***
 У получения списка фильмов есть пагинация и поиск по русскому имени.
@@ -23,12 +25,12 @@ import { Reviews } from '../reviews/reviews.model';
 @Injectable()
 export class FilmsService {
   constructor(
-    @Inject('MOVIES-SERVICE') private moviesClient: ClientProxy,
+    @Inject('PERSONS-SERVICE') private personsClient: ClientProxy,
     @InjectModel(Films) private filmsRepository: typeof Films,
   ) {}
-  async getAllFilms(params) {
+  async getAllFilms(params: FilmsQueryDto) {
     const { page, size, name } = params;
-    const condition = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
+    const query = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
 
     return await this.filmsRepository.findAndCountAll({
@@ -54,14 +56,15 @@ export class FilmsService {
           attributes: ['id', 'countryNameRu', 'countryNameEng'],
         },
       ],
-      where: condition,
+      where: query,
       limit,
       offset,
     });
   }
 
-  async getFilmById(id) {
-    const currentFilm = await this.filmsRepository.findOne({
+  async getFilmById(filmId) {
+    console.log(filmId);
+    const film: Films = await this.filmsRepository.findOne({
       attributes: {
         exclude: [
           'reviewsCount',
@@ -84,77 +87,71 @@ export class FilmsService {
           where: { parentId: { [Op.is]: null } },
         },
       ],
-      where: { kinopoiskId: id.id },
+      where: { kinopoiskId: filmId.id },
     });
-    const currentStaff = await lastValueFrom(
-      this.moviesClient.send({ cmd: 'get-staff-previous' }, currentFilm.id),
+    const staff = await lastValueFrom(
+      this.personsClient.send(
+        { cmd: 'get-staff-by-filmId' },
+        { id: film.id, size: 10 },
+      ),
     );
     return {
-      currentFilm,
-      currentStaff,
+      film,
+      staff,
     };
   }
 
   async getFilmsByFilers(params) {
+    console.log('params: ', params);
     const films = [];
     const genres = [];
     const countries = [];
     const orderBy = [];
     const personQuery = [];
-    let filmsIdByPerson = [];
 
     const { page, size } = params;
     const { limit, offset } = this.getPagination(page, size);
 
     for (const [key, value] of Object.entries(params)) {
-      // если квери "год" или "тип" пушим ключ - значение с оператором И по умолчанию
       if (key === 'year' || key === 'type') {
         films.push({ [key]: value });
       }
-      // Если "рейтинг" или "число голосов" то пушим с оператором >=
       if (key === 'ratingKinopoisk' || key === 'ratingKinopoiskVoteCount') {
         films.push({ [key]: { [Op.gte]: value } });
       }
-      // жанры пушим чистым значением, в поиске подставим оператор Or
       if (key === 'genreId') {
         genres.push(value);
       }
-      // Так же как и с жанрами
       if (key === 'countryId') {
         countries.push(value);
       }
-      // ключ сортировки. Если поле nameRu - то пушим сортировку как по алфавиту, в других случая от большего к меньшему + сортировку по алфавиту
       if (key === 'orderBy') {
         orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC'], [
           'nameRu',
           'ASC',
         ]);
       }
-      //Если ключ - это профессия актера
       if (key === 'DIRECTOR' || key === 'ACTOR') {
         personQuery.push({ professionKey: key, staffId: value });
       }
     }
-    filmsIdByPerson = await lastValueFrom(
-      this.moviesClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
+    const filmsIdByPerson = await lastValueFrom(
+      this.personsClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
     );
-    // если запрос на персону был, но:
     if (personQuery.length > 0) {
-      //не вернулся объект с запроса, то данные не валидны. Ошибка в професии персоны
       if (filmsIdByPerson.length === 0) {
         return {
           count: 0,
           rows: [],
-        }; // Возвращаем пустой массив как говорил Евгений с фронта
+        };
       }
     }
-    // Фильмы полученные от персон должны быть с оператором ИЛИ
-    const whereQuery =
+    const queryWhere =
       filmsIdByPerson.length > 0
         ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: films };
 
-    const resFilms = await this.filmsRepository.findAndCountAll({
+    return await this.filmsRepository.findAndCountAll({
       attributes: [
         'id',
         'kinopoiskId',
@@ -170,7 +167,7 @@ export class FilmsService {
         'filmLength',
         'type',
       ],
-      where: whereQuery,
+      where: queryWhere,
       order: orderBy,
       include: [
         {
@@ -188,44 +185,34 @@ export class FilmsService {
       offset,
       distinct: true,
     });
-
-    // return {count: resFilms.count, films: resFilms.rows.map(x => x.nameRu)};
-    return resFilms;
   }
 
   async getFilmsByIdPrevious(filmsId) {
-    const films = [];
-
-    for (const item of filmsId) {
-      films.push(
-        await this.filmsRepository.findAll({
-          where: item.filmId,
-          attributes: [
-            'kinopoiskId',
-            'year',
-            'nameRu',
-            'nameOriginal',
-            'posterUrl',
-            'posterUrlPreview',
-            'coverUrl',
-            'logoUrl',
-            'ratingKinopoisk',
-          ],
-        }),
-      );
-    }
-
-    return films;
+    return await this.filmsRepository.findAll({
+      where: filmsId,
+      attributes: [
+        'kinopoiskId',
+        'year',
+        'nameRu',
+        'nameOriginal',
+        'posterUrl',
+        'posterUrlPreview',
+        'coverUrl',
+        'logoUrl',
+        'ratingKinopoisk',
+      ],
+    });
   }
 
   async filmsAutosagest(params) {
     const search = params.nameRu
       ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
       : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
+    const { size = 10 } = params;
     return await this.filmsRepository.findAll({
-      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal'],
+      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
       where: search,
-      limit: 10,
+      limit: size,
     });
   }
 
@@ -234,5 +221,13 @@ export class FilmsService {
     const offset = page ? page * limit : 0;
 
     return { limit, offset };
+  }
+
+  async updateFilmById(film) {
+    const filmData: FilmsUpdateDto = film.film;
+    const currentFilm = await this.filmsRepository.findOne({
+      where: { kinopoiskId: film.id },
+    });
+    return await currentFilm.update(filmData);
   }
 }
