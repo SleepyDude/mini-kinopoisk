@@ -16,6 +16,7 @@ export * from './dto/roles/update-role.dto';
 // models
 export * from './models/users/users.model';
 export * from './models/users/roles.model';
+export * from './dto/vk/vk.model'
 
 // exceptions
 export * from './exceptions/http.rpc.exception';
