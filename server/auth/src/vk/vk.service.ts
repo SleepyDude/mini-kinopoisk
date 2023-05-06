@@ -1,9 +1,8 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AuthVK } from './vk.model';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
-import { HttpRpcException } from '@hotels2023nestjs/shared';
+import { AuthVK, HttpRpcException } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class VkService {
@@ -27,8 +26,6 @@ export class VkService {
         };
     
         const host = process.env.HOST
-        console.log(`https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}/login&code=${code}`
-        )
     
         return this.http
           .get(
@@ -39,13 +36,10 @@ export class VkService {
 
       async loginVk(auth: AuthVK) {
         let authData;
-        console.log(`[vk][service][loginVk][run]`)
     
         try {
           authData = await this.getVkToken(auth.code);
-          console.log(`[vk][service][loginVk][run]`)
         } catch (err) {
-          console.log(`[vk][service][loginVk][ошибка] ${err}`)
           throw new BadRequestException("Wrong VK code");
         }
     
@@ -55,7 +49,9 @@ export class VkService {
         : await this.userService.getUserByVkId(authData.data.user_id);
 
         if (user) {
-          return await this.authService.login({...user}, true);
+          const email = (user.email) ? user.email : `${user.vk_id}@vk.com`
+          const tokens = await this.authService.login({email: email, password: null}, true);
+          return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: email}
         }
     
         try {
@@ -67,9 +63,8 @@ export class VkService {
 
           let userData = {
             vk_id: authData.data.user_id,
-            email: authData.data.email,
-            password: null,
-            roles: []
+            email: (hasEmail)? authData.data.email : `${user.vk_id}@vk.com`,
+            password: null
           };
 
           const id = await this.userService.createUser({...userData});
@@ -83,10 +78,9 @@ export class VkService {
 
           // создать профиль
     
-          return await this.authService.login(userData, true);
+          return await this.authService.login({email: userData.email, password: null}, true);
         } catch (err) {
           throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);
-          // throw new BadRequestException(err);
         }
       }
     
