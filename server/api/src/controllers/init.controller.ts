@@ -18,6 +18,6 @@ export class InitController {
     @Get()
     async createAdminAndRoles(
     ) {
-        return await this.authService.send( { cmd: 'init' }, {} );
+        return this.authService.send( { cmd: 'init' }, {} );
     }
 }
