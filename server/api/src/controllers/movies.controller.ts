@@ -62,6 +62,8 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-films-autosagest' }, query)
     }
 
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
     @ApiParam({ name: 'id' })
     @ApiOperation({ summary: 'Обновление имени фильма по айди' })
     @Post('/about/:id')
@@ -86,12 +88,16 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-genre-byId' }, id);
     }
 
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
     @ApiOperation({ summary: 'Удаление жанра по айди' })
     @Delete('/genres/:id')
     deleteGenreById(@Param('id') id) {
         return this.moviesService.send({ cmd: 'delete-genre-byId' }, id);
     }
 
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
     @ApiOperation({ summary: 'Апдейт жанров по айди' })
     @ApiResponse({ status: 201, description: 'Обновление жанорв' })
     @Post('/genres/:id')
@@ -120,6 +126,8 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'get-country-byId' }, countryId);
     }
 
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
     @ApiOperation({ summary: 'Апдейт стран по айди' })
     @ApiResponse({ status: 201, description: 'Обновление стран' })
     @Post('/countries/:id')
@@ -133,6 +141,8 @@ export class MoviesController {
         );
     }
 
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
     @ApiOperation({ summary: 'Удаление страны по айди' })
     @Delete('/countries/:id')
     deleteCountriesById(@Param('id') countryId) {
