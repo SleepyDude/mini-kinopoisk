@@ -1,5 +1,4 @@
-import { CreateUserDto } from '@hotels2023nestjs/shared';
-import { Body, Controller, Get, Inject, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Req, Res, UseFilters, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from "express";
@@ -8,6 +7,7 @@ import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { Token, TokenEmail } from '../types/token.return.type';
 import { AuthGuard } from '@nestjs/passport'
+import { AuthVK, CreateUserDto } from '@hotels2023nestjs/shared';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Авторизация')
@@ -27,6 +27,7 @@ export class AuthController {
   ) {
       const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'registration'}, dto));
       response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+      
       return {email: dto.email, token: accessToken};
   }
 
@@ -38,8 +39,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ) {
     const {accessToken, refreshToken} = await firstValueFrom(this.authService.send({cmd: 'login'}, dto));
-    // console.log(`[api][auth][login] response.cookie: ${JSON.stringify(response.cookie)}`);
     response.cookie('refreshToken', refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+
     return {token: accessToken};
   }
 
@@ -53,6 +54,7 @@ export class AuthController {
         const { refreshToken } = request.cookies;
         response.clearCookie('refreshToken');
         const success =  await firstValueFrom(this.authService.send({cmd: 'logout'}, refreshToken));
+
         return !!success;
     }
 
@@ -63,11 +65,10 @@ export class AuthController {
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response
     ) {
-        // console.log(`[api][auth][refresh] request.signedCookies: ${JSON.stringify(request.signedCookies)}`);
-        // console.log(`[api][auth][refresh] request.cookies: ${JSON.stringify(request.cookies)}`);
         const { refreshToken } = request.cookies;
         const { accessToken, newRefreshToken } = await firstValueFrom( this.authService.send({cmd: 'refresh'}, refreshToken) );
         response.cookie('refreshToken', newRefreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+
         return {token: accessToken};
     }
 
@@ -75,17 +76,16 @@ export class AuthController {
     @ApiResponse({ status: 200, type: TokenEmail, description: 'refresh token записывает в куки'})
     @Post('vk')
     async vkLogin(
-        @Body() auth: any,
+        @Body(new ValidationPipe()) auth: AuthVK,
         @Res({ passthrough: true }) response: Response) {
-            console.log(`[auth][controller][vkAuth][run]`)
-            const tokens = await firstValueFrom(this.authService.send( { cmd: 'vk' }, auth));
-
-            response.cookie('refreshToken', tokens.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-            return {token: tokens.accessToken};
+            const dataFromVk = await firstValueFrom(this.authService.send( { cmd: 'vk' }, auth));
+            response.cookie('refreshToken', dataFromVk.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+            
+            return {token: dataFromVk.accessToken, email: dataFromVk.email};
     }
 
     @UseGuards(AuthGuard('google'))
-    @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
+    @ApiResponse({ status: 200, type: TokenEmail, description: 'Вернёт access token, а refresh token запишет в куки' })
     @ApiResponse({ status: 200})
     @Get('google')
     async googleLogin(
@@ -93,14 +93,13 @@ export class AuthController {
     }
 
     @UseGuards(AuthGuard('google'))
-    @ApiOperation({ summary: `` })
-    @ApiResponse({ status: 200, type: Token, description: 'Вернёт access token, а refresh token запишет в куки' })
     @Get('google/callback')
     async googleCallback(
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response) {
         const googleResponseData = await firstValueFrom(this.authService.send( { cmd: 'google-callback' }, request['user']));
         response.cookie('refreshToken', googleResponseData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+
         return {token: googleResponseData.accessToken, email: googleResponseData.email};    
     }
 }

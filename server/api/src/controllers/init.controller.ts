@@ -1,7 +1,6 @@
 import { Controller, Get, Inject, UseFilters } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
-import { TokenEmail } from '../types/token.return.type';
 import { ClientProxy } from '@nestjs/microservices';
 
 @ApiTags('Инициализация приложения')
@@ -14,7 +13,7 @@ export class InitController {
 
     @UseFilters(AllExceptionsFilter)
     @ApiOperation({ summary: 'Инициализация сервера' })
-    @ApiResponse({ status: 201, type: TokenEmail, description: 'Инициализация сервера и создание главного администратора' })
+    @ApiResponse({ status: 201, type: Boolean, description: 'Инициализация требуется каждый раз после очистки БД' })
     @Get()
     async createAdminAndRoles(
     ) {
