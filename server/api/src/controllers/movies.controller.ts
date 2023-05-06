@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Post, Query, Req, UseFilters, UseGuards } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import {
     ApiOperation,
@@ -14,6 +14,7 @@ import { RolesGuard } from "../guards/roles.guard";
 import { RoleAccess } from "../guards/roles.decorator";
 import { GenreQuery, PageQuery } from "../types/pagination.query.enum";
 import { initRoles } from '../guards/init.roles'
+import { AllExceptionsFilter } from "../filters/all.exceptions.filter";
 
 @ApiTags('Фильмы')
 @Controller('movies')
@@ -37,6 +38,7 @@ export class MoviesController {
     @ApiParam({name: 'id'})
     @ApiOperation({ summary: 'Все о фильме по айди' })
     @ApiResponse({ status: 200, description: 'Вся информация о фильме' })
+    @UseFilters(AllExceptionsFilter)
     @Get('/about/:id')
     getFilmById(@Param() filmId: number) {
         return this.moviesService.send({ cmd: 'get-film-byId' }, filmId);
