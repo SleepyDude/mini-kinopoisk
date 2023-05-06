@@ -32,4 +32,11 @@ export class CountriesService {
     await currentCountry.update(countryDto);
     return currentCountry;
   }
+
+  async deleteCountryById(countryId) {
+    const country = await this.countriesRepository.findOne({
+      where: { id: countryId },
+    });
+    return country.destroy();
+  }
 }

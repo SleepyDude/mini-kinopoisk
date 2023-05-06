@@ -13,8 +13,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      # - ./pgdata-test/data:/var/lib/postgresql/data
       - ./initdb-scripts/testdb:/docker-entrypoint-initdb.d
+      # - ./pgdata-test:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
@@ -30,12 +30,14 @@ services:
 
   auth:
     container_name: auth-dns-movies
-    build: ./server/auth
+    build:
+      dockerfile: ./server/auth/Dockerfile
+      context: ./
     env_file:
       - ./.env
     depends_on:
       - postgres
       - rabbitmq
     volumes:
-      - ./server/auth:/app
-      - /app/node_modules
+      - ./server/auth:/app/server/auth
+      - /app/server/auth/node_modules

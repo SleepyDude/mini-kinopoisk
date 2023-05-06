@@ -31,4 +31,11 @@ export class GenresService {
     await currentGenre.update(genreDto);
     return currentGenre;
   }
+
+  async deleteGenreById(id) {
+    const currentGenre = await this.genresRepository.findOne({
+      where: id,
+    });
+    return currentGenre.destroy();
+  }
 }
