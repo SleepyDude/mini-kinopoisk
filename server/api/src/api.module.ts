@@ -10,13 +10,12 @@ import { RolesController } from './controllers/roles.controller';
 import { ConfigModule } from '@nestjs/config';
 import { InitController } from './controllers/init.controller';
 import { GoogleStrategy } from './controllers/google.strategy';
+import { ProfilesController } from './controllers/profiles.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
-      // envFilePath: './.env',
-
     }),
     ClientsModule.register([
       {
@@ -25,6 +24,15 @@ import { GoogleStrategy } from './controllers/google.strategy';
         options: {
           urls: [process.env.CLOUDAMQP_URL],
           queue: process.env.AUTH_QUEUE,
+          queueOptions: { durable: false },
+        },
+      },
+      {
+        name: 'SOCIAL-SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.CLOUDAMQP_URL],
+          queue: process.env.SOCIAL_QUEUE,
           queueOptions: { durable: false },
         },
       },
@@ -55,7 +63,8 @@ import { GoogleStrategy } from './controllers/google.strategy';
       ApiController,
       RolesController,
       MoviesController,
-      InitController
+      InitController,
+      ProfilesController,
   ],
   providers: [GoogleStrategy],
 })

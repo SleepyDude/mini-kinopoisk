@@ -18,9 +18,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
             status = exception.getStatus();
             errorMessage = exception.getResponse();
             if (typeof errorMessage == 'object') {
+
                 const { validation_message } = errorMessage as {validation_message: object};
                 if (validation_message) { // имеем ошибку валидации
                     errorMessage = validation_message;
+                }
+
+                const { message } = errorMessage as { message: string };
+                if (message) { // для обработки встроенных пайпов в валидации, например @Param('id', ParseIntPipe)
+                    errorMessage = message;
                 }
             }
         } else {

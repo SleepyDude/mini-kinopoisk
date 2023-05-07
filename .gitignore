@@ -144,3 +144,6 @@ pgdata-test
 
 # shared
 /shared/package-lock.json
+
+# social
+/server/social/package-lock.json

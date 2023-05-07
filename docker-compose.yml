@@ -62,6 +62,21 @@ services:
       - ./server/auth:/app/server/auth
       - /app/server/auth/node_modules
 
+  social:
+    container_name: social-dns-movies
+    build:
+      dockerfile: ./server/social/Dockerfile
+      context: ./
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - rabbitmq
+      - auth
+    volumes:
+      - ./server/social:/app/server/social
+      - /app/server/social/node_modules
+
   persons:
     container_name: persons-dns-movies
     build:
@@ -102,6 +117,7 @@ services:
       - persons
       - movies
       - auth
+      - social
     volumes:
       - ./server/api:/app/server/api
       - /app/server/api/node_modules
