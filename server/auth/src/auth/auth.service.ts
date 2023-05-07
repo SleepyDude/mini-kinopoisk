@@ -15,7 +15,12 @@ export class AuthService {
   async login(userDto: CreateUserDto | any, skipPasswordCheck: boolean = false) {
 
     const user = await this.defineUserExists(userDto.email);
-    const userPassword = user?.password;
+
+    if (!user) {
+      throw new HttpRpcException(`Пользователя с email ${userDto.email} не существует`, HttpStatus.NOT_FOUND);
+    }
+
+    const userPassword = user.password;
     let isRightPassword;
     if (userPassword) {
       isRightPassword = await bcrypt.compare(userDto.password, userPassword);
