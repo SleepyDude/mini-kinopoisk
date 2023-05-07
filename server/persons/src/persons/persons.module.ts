@@ -4,10 +4,14 @@ import { PersonsService } from './persons.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { PersonsFilms } from './persons.staff.m2m.model';
 import { Persons } from './persons.model';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [PersonsController],
   providers: [PersonsService],
-  imports: [SequelizeModule.forFeature([Persons, PersonsFilms])],
+  imports: [
+    CacheModule.register(),
+    SequelizeModule.forFeature([Persons, PersonsFilms]),
+  ],
 })
 export class PersonsModule {}
