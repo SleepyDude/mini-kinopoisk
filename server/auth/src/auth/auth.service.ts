@@ -1,16 +1,19 @@
 import { CreateUserDto, HttpRpcException } from '@hotels2023nestjs/shared';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
 import { TokensService } from 'src/tokens/tokens.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from 'src/tokens/dto/user.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
   constructor(
   private userService: UsersService,
-  private tokenService: TokensService) {}
+  private tokenService: TokensService,
+  @Inject('SOCIAL-SERVICE') private readonly socialService: ClientProxy) {}
 
   async login(userDto: CreateUserDto | any, skipPasswordCheck: boolean = false) {
 
@@ -49,6 +52,7 @@ export class AuthService {
 
     const id = await this.userService.createUser({email: userDto.email, password: hashedPassword})
 
+    await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, id ));
     // createProfile(userDto)
 
     return await this.tokenService.generateAndSaveToken({email: userDto.email, id: id, roles: []})

@@ -73,8 +73,13 @@ export class RolesGuard implements CanActivate {
                 
                 // Как узнать, что пользователь собирается взять параметры о себе? Если мы договоримся, что
                 // берем данные о пользователе только как параметры и что эти данные только email либо id.
-                if (roleParams.allowSelf && 
-                    ( request.params['email'] == email || request.params['id'] == id)) return of(true);
+                
+
+                if (roleParams.allowSelf) {
+                    if ( request.params['email'] == email || request.params['id'] == id) return of(true);
+                    // request.user = {email, id, roles};
+                    // return of(true);
+                }
 
                 // Считаем максимальный уровень доступа для пользователя (записываем его в реквест чтобы можно было в декораторе достать)
                 request.userMaxPermission = Math.max(...roles.map( role => role.value ));

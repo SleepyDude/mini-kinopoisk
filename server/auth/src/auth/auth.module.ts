@@ -8,6 +8,7 @@ import { VkService } from 'src/vk/vk.service';
 import { HttpModule } from '@nestjs/axios';
 import { RolesModule } from 'src/roles/roles.module';
 import { GoogleService } from 'src/google/google.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   controllers: [AuthController],
@@ -15,7 +16,16 @@ import { GoogleService } from 'src/google/google.service';
   imports: [TokensModule,
             UsersModule,
             RolesModule,
-            HttpModule
+            HttpModule,
+            ClientsModule.register([{
+              name: 'SOCIAL-SERVICE',
+              transport: Transport.RMQ,
+              options: {
+                urls: [process.env.CLOUDAMQP_URL],
+                queue: process.env.SOCIAL_QUEUE,
+                queueOptions: { durable: false },
+              },
+            },],),
           ],
   exports: [AuthService]
 })
