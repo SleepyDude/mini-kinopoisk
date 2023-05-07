@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
@@ -59,50 +59,53 @@ export class FilmsService {
       where: query,
       limit,
       offset,
+      distinct: true,
     });
   }
 
   async getFilmById(filmId) {
-    console.log(filmId);
-    const film: Films = await this.filmsRepository.findOne({
-      attributes: {
-        exclude: [
-          'reviewsCount',
-          'ratingGoodReview',
-          'ratingGoodReviewVoteCount',
-          'ratingFilmCritics',
-          'ratingFilmCriticsVoteCount',
-          'serial',
-          'shortFilm',
-          'createdAt',
-          'updatedAt',
-        ],
-      },
-      include: [
-        { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        {
-          model: Reviews,
-          limit: 15,
-          attributes: { exclude: ['updatedAt', 'userId', 'filmIdFK'] },
-          where: { parentId: { [Op.is]: null } },
+    try {
+      const film: Films = await this.filmsRepository.findOne({
+        attributes: {
+          exclude: [
+            'reviewsCount',
+            'ratingGoodReview',
+            'ratingGoodReviewVoteCount',
+            'ratingFilmCritics',
+            'ratingFilmCriticsVoteCount',
+            'serial',
+            'shortFilm',
+            'createdAt',
+            'updatedAt',
+          ],
         },
-      ],
-      where: { kinopoiskId: filmId.id },
-    });
-    const staff = await lastValueFrom(
-      this.personsClient.send(
-        { cmd: 'get-staff-by-filmId' },
-        { id: film.id, size: 10 },
-      ),
-    );
-    return {
-      film,
-      staff,
-    };
+        include: [
+          { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+          {
+            model: Reviews,
+            limit: 15,
+            attributes: { exclude: ['updatedAt', 'userId', 'filmIdFK'] },
+            where: { parentId: { [Op.is]: null } },
+          },
+        ],
+        where: { kinopoiskId: filmId.id },
+      });
+      const staff = await lastValueFrom(
+        this.personsClient.send(
+          { cmd: 'get-staff-by-filmId' },
+          { id: film.id, size: 10 },
+        ),
+      );
+      return {
+        film,
+        staff,
+      };
+    } catch (err) {
+      return new HttpException('Айди не зарегистрирован', HttpStatus.NOT_FOUND);
+    }
   }
 
   async getFilmsByFilers(params) {
-    console.log('params: ', params);
     const films = [];
     const genres = [];
     const countries = [];
