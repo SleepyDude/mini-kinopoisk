@@ -4,11 +4,15 @@ import { GenresService } from './genres.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Genres } from './genres.model';
 import { GenresFilms } from './genres.m2m.model';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [GenresController],
   providers: [GenresService],
-  imports: [SequelizeModule.forFeature([Genres, GenresFilms])],
+  imports: [
+    CacheModule.register(),
+    SequelizeModule.forFeature([Genres, GenresFilms]),
+  ],
   exports: [GenresService],
 })
 export class GenresModule {}
