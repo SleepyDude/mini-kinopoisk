@@ -110,6 +110,8 @@ services:
     build:
       dockerfile: ./server/api/Dockerfile
       context: ./
+    profiles:
+      - dev
     env_file:
       - ./.env
     depends_on:
