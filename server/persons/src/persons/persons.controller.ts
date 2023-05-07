@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
@@ -6,6 +6,7 @@ import {
   PersonsQueryDto,
   StaffQueryDto,
 } from './dto/persons.query.dto';
+import { ServiceRpcFilter } from './exceptions/exception.filter';
 
 @Controller('persons')
 export class PersonsController {
@@ -16,6 +17,7 @@ export class PersonsController {
     return await this.personsService.getAllPersons(params);
   }
 
+  @UseFilters(ServiceRpcFilter)
   @MessagePattern({ cmd: 'get-person-byId' })
   async getPersonById(@Payload() id: number) {
     return await this.personsService.getPersonById(id);

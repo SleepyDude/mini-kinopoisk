@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PersonsFilms } from './persons.staff.m2m.model';
 import { Persons } from './persons.model';
@@ -10,6 +10,7 @@ import {
 } from './dto/persons.query.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { HttpRpcException } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class PersonsService {
@@ -27,15 +28,21 @@ export class PersonsService {
     if (cache) {
       return cache;
     }
-    const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
-      attributes: [['filmId', 'id']],
-      where: { staffId: id },
-    });
     const person: Persons = await this.personsRepository.findOne({
       attributes: {
         exclude: ['createdAt', 'updatedAt'],
       },
       where: { personId: id },
+    });
+    if (!person) {
+      throw new HttpRpcException(
+        'Такой айди не зарегистрирован',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
+      attributes: [['filmId', 'id']],
+      where: { staffId: id },
     });
     await this.cacheManager.set(`getPersonById${JSON.stringify(id)}`, {
       filmsId: filmsId,
