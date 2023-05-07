@@ -1,4 +1,4 @@
-import { UpdateProfileDto } from '@hotels2023nestjs/shared';
+import { HttpRpcException, UpdateProfileDto } from '@hotels2023nestjs/shared';
 import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
@@ -20,9 +20,9 @@ export class ProfilesService {
     }
 
     private async findProfileByUserId(id: number): Promise<Profile> {
-        const profile = this.profileRepository.findOne({ where: {user_id: id} });
+        const profile = await this.profileRepository.findOne({ where: {user_id: id} });
         if (profile) return profile;
-        throw new HttpException('Профиль не найден', HttpStatus.NOT_FOUND);
+        throw new HttpRpcException('Профиль не найден', HttpStatus.NOT_FOUND);
     }
 
     async getAllProfiles() {

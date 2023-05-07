@@ -23,3 +23,6 @@ export * from './models/profiles/profiles.model';
 
 // exceptions
 export * from './exceptions/http.rpc.exception';
+
+// filters
+export * from './filters/service-rpc.filter';

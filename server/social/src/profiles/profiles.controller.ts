@@ -1,9 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 // import { DtoValidationPipe, HttpExceptionFilter, ObservableExceptionFilter, SharedService } from 'y/shared';
 import { UpdateProfileDto } from '@hotels2023nestjs/shared';
 import { ProfilesService } from './profiles.service';
+import { ServiceRpcFilter } from '@hotels2023nestjs/shared';
 
+@UseFilters(ServiceRpcFilter)
 @Controller()
 export class ProfilesController {
     constructor(

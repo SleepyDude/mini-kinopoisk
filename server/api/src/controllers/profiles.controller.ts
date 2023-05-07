@@ -5,8 +5,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Profile, UpdateProfileDto } from '@hotels2023nestjs/shared';
 import { RolesGuard } from '../guards/roles.guard';
 import { RoleAccess } from '../guards/roles.decorator';
-import { initRoles } from 'src/guards/init.roles';
-import { DtoValidationPipe } from 'src/pipes/dto-validation.pipe';
+import { initRoles } from '../guards/init.roles';
+import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с профилем пользователя')

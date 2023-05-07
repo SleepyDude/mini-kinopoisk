@@ -43,7 +43,7 @@ export class RolesGuard implements CanActivate {
         return this.authService.send({ cmd: 'verify-access-token' }, jwt).pipe(
             switchMap((value) => {
                 // console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
-                const { email, id, roles } = value as { email: string, id: number, roles: Array<any>};
+                const { id, roles } = value as { id: number, roles: Array<any>};
 
                 const { error } = value;
 
@@ -76,7 +76,7 @@ export class RolesGuard implements CanActivate {
                 
 
                 if (roleParams.allowSelf) {
-                    if ( request.params['email'] == email || request.params['id'] == id) return of(true);
+                    if (request.params['id'] == id) return of(true);
                     // request.user = {email, id, roles};
                     // return of(true);
                 }
