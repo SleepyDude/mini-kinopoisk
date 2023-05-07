@@ -49,12 +49,12 @@ export class VkService {
         : await this.userService.getUserByVkId(authData.data.user_id);
 
         if (user) {
-          const email = (user.email) ? user.email : `${user.vk_id}@vk.com`
-          const tokens = await this.authService.login({email: email, password: null}, true);
-          return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: email}
+          const tokens = await this.authService.login({email: user.email, password: user.password}, true, user.id);
+          return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: user.email}
         }
     
         try {
+          
           const { data } = await this.getUserDataFromVk(
             authData.data.user_id,
             authData.data.access_token
@@ -63,7 +63,7 @@ export class VkService {
 
           let userData = {
             vk_id: authData.data.user_id,
-            email: (hasEmail)? authData.data.email : `${user.vk_id}@vk.com`,
+            email: (hasEmail)? authData.data.email : null,
             password: null
           };
 
@@ -78,7 +78,8 @@ export class VkService {
 
           // создать профиль
     
-          return await this.authService.login({email: userData.email, password: null}, true);
+          return await this.authService.login({email: userData.email, password: null}, true, id);
+
         } catch (err) {
           throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);
         }

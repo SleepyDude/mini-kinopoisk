@@ -12,9 +12,9 @@ export class AuthService {
   private userService: UsersService,
   private tokenService: TokensService) {}
 
-  async login(userDto: CreateUserDto | any, skipPasswordCheck: boolean = false) {
+  async login(userDto: CreateUserDto | any, skipPasswordCheck: boolean = false, id: number = null) {
 
-    const user = await this.defineUserExists(userDto.email);
+    const user = (id) ? await this.userService.getUserById(id) : await this.userService.getUserByEmail(userDto.email);
 
     if (!user) {
       throw new HttpRpcException(`Пользователя с email ${userDto.email} не существует`, HttpStatus.NOT_FOUND);
@@ -35,14 +35,8 @@ export class AuthService {
     return tokens;
   }
 
-  async defineUserExists(email: string) : Promise<any> {
-
-    const user = await this.userService.getUserByEmail(email);
-    return user;
-  }
-
   async registration(userDto: LoginDto) {
-    if (await this.defineUserExists(userDto.email)) {
+    if (await this.userService.getUserByEmail(userDto.email)) {
       throw new HttpRpcException(`Пользователь с таким e-mail уже существует`, HttpStatus.CONFLICT);
     }
     const hashedPassword = await bcrypt.hash(userDto.password, +process.env.SALT);
