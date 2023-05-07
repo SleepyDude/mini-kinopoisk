@@ -5,7 +5,11 @@ import { RpcException } from '@nestjs/microservices';
 @Catch()
 export class ServiceRpcFilter implements RpcExceptionFilter<RpcException> {
   catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
-    console.log(`[shared][ServiceRpcFilter] catch exception: ${JSON.stringify(exception)}`);
+    console.log(
+      `[shared][ServiceRpcFilter] catch exception: ${JSON.stringify(
+        exception,
+      )}`,
+    );
     return throwError(() => exception);
   }
 }
