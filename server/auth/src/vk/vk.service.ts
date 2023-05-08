@@ -1,15 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthVK, HttpRpcException } from '@hotels2023nestjs/shared';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class VkService {
     constructor(
         private http: HttpService,  
         private authService: AuthService,
-        private userService: UsersService) {}
+        private userService: UsersService,
+        @Inject('SOCIAL-SERVICE') private readonly socialService: ClientProxy) {}
 
     async getUserDataFromVk(userId: number, token: string): Promise<any> {
         return this.http
@@ -59,7 +62,7 @@ export class VkService {
             authData.data.user_id,
             authData.data.access_token
           );
-          const profile = data.response[0];
+          const profileFromVk = data.response[0];
 
           let userData = {
             vk_id: authData.data.user_id,
@@ -67,18 +70,20 @@ export class VkService {
             password: null
           };
 
-          const id = await this.userService.createUser({...userData});
+          const user = await this.userService.createUser({...userData});
+          const avatarId = firstValueFrom(this.socialService.send( { cmd: 'upload-photo' }, profileFromVk.photo_400 ));
 
           let profileData = {
-            id: id,
-            name: profile.first_name,
-            lastName: profile.last_name,
-            avatar: profile.photo_400
+            user_id: user.id,
+            name: profileFromVk.first_name,
+            lastName: profileFromVk.last_name,
+            avatarId: avatarId
           };
 
-          // создать профиль
+          await this.socialService.send( { cmd: 'create-profile' }, profileData );
+          // await firstValueFrom(this.socialService.send( { cmd: 'set-avatar' }, {profileId: profile.id, avatarId: avatarId} ));
     
-          return await this.authService.login({email: userData.email, password: null}, true, id);
+          return await this.authService.login({email: userData.email, password: null}, true, user.id);
 
         } catch (err) {
           throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);

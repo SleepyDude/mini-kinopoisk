@@ -1,4 +1,3 @@
-import { CreateRoleDto, Role } from '@hotels2023nestjs/shared';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Inject, Param, Post, Put, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -11,6 +10,7 @@ import { RolesGuard } from '../guards/roles.guard';
 import { initRoles } from '../guards/init.roles'
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { UpdateRoleDto } from '../types/update-role.model';
+import { CreateRoleDto, Role } from '@hotels2023nestjs/shared';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с ролями')

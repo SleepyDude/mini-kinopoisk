@@ -1,13 +1,11 @@
 import { Controller, UseFilters } from "@nestjs/common";
 import { Ctx, MessagePattern, Payload, RmqContext } from "@nestjs/microservices";
 import { ExceptionFilter } from "../rpc-exception.filter";
-import { CreateRoleDto } from "./dto/create-role.dto";
-import { DeleteRoleDto } from "./dto/delete-role.dto";
-import { UpdateRoleDto } from "./dto/update-role.dto";
 // import { HttpExceptionFilter, SharedService } from "y/shared";
 // import { CreateRoleDto } from "y/shared/dto";
 // import { DtoValidationPipe } from "y/shared/pipes/dto-validation.pipe";
 import { RolesService } from "./roles.service";
+import { CreateRoleDto, UpdateRoleDto } from "@hotels2023nestjs/shared";
 
 @UseFilters(ExceptionFilter)
 @Controller('roles')

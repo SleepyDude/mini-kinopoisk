@@ -1,9 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { HttpRpcException } from '@hotels2023nestjs/shared';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
-import { Role } from './roles.model';
+import { CreateRoleDto, HttpRpcException, Role, UpdateRoleDto } from '@hotels2023nestjs/shared';
 
 @Injectable()
 export class RolesService {

@@ -20,13 +20,24 @@ export class User extends Model<User, UserCreateAttrs> {
   })
   id: number;
 
-  @ApiProperty({example: 'name@post.ru', description: 'E-mail address'}) 
+  @ApiProperty({example: '1', description: 'Вк identifier'}) 
+  @Column({
+    type: DataType.INTEGER,
+    unique: true
+  })
+  vk_id: number;
+
+  @ApiProperty({example: 'name@post.ru', description: 'E-mail адрес'}) 
   @Column({ type: DataType.STRING, unique: true, allowNull: true })
   email: string;
 
-  @ApiProperty({example: '********', description: 'Secure password'}) 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @ApiProperty({example: 'ё12амКвв%%цы', description: 'Пароль'}) 
+  @Column({ type: DataType.STRING, allowNull: true })
   password: string;
+
+  @ApiProperty({example: 'false', description: 'Активирован ли аккаунт?'}) 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isActivated: boolean;
 
   @BelongsToMany( () => Role, () => UserRoles)
   roles: Role[];

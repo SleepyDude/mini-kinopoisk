@@ -1,10 +1,8 @@
-import { CreateUserDto, HttpRpcException } from '@hotels2023nestjs/shared';
+import { CreateUserDto, HttpRpcException, UserDto } from '@hotels2023nestjs/shared';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs'
 import { TokensService } from 'src/tokens/tokens.service';
 import { UsersService } from 'src/users/users.service';
-import { UserDto } from 'src/tokens/dto/user.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
@@ -35,21 +33,23 @@ export class AuthService {
     const tokenData = new UserDto(user);
     const tokens = await this.tokenService.generateAndSaveToken(tokenData);
 
-    return tokens;
+    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: userDto.email};
   }
 
-  async registration(userDto: LoginDto) {
+  async registration(userDto: CreateUserDto) {
     if (await this.userService.getUserByEmail(userDto.email)) {
       throw new HttpRpcException(`Пользователь с таким e-mail уже существует`, HttpStatus.CONFLICT);
     }
     const hashedPassword = await bcrypt.hash(userDto.password, +process.env.SALT);
 
-    const id = await this.userService.createUser({email: userDto.email, password: hashedPassword})
+    const user = await this.userService.createUser({email: userDto.email, password: hashedPassword})
 
-    await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, id ));
-    // createProfile(userDto)
+    const profile = await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, {user_id: user.id} ));
 
-    return await this.tokenService.generateAndSaveToken({email: userDto.email, id: id, roles: []})
+    const tokenData = new UserDto(user);
+    const tokens = await this.tokenService.generateAndSaveToken(tokenData);
+
+    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: userDto.email, uuid: profile.uuid};
   }
 
   async logout(refreshToken) {

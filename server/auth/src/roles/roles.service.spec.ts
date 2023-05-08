@@ -1,8 +1,8 @@
 import { RpcException } from "@nestjs/microservices";
 import { getModelToken } from "@nestjs/sequelize";
 import { Test } from "@nestjs/testing";
-import { Role } from "./roles.model";
 import { RolesService } from "./roles.service";
+import { Role } from "@hotels2023nestjs/shared";
 
 const rolesRepMocks = {
     role: (roleModel: any) => ({

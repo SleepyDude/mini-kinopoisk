@@ -1,13 +1,12 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { LoginDto } from './dto/login.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { VkService } from 'src/vk/vk.service';
 import { ExceptionFilter } from '../rpc-exception.filter';
 import { InitService } from '../init/init.service';
 import { GoogleService } from 'src/google/google.service';
-import { AuthVK } from '@hotels2023nestjs/shared';
+import { AuthVK, CreateUserDto } from '@hotels2023nestjs/shared';
 
 @UseFilters(ExceptionFilter)
 @Controller('auth')
@@ -43,14 +42,14 @@ export class AuthController {
 
     @MessagePattern({ cmd: 'login' })
     async login(
-        @Payload() dto: LoginDto
+        @Payload() dto: CreateUserDto
     ){
         return await this.authService.login(dto); 
     }
 
     @MessagePattern({ cmd: 'registration' })
     async registration(
-        @Payload() dto: LoginDto
+        @Payload() dto: CreateUserDto
     ) {
         return await this.authService.registration(dto)
     }

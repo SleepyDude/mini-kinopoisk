@@ -1,7 +1,7 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 // import { DtoValidationPipe, HttpExceptionFilter, ObservableExceptionFilter, SharedService } from 'y/shared';
-import { UpdateProfileDto } from '@hotels2023nestjs/shared';
+import { CreateProfileDto, UpdateProfileDto } from '@hotels2023nestjs/shared';
 import { ProfilesService } from './profiles.service';
 import { ServiceRpcFilter } from '@hotels2023nestjs/shared';
 
@@ -19,10 +19,10 @@ export class ProfilesController {
 
     @MessagePattern({ cmd: 'create-profile' })
     async createProfile(
-        @Payload() id: number,
+        @Payload() dto: CreateProfileDto,
     ) {
-        console.log(`[social][profiles.controller][createProfile] id: ${id}`);
-        return this.profilesService.createProfile(id);
+        console.log(`[social][profiles.controller][createProfile] id: ${dto.user_id}`);
+        return this.profilesService.createProfile(dto);
     }
 
     @MessagePattern({ cmd: 'get-profile-by-user-id' })

@@ -1,7 +1,7 @@
 import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../roles/roles.model';
-import { UserRoles } from '../roles/user-roles.model';
+import { Role } from './roles.model';
+import { UserRoles } from './user-roles.model';
 
 interface UserCreateAttrs {
   email: string;
@@ -20,29 +20,25 @@ export class User extends Model<User, UserCreateAttrs> {
   })
   id: number;
 
-  @ApiProperty({example: '1', description: 'Unique identifier'}) 
+  @ApiProperty({example: '1', description: 'Вк identifier'}) 
   @Column({
     type: DataType.INTEGER,
     unique: true
   })
   vk_id: number;
 
-  @ApiProperty({example: 'name@post.ru', description: 'E-mail address'}) 
+  @ApiProperty({example: 'name@post.ru', description: 'E-mail адрес'}) 
   @Column({ type: DataType.STRING, unique: true, allowNull: true })
   email: string;
 
-  @ApiProperty({example: '********', description: 'Secure password'}) 
+  @ApiProperty({example: 'ё12амКвв%%цы', description: 'Пароль'}) 
   @Column({ type: DataType.STRING, allowNull: true })
   password: string;
 
-  // @ApiProperty({example: 'false', description: 'Is account activated?'}) 
-  // @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  // isActivated: boolean;
-
-  // @ApiProperty({example: '', description: 'Activation link'}) 
-  // @Column({ type: DataType.STRING, allowNull: false })
-  // activationLink: string;
+  @ApiProperty({example: 'false', description: 'Активирован ли аккаунт?'}) 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isActivated: boolean;
 
   @BelongsToMany( () => Role, () => UserRoles)
   roles: Role[];
-}
+} 
