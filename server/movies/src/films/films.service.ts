@@ -9,6 +9,8 @@ import { Countries } from '../countries/countries.model';
 import { Reviews } from '../reviews/reviews.model';
 import { FilmsQueryDto } from './dto/films.query.dto';
 import { FilmsUpdateDto } from './dto/films.update.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 `***
 У получения списка фильмов есть пагинация и поиск по русскому имени.
@@ -27,43 +29,64 @@ export class FilmsService {
   constructor(
     @Inject('PERSONS-SERVICE') private personsClient: ClientProxy,
     @InjectModel(Films) private filmsRepository: typeof Films,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   async getAllFilms(params: FilmsQueryDto) {
+    const cache = await this.cacheManager.get(
+      `getAllFilms${JSON.stringify(params)}`,
+    );
+    if (cache) {
+      return cache;
+    }
     const { page, size, name } = params;
     const query = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
 
-    return await this.filmsRepository.findAndCountAll({
-      attributes: [
-        'kinopoiskId',
-        'nameRu',
-        'nameOriginal',
-        'posterUrl',
-        'posterUrlPreview',
-        'coverUrl',
-        'logoUrl',
-        'ratingKinopoisk',
-        'year',
-        'filmLength',
-      ],
-      include: [
-        {
-          model: Genres,
-          attributes: ['id', 'genreNameRu', 'genreNameEng'],
-        },
-        {
-          model: Countries,
-          attributes: ['id', 'countryNameRu', 'countryNameEng'],
-        },
-      ],
-      where: query,
-      limit,
-      offset,
-      distinct: true,
-    });
+    return await this.filmsRepository
+      .findAndCountAll({
+        attributes: [
+          'kinopoiskId',
+          'nameRu',
+          'nameOriginal',
+          'posterUrl',
+          'posterUrlPreview',
+          'coverUrl',
+          'logoUrl',
+          'ratingKinopoisk',
+          'year',
+          'filmLength',
+        ],
+        include: [
+          {
+            model: Genres,
+            attributes: ['id', 'genreNameRu', 'genreNameEng'],
+          },
+          {
+            model: Countries,
+            attributes: ['id', 'countryNameRu', 'countryNameEng'],
+          },
+        ],
+        where: query,
+        limit,
+        offset,
+        distinct: true,
+      })
+      .then(async (result) => {
+        await this.cacheManager.set(
+          `getAllFilms${JSON.stringify(params)}`,
+          result,
+        );
+        return result;
+      });
   }
 
   async getFilmById(filmId) {
+    const cache = await this.cacheManager.get(
+      `getFilmById${JSON.stringify(filmId)}`,
+    );
+    if (cache) {
+      return cache;
+    }
     try {
       const film: Films = await this.filmsRepository.findOne({
         attributes: {
@@ -96,6 +119,10 @@ export class FilmsService {
           { id: film.id, size: 10 },
         ),
       );
+      await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
+        film,
+        staff,
+      });
       return {
         film,
         staff,
@@ -106,6 +133,12 @@ export class FilmsService {
   }
 
   async getFilmsByFilers(params) {
+    const cache = await this.cacheManager.get(
+      `getFilmsByFilers${JSON.stringify(params)}`,
+    );
+    if (cache) {
+      return cache;
+    }
     const films = [];
     const genres = [];
     const countries = [];
@@ -154,69 +187,105 @@ export class FilmsService {
         ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: films };
 
-    return await this.filmsRepository.findAndCountAll({
-      attributes: [
-        'id',
-        'kinopoiskId',
-        'nameRu',
-        'nameOriginal',
-        'ratingKinopoiskVoteCount',
-        'posterUrl',
-        'posterUrlPreview',
-        'coverUrl',
-        'logoUrl',
-        'ratingKinopoisk',
-        'year',
-        'filmLength',
-        'type',
-      ],
-      where: queryWhere,
-      order: orderBy,
-      include: [
-        {
-          model: Genres,
-          where: { id: { [Op.or]: genres } },
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
-        {
-          model: Countries,
-          where: { id: { [Op.or]: countries } },
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
-      ],
-      limit,
-      offset,
-      distinct: true,
-    });
+    return await this.filmsRepository
+      .findAndCountAll({
+        attributes: [
+          'id',
+          'kinopoiskId',
+          'nameRu',
+          'nameOriginal',
+          'ratingKinopoiskVoteCount',
+          'posterUrl',
+          'posterUrlPreview',
+          'coverUrl',
+          'logoUrl',
+          'ratingKinopoisk',
+          'year',
+          'filmLength',
+          'type',
+        ],
+        where: queryWhere,
+        order: orderBy,
+        include: [
+          {
+            model: Genres,
+            where: { id: { [Op.or]: genres } },
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+          },
+          {
+            model: Countries,
+            where: { id: { [Op.or]: countries } },
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+          },
+        ],
+        limit,
+        offset,
+        distinct: true,
+      })
+      .then(async (result) => {
+        await this.cacheManager.set(
+          `getFilmsByFilers${JSON.stringify(params)}`,
+          result,
+        );
+        return result;
+      });
   }
 
   async getFilmsByIdPrevious(filmsId) {
-    return await this.filmsRepository.findAll({
-      where: filmsId,
-      attributes: [
-        'kinopoiskId',
-        'year',
-        'nameRu',
-        'nameOriginal',
-        'posterUrl',
-        'posterUrlPreview',
-        'coverUrl',
-        'logoUrl',
-        'ratingKinopoisk',
-      ],
-    });
+    const cache = await this.cacheManager.get(
+      `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
+    );
+    if (cache) {
+      return cache;
+    }
+    return await this.filmsRepository
+      .findAll({
+        where: filmsId,
+        attributes: [
+          'kinopoiskId',
+          'year',
+          'nameRu',
+          'nameOriginal',
+          'posterUrl',
+          'posterUrlPreview',
+          'coverUrl',
+          'logoUrl',
+          'ratingKinopoisk',
+        ],
+      })
+      .then(async (result) => {
+        await this.cacheManager.set(
+          `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
+          result,
+        );
+        return result;
+      });
   }
 
   async filmsAutosagest(params) {
+    const cache = await this.cacheManager.get(
+      `filmsAutosagest${JSON.stringify(params)}`,
+    );
+    if (cache) {
+      return cache;
+    }
     const search = params.nameRu
       ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
       : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
     const { size = 10 } = params;
-    return await this.filmsRepository.findAll({
-      attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
-      where: search,
-      limit: size,
-    });
+    return await this.filmsRepository
+      .findAll({
+        attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
+        where: search,
+        limit: size,
+      })
+      .then(async (result) => {
+        await this.cacheManager.set(
+          `filmsAutosagest${JSON.stringify(params)}`,
+          result,
+        );
+        return result;
+      });
   }
 
   private getPagination(page, size) {

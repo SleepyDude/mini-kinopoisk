@@ -1,8 +1,9 @@
-import { Controller, Get, Inject, Param, Query } from "@nestjs/common";
+import { Controller, Get, Inject, Param, Query, UseFilters } from "@nestjs/common";
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from "rxjs";
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FiltersProfessionQuery } from "../types/filters.query.enum";
+import { AllExceptionsFilter } from "../filters/all.exceptions.filter";
 
 @ApiTags('Актеры и прочий состав')
 @Controller('persons')
@@ -25,6 +26,7 @@ export class PersonsController {
     @ApiParam({ name: 'id' })
     @ApiOperation({ summary: 'О персоне по айди' })
     @ApiResponse({ status: 200, description: 'Выводит всю информацию о актере по айди' })
+    @UseFilters(AllExceptionsFilter)
     @Get('/about/:id')
     async getPersonById(@Param('id') id) {
         let person = await lastValueFrom(this.personsClient.send({ cmd: 'get-person-byId' }, id));

@@ -6,11 +6,13 @@ import { Films } from './films.model';
 import { SimilarFilms } from './films.similar.m2m.model';
 import { Similar } from './films.similar.model';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [FilmsController],
   providers: [FilmsService],
   imports: [
+    CacheModule.register(),
     SequelizeModule.forFeature([Films, Similar, SimilarFilms]),
     ClientsModule.register([
       {

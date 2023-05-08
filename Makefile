@@ -1,11 +1,11 @@
 run:
- docker compose --profile dev up
+	docker compose --profile dev up
 
 build:
- docker compose --profile dev build
+	docker compose --profile dev build
 
 run-test:
- docker compose --profile test up
+	docker compose --profile test up
 
 build-test:
- docker compose --profile test build
+	docker compose --profile test build
