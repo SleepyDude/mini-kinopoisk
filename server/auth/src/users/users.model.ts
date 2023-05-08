@@ -28,7 +28,7 @@ export class User extends Model<User, UserCreateAttrs> {
   vk_id: number;
 
   @ApiProperty({example: 'name@post.ru', description: 'E-mail address'}) 
-  @Column({ type: DataType.STRING, unique: true, allowNull: false })
+  @Column({ type: DataType.STRING, unique: true, allowNull: true })
   email: string;
 
   @ApiProperty({example: '********', description: 'Secure password'}) 
