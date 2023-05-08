@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@hotels2023nestjs/shared": "file:../../shared",
+    "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
@@ -30,6 +31,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "amqp-connection-manager": "^4.1.12",
     "amqplib": "^0.10.3",
+    "cache-manager": "^5.2.1",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "pg": "^8.10.0",
@@ -69,7 +71,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": "test",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
