@@ -26,3 +26,6 @@ export * from './exceptions/http.rpc.exception';
 
 // filters
 export * from './filters/service-rpc.filter';
+
+// files
+export * from './models/files/files.model'
