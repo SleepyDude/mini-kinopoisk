@@ -36,6 +36,7 @@ export class DbFilesController {
     async uploadFile(
         @Payload() file
     ) {
+        console.log(`[CONTROLLER]`)
         return await this.dbFilesService.uploadFile(file);
     }
 

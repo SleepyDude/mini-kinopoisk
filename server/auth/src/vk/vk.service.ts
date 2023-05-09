@@ -51,6 +51,8 @@ export class VkService {
         const user = (hasEmail)? await this.userService.getUserByEmail(authData.data.email) 
         : await this.userService.getUserByVkId(authData.data.user_id);
 
+        console.log(`[USER] == ${JSON.stringify(user)}`)
+
         if (user) {
           const tokens = await this.authService.login({email: user.email, password: user.password}, true, user.id);
           return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: user.email}
@@ -58,10 +60,12 @@ export class VkService {
     
         try {
           
+
           const { data } = await this.getUserDataFromVk(
             authData.data.user_id,
             authData.data.access_token
           );
+          console.log(`[USER] == ${JSON.stringify(data)}`)
           const profileFromVk = data.response[0];
 
           let userData = {
@@ -71,7 +75,22 @@ export class VkService {
           };
 
           const user = await this.userService.createUser({...userData});
-          const avatarId = firstValueFrom(this.socialService.send( { cmd: 'upload-photo' }, profileFromVk.photo_400 ));
+          console.log(`[LINK] == ${profileFromVk.photo_400}`)
+          const avatar = this.http
+          .get(
+            profileFromVk.photo_400, {
+              responseType: "text",
+              responseEncoding: "base64",
+            }).toPromise();
+
+            const ava = await avatar;
+            
+            const base64 = Buffer.from(ava.data, "base64");
+        
+          
+          console.log(`[AVATAR] == ${JSON.stringify(base64)}`)
+          const avatarId = await firstValueFrom(this.socialService.send( { cmd: 'upload-photo' }, base64 ));
+          console.log(`[AVATAR_ID] == ${JSON.stringify(avatarId)}`)
 
           let profileData = {
             user_id: user.id,
@@ -79,6 +98,8 @@ export class VkService {
             lastName: profileFromVk.last_name,
             avatarId: avatarId
           };
+
+          console.log(JSON.stringify(profileData))
 
           await this.socialService.send( { cmd: 'create-profile' }, profileData );
           // await firstValueFrom(this.socialService.send( { cmd: 'set-avatar' }, {profileId: profile.id, avatarId: avatarId} ));

@@ -18,11 +18,16 @@ export class DatabaseFilesService {
   async uploadFile(fileContent) : Promise<number> {
     try {
       const fileName = uuid.v4() + '.jpg';
+      console.log(`[FILENAME] == ${fileName}`)
+
+      // console.log(`[FILE] == ${JSON.stringify(fileContent)}`)
       
       if (!fs.existsSync(this.uploadPath)) {
+        console.log(`[FILE] == IN IF`)
           fs.mkdirSync(this.uploadPath, {recursive: true})
       }
       const path2file = path.join(this.uploadPath, fileName);
+      console.log(`[FILE] == ${path2file}`)
       fs.writeFileSync(path2file, Buffer.from(fileContent.buffer))
       const dbFile = await this.dbFilesRepository.create({
         fileName: fileName,
