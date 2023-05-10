@@ -75,6 +75,15 @@ export class MoviesController {
         return this.moviesService.send({ cmd: 'update-film-byId' }, { id: id, film: filmData })
     }
 
+    @UseGuards(RolesGuard)
+    @RoleAccess(initRoles.ADMIN.value)
+    @ApiParam({ name: 'id' })
+    @ApiOperation({ summary: 'Удаление фильма по айди' })
+    @Delete('/about/:id')
+    deleteFilmById(@Param('id') filmId) {
+        return this.moviesService.send({ cmd: 'delete-film-byId' }, filmId);
+    }
+
     //ЖАНРЫ:
     @ApiOperation({ summary: 'Получение списка жанров' })
     @ApiResponse( { status: 200, description: 'Выводит список всех жанров' })

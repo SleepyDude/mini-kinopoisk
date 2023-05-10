@@ -7,6 +7,8 @@ import { SimilarFilms } from './films.similar.m2m.model';
 import { Similar } from './films.similar.model';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CacheModule } from '@nestjs/cache-manager';
+import { BudgetModule } from '../budget/budget.module';
+import { TrailersModule } from '../trailers/trailers.module';
 
 @Module({
   controllers: [FilmsController],
@@ -25,6 +27,8 @@ import { CacheModule } from '@nestjs/cache-manager';
         },
       },
     ]),
+    BudgetModule,
+    TrailersModule,
   ],
 })
 export class FilmsModule {}

@@ -11,6 +11,8 @@ import { FilmsQueryDto } from './dto/films.query.dto';
 import { FilmsUpdateDto } from './dto/films.update.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { BudgetService } from '../budget/budget.service';
+import { TrailersService } from '../trailers/trailers.service';
 
 `***
 У получения списка фильмов есть пагинация и поиск по русскому имени.
@@ -30,6 +32,8 @@ export class FilmsService {
     @Inject('PERSONS-SERVICE') private personsClient: ClientProxy,
     @InjectModel(Films) private filmsRepository: typeof Films,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private budgetService: BudgetService,
+    private trailersService: TrailersService,
   ) {}
   async getAllFilms(params: FilmsQueryDto) {
     const cache = await this.cacheManager.get(
@@ -301,5 +305,13 @@ export class FilmsService {
       where: { kinopoiskId: film.id },
     });
     return await currentFilm.update(filmData);
+  }
+
+  async deleteFilmById(filmId) {
+    await this.budgetService.deleteBudgetByFilmId(filmId);
+    await this.trailersService.deleteTrailersBuFilmId(filmId);
+    return await this.filmsRepository.destroy({
+      where: { id: filmId },
+    });
   }
 }
