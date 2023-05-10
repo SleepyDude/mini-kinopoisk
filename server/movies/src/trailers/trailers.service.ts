@@ -16,4 +16,10 @@ export class TrailersService {
     }
     return isTrailer;
   }
+
+  async deleteTrailersBuFilmId(filmId) {
+    return await this.trailersRepository.destroy({
+      where: { kinopoiskFilmId: filmId },
+    });
+  }
 }
