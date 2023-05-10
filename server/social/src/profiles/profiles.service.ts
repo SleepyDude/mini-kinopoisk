@@ -3,8 +3,9 @@ import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } 
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { catchError, firstValueFrom, Observable, of, switchMap } from 'rxjs';
+import { Review } from 'src/reviews/reviews.model';
 // import { CreateProfileDto, RegisterProfileDto, UpdateProfileDto } from 'y/shared/dto';
-import { Profile } from '@hotels2023nestjs/shared';
+import { Profile } from './profiles.model';
 // import { ReturnProfile } from './types';
 
 @Injectable()
@@ -32,7 +33,13 @@ export class ProfilesService {
     async getProfileByUserId(id: number): Promise<Profile> {
     
         const profile = await this.profileRepository.findOne({
-            where: { user_id: id }
+            where: { user_id: id },
+            include: [
+                {
+                  model: Review,
+                //   include:
+                },
+            ]
         });
 
         return profile;

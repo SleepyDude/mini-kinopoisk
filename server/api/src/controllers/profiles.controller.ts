@@ -2,7 +2,7 @@ import { Body, Controller, Get, Inject, Param, ParseIntPipe, Put, UseFilters, Us
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { ClientProxy } from '@nestjs/microservices';
-import { Profile, UpdateProfileDto } from '@hotels2023nestjs/shared';
+import { UpdateProfileDto } from '@hotels2023nestjs/shared';
 import { RolesGuard } from '../guards/roles.guard';
 import { RoleAccess } from '../guards/roles.decorator';
 import { initRoles } from '../guards/init.roles';
@@ -20,7 +20,7 @@ export class ProfilesController {
     @UseGuards(RolesGuard)
     @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
     @ApiOperation({ summary: 'Получение профиля по id' })
-    @ApiResponse({ status: 200, type: Profile, description: 'Профиль пользователя с данным <id>, доступ у самого пользователя и администратора' })
+    @ApiResponse({ status: 200, description: 'Профиль пользователя с данным <id>, доступ у самого пользователя и администратора' })
     @Get(':id')
     async getProfileByUserId(
         @Param('id', ParseIntPipe) id: number,
@@ -32,7 +32,7 @@ export class ProfilesController {
     @UseGuards(RolesGuard)
     @RoleAccess({ minRoleVal: initRoles.OWNER.value, allowSelf: true })
     @ApiOperation({ summary: 'Изменение профиля по id' })
-    @ApiResponse({ status: 200, type: Profile, description: 'Профиль пользователя с данным <id>, доступ у самого пользователя и у главного администратора' })
+    @ApiResponse({ status: 200, description: 'Профиль пользователя с данным <id>, доступ у самого пользователя и у главного администратора' })
     @Put(':id')
     async updateProfile(
         @Param('id', ParseIntPipe) id: number,

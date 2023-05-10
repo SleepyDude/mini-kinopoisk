@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
 
         if (!authHeader) {
             throw new HttpException('Нет заголовка авторизации', HttpStatus.UNAUTHORIZED);
-        } 
+        }
         
         const authHeaderParts = (authHeader as string).split(' ');
 
@@ -39,10 +39,11 @@ export class RolesGuard implements CanActivate {
         }
 
         const jwt = authHeaderParts[1];
+        // console.log(`JWT`)
 
         return this.authService.send({ cmd: 'verify-access-token' }, jwt).pipe(
             switchMap((value) => {
-                // console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
+                console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
                 const { id, roles } = value as { id: number, roles: Array<any>};
 
                 const { error } = value;
@@ -51,6 +52,8 @@ export class RolesGuard implements CanActivate {
                     throw new HttpException(error, HttpStatus.UNAUTHORIZED);
                 }
 
+                request.user = {id, roles}; // Устанавливаем в реквест параметры которые могут пригодиться
+                console.log(`ROLES GUARD:\n\nrequest.user: ${JSON.stringify(request.user)}\n\n`);
                 // Проверяем роли. Необходимость роли находится в метаданных гарда
                 // Пытаемся достать метаданные из заголовка     
                 let roleParams = this.reflector.get<RoleDecoratorParams>(

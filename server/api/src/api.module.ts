@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { InitController } from './controllers/init.controller';
 import { GoogleStrategy } from './controllers/google.strategy';
 import { ProfilesController } from './controllers/profiles.controller';
+import { ReviewsController } from './controllers/reviews.controller';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { ProfilesController } from './controllers/profiles.controller';
       MoviesController,
       InitController,
       ProfilesController,
+      ReviewsController,
   ],
   providers: [GoogleStrategy],
 })

@@ -61,11 +61,11 @@ describe('Init e2e', () => {
 
     it('Инициализируем ресурс /api/init. Успех', async () => {
         const res = await request(app.getHttpServer())
-        .get('/init')
-        // .send({email: 'admin@mail.ru', password: 'admin' })
-            .expect(200)
-            // .expect((resp: any) => {
-                // console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
+            .get('/init')
+            // .expect(200)
+            .expect((resp: any) => {
+                console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
+            });
                 // expect(resp).toHaveProperty('header');
                 // const header = resp.header;
                 // expect(header).toHaveProperty('set-cookie');

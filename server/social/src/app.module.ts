@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
     imports: [
         ProfilesModule,
+        ReviewsModule,
         SequelizeModule.forRoot({
             dialect: 'postgres',
             host: process.env.POSTGRES_HOST,

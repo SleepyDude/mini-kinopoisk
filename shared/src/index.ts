@@ -14,15 +14,19 @@ export * from './dto/roles/delete-role.dto';
 export * from './dto/roles/update-role.dto';
 
 export * from './dto/profiles/update-profile.dto';
+export { CreateReviewDto } from './dto/reviews/create-review.dto';
 
 // models
 export * from './models/users/users.model';
 export * from './models/users/roles.model';
 export * from './dto/vk/vk.model'
-export * from './models/profiles/profiles.model';
 
 // exceptions
 export * from './exceptions/http.rpc.exception';
 
 // filters
 export * from './filters/service-rpc.filter';
+
+// interfaces
+export * from './interfaces/reviews.interface';
+export * from './interfaces/profiles.interface';

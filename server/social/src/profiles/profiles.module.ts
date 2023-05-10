@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ProfilesController } from './profiles.controller';
-import { Profile } from '@hotels2023nestjs/shared';
+import { Profile } from './profiles.model';
 import { ProfilesService } from './profiles.service';
 
 @Module({
