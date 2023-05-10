@@ -78,15 +78,11 @@ export class RolesGuard implements CanActivate {
             context.getClass(),
           );
         }
+
+        request.user = { id, roles };
         // console.log(`[api][roles.guard] roleParams in meta: ${JSON.stringify(roleParams)}`);
         // Если их нет, то гард проходит проверку (авторизация уже прошла)
         if (!roleParams) return of(true);
-
-        // Теперь используем объект пользователя для проверки ролей
-        // console.log(`[api][roles.guard] request.params: ${JSON.stringify(request.params)}`)
-
-        // Как узнать, что пользователь собирается взять параметры о себе? Если мы договоримся, что
-        // берем данные о пользователе только как параметры и что эти данные только email либо id.
 
         if (roleParams.allowSelf) {
           if (request.params['id'] == id) return of(true);

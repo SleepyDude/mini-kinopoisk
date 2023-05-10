@@ -1,6 +1,6 @@
 import { Module, DynamicModule } from '@nestjs/common';
-import { ClientProxyFactory } from '@nestjs/microservices/client/client-proxy-factory';
-import { Transport } from '@nestjs/microservices/enums/transport.enum';
+import { ClientProxyFactory } from '@nestjs/microservices';
+import { Transport } from '@nestjs/microservices';
 
 @Module({})
 export class SharedModule {
@@ -9,7 +9,6 @@ export class SharedModule {
       {
         provide: service,
         useFactory: () => {
-          // const URL = configService.get('CLOUDAMQP_URL');
           return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {

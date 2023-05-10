@@ -22,11 +22,13 @@ export * from './dto/profiles_files/create-profile.dto';
 export * from './dto/profiles_files/update-avatar.dto';
 export * from './dto/profiles_files/path2file.type'
 
+export { CreateReviewDto } from './dto/reviews/create-review.dto';
+
 // models
 export * from './models/users/users.model';
 export * from './models/users/roles.model';
 export * from './models/users/user-roles.model';
-export * from './dto/vk/vk.model'
+export * from './dto/vk/vk.model';
 export * from './models/profiles/profiles.model';
 // export * from './models/files/files.model'
 
@@ -35,3 +37,7 @@ export * from './exceptions/http.rpc.exception';
 
 // filters
 export * from './filters/service-rpc.filter';
+
+// interfaces
+export * from './interfaces/reviews.interface';
+export * from './interfaces/profiles.interface';

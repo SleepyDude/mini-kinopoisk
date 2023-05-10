@@ -1,9 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class UpdateProfileDto {
-
-    @ApiProperty({ example: 'Ubivashka666', description: 'Никнейм' })
+    
+    @ApiProperty({ example: 'Ubivashka666', description: 'Имя пользователя' })
     @IsString({ message: 'Должно быть строкой' })
     @IsOptional()
     readonly username: string;
@@ -22,4 +22,5 @@ export class UpdateProfileDto {
     @IsString({ message: 'Должно быть строкой' })
     @IsOptional()
     readonly favMovie: string;
+
 }

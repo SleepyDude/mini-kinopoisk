@@ -9,6 +9,7 @@ import { RolesController } from './controllers/roles.controller';
 import { ConfigModule } from '@nestjs/config';
 import { InitController } from './controllers/init.controller';
 import { ProfilesController } from './controllers/profiles.controller';
+import { ReviewsController } from './controllers/reviews.controller';
 import { FilesController } from './controllers/files.controller';
 
 @Module({
@@ -63,6 +64,7 @@ import { FilesController } from './controllers/files.controller';
     MoviesController,
     InitController,
     ProfilesController,
+    ReviewsController,
     FilesController,
   ],
   providers: [],
