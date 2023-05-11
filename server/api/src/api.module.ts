@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
-import {PersonsController} from "./controllers/persons.controller";
-import { MoviesController } from "./controllers/movies.controller";
+import { PersonsController } from './controllers/persons.controller';
+import { MoviesController } from './controllers/movies.controller';
 import { AuthController } from './controllers/auth.controller';
 import { RolesController } from './controllers/roles.controller';
 import { ConfigModule } from '@nestjs/config';
@@ -53,19 +53,18 @@ import { FilesController } from './controllers/files.controller';
           queueOptions: { durable: false },
         },
       },
-    ])
+    ]),
   ],
   controllers: [
-      UsersController,
-      PersonsController,
-      AuthController,
-      RolesController,
-      MoviesController,
-      InitController,
-      ProfilesController,
-      FilesController
+    UsersController,
+    PersonsController,
+    AuthController,
+    RolesController,
+    MoviesController,
+    InitController,
+    ProfilesController,
+    FilesController,
   ],
   providers: [],
-
 })
 export class ApiModule {}

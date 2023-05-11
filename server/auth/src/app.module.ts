@@ -4,25 +4,9 @@ import { AuthModule } from './auth/auth.module';
 import { TokensModule } from './tokens/tokens.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
-      // ConfigModule.forRoot({
-      // envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
-      // // envFilePath: './.env',
-      // }),
-      // ClientsModule.register([{
-      //   name: 'SOCIAL-SERVICE',
-      //   transport: Transport.RMQ,
-      //   options: {
-      //     urls: [process.env.CLOUDAMQP_URL],
-      //     queue: process.env.SOCIAL_QUEUE,
-      //     queueOptions: { durable: false },
-      //   },
-      // },],),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -34,9 +18,9 @@ import { AuthController } from './auth/auth.controller';
       autoLoadModels: true,
     }),
     AuthModule,
-    TokensModule, 
+    TokensModule,
     RolesModule,
-    UsersModule
+    UsersModule,
   ],
   controllers: [],
   providers: [],

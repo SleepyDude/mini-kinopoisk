@@ -11,60 +11,46 @@ import { AuthVK, CreateUserDto } from '@hotels2023nestjs/shared';
 @UseFilters(ExceptionFilter)
 @Controller('auth')
 export class AuthController {
+  constructor(
+    private authService: AuthService,
+    private tokenService: TokensService,
+    private vkService: VkService,
+    private initService: InitService,
+    private googleService: GoogleService,
+  ) {}
 
-    constructor(
-        private authService: AuthService,
-        private tokenService: TokensService,
-        private vkService: VkService,
-        private initService: InitService,
-        private googleService: GoogleService
-    ) {}
+  @MessagePattern({ cmd: 'init' })
+  async init() {
+    return await this.initService.createAdminAndRoles();
+  }
 
-    @MessagePattern({ cmd: 'init' })
-    async init(
-    ) {
-        return await this.initService.createAdminAndRoles();
-    }
+  @MessagePattern({ cmd: 'vk-login' })
+  async vkAuth(@Payload() auth: AuthVK) {
+    return await this.vkService.loginVk(auth);
+  }
 
-    @MessagePattern({ cmd: 'vk-login' })
-    async vkAuth(
-        @Payload() auth: AuthVK,
-    ) {
-        return await this.vkService.loginVk(auth); 
-    }
+  @MessagePattern({ cmd: 'google-login' })
+  async googleAuthRedirect(@Payload() ticketPayload: any) {
+    return await this.googleService.googleLogin(ticketPayload);
+  }
 
-    @MessagePattern({ cmd: 'google-login' })
-    async googleAuthRedirect(
-        @Payload() ticketPayload: any
-    ) {
-        return await this.googleService.googleLogin(ticketPayload);
-    }
+  @MessagePattern({ cmd: 'login' })
+  async login(@Payload() dto: CreateUserDto) {
+    return await this.authService.login(dto);
+  }
 
-    @MessagePattern({ cmd: 'login' })
-    async login(
-        @Payload() dto: CreateUserDto
-    ){
-        return await this.authService.login(dto); 
-    }
+  @MessagePattern({ cmd: 'registration' })
+  async registration(@Payload() dto: CreateUserDto) {
+    return await this.authService.registration(dto);
+  }
 
-    @MessagePattern({ cmd: 'registration' })
-    async registration(
-        @Payload() dto: CreateUserDto
-    ) {
-        return await this.authService.registration(dto)
-    }
+  @MessagePattern({ cmd: 'logout' })
+  async logout(@Payload() refreshToken: string) {
+    return await this.authService.logout(refreshToken);
+  }
 
-    @MessagePattern({ cmd: 'logout' })
-    async logout(
-        @Payload() refreshToken: string
-    ) {
-        return await this.authService.logout(refreshToken);
-    }
-
-    @MessagePattern({ cmd: 'refresh' })
-    async refresh(
-        @Payload() refreshToken: string
-    ) {
-        return await this.tokenService.refresh(refreshToken);
-    }
+  @MessagePattern({ cmd: 'refresh' })
+  async refresh(@Payload() refreshToken: string) {
+    return await this.tokenService.refresh(refreshToken);
+  }
 }

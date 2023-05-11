@@ -1,4 +1,3 @@
-
 export class MessageOutput {
-    "message": string;
+  'message': string;
 }

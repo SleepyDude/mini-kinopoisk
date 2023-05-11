@@ -1,11 +1,11 @@
-import { MockFunctionMetadata, ModuleMocker } from "jest-mock";
-import { AuthController } from "../src/auth/auth.controller";
-import { AuthService } from "../src/auth/auth.service";
-import { Test } from "@nestjs/testing";
-import { InitService } from "../src/init/init.service";
-import { VkService } from "../src/vk/vk.service";
-import { GoogleService } from "../src/google/google.service";
-import { TokensService } from "../src/tokens/tokens.service";
+import { MockFunctionMetadata, ModuleMocker } from 'jest-mock';
+import { AuthController } from '../src/auth/auth.controller';
+import { AuthService } from '../src/auth/auth.service';
+import { Test } from '@nestjs/testing';
+import { InitService } from '../src/init/init.service';
+import { VkService } from '../src/vk/vk.service';
+import { GoogleService } from '../src/google/google.service';
+import { TokensService } from '../src/tokens/tokens.service';
 
 const moduleMocker = new ModuleMocker(global);
 
