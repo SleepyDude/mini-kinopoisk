@@ -35,4 +35,9 @@ export class FilmsController {
   async updateFilmById(@Payload() film) {
     return await this.filmsService.updateFilmById(film);
   }
+
+  @MessagePattern({ cmd: 'delete-film-byId' })
+  async deleteFilmById(@Payload() filmId) {
+    return await this.filmsService.deleteFilmById(filmId);
+  }
 }
