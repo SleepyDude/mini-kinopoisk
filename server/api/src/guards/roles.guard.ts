@@ -91,6 +91,8 @@ export class RolesGuard implements CanActivate {
         // Если их нет, то гард проходит проверку (авторизация уже прошла)
         if (!roleParams) return of(true);
 
+        // console.log(`[roles.guard] roleParams: ${JSON.stringify(roleParams)}`);
+
         // Как узнать, что пользователь собирается взять параметры о себе? Если мы договоримся, что
         // берем данные о пользователе только как параметры и что эти данные только email либо id.
 
