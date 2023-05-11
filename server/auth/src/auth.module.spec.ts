@@ -1,7 +1,7 @@
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
-import { AuthController } from "../src/auth/auth.controller";
-import { AuthService } from "../src/auth/auth.service";
-import { Test } from "@nestjs/testing";
+import { AuthController } from '../src/auth/auth.controller';
+import { AuthService } from '../src/auth/auth.service';
+import { Test } from '@nestjs/testing';
 
 const moduleMocker = new ModuleMocker(global);
 
@@ -9,7 +9,7 @@ describe('Auth module', () => {
   let controller: AuthController;
   let service: AuthService;
 
-  const mockAuthService = {}
+  const mockAuthService = {};
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -39,5 +39,5 @@ describe('Auth module', () => {
 
   it('controller defined', () => {
     expect(controller).toBeDefined();
-  })
-})
+  });
+});

@@ -1,4 +1,6 @@
-import { PickType } from "@nestjs/swagger";
-import { DeleteRoleDto } from "./delete-role.dto";
+import { PickType } from '@nestjs/swagger';
+import { DeleteRoleDto } from './delete-role.dto';
 
-export class UpdateRoleParamDto extends PickType(DeleteRoleDto, ['name'] as const) {}
+export class UpdateRoleParamDto extends PickType(DeleteRoleDto, [
+  'name',
+] as const) {}

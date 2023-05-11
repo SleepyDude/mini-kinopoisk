@@ -2,7 +2,6 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { initRoles } from './init.roles';
 import { RolesService } from 'src/roles/roles.service';
 import { UsersService } from 'src/users/users.service';
-import * as bcrypt from 'bcryptjs';
 import { HttpRpcException } from '@hotels2023nestjs/shared';
 import { AuthService } from 'src/auth/auth.service';
 

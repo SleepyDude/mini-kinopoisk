@@ -19,6 +19,7 @@ export class ReviewsService {
         console.log(`[social][reviews.service][createReview] dto: ${JSON.stringify(dto)}`);
 
         let { parent_id, parentPath } = dto;
+        
         if (parent_id && parentPath) {
             parentPath += parent_id + '.';
         } else {
