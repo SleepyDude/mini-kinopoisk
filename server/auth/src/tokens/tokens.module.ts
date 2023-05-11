@@ -10,9 +10,11 @@ import { UsersModule } from 'src/users/users.module';
 @Module({
   providers: [TokensService],
   exports: [TokensService],
-  imports: [SequelizeModule.forFeature([ Token ]),
-            UsersModule,
-  JwtModule.register({})],
-  controllers: [TokensController]
+  imports: [
+    SequelizeModule.forFeature([Token]),
+    UsersModule,
+    JwtModule.register({}),
+  ],
+  controllers: [TokensController],
 })
 export class TokensModule {}

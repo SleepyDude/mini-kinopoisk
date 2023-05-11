@@ -1,4 +1,10 @@
-import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../roles/roles.model';
 import { UserRoles } from '../roles/user-roles.model';
@@ -10,8 +16,7 @@ interface UserCreateAttrs {
 
 @Table({ tableName: 'users' })
 export class User extends Model<User, UserCreateAttrs> {
-
-  @ApiProperty({example: '1', description: 'Unique identifier'}) 
+  @ApiProperty({ example: '1', description: 'Unique identifier' })
   @Column({
     type: DataType.INTEGER,
     unique: true,
@@ -20,29 +25,29 @@ export class User extends Model<User, UserCreateAttrs> {
   })
   id: number;
 
-  @ApiProperty({example: '1', description: 'Unique identifier'}) 
+  @ApiProperty({ example: '1', description: 'Unique identifier' })
   @Column({
     type: DataType.INTEGER,
-    unique: true
+    unique: true,
   })
   vk_id: number;
 
-  @ApiProperty({example: 'name@post.ru', description: 'E-mail address'}) 
+  @ApiProperty({ example: 'name@post.ru', description: 'E-mail address' })
   @Column({ type: DataType.STRING, unique: true, allowNull: true })
   email: string;
 
-  @ApiProperty({example: '********', description: 'Secure password'}) 
+  @ApiProperty({ example: '********', description: 'Secure password' })
   @Column({ type: DataType.STRING, allowNull: true })
   password: string;
 
-  // @ApiProperty({example: 'false', description: 'Is account activated?'}) 
+  // @ApiProperty({example: 'false', description: 'Is account activated?'})
   // @Column({ type: DataType.BOOLEAN, defaultValue: false })
   // isActivated: boolean;
 
-  // @ApiProperty({example: '', description: 'Activation link'}) 
+  // @ApiProperty({example: '', description: 'Activation link'})
   // @Column({ type: DataType.STRING, allowNull: false })
   // activationLink: string;
 
-  @BelongsToMany( () => Role, () => UserRoles)
+  @BelongsToMany(() => Role, () => UserRoles)
   roles: Role[];
 }
