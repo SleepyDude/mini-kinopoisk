@@ -12,7 +12,8 @@ export class VkService {
         private http: HttpService,  
         private authService: AuthService,
         private userService: UsersService,
-        @Inject('SOCIAL-SERVICE') private readonly socialService: ClientProxy) {}
+        @Inject('SOCIAL-SERVICE') private readonly socialService: ClientProxy,
+        ) {}
 
     async getUserDataFromVk(userId: number, token: string): Promise<any> {
         return this.http
@@ -29,10 +30,11 @@ export class VkService {
         };
     
         const host = process.env.HOST
+        const redirectLink = process.env.REDIRECT_LINK
     
         return this.http
           .get(
-            `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}/login&code=${code}`
+            `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}${redirectLink}&code=${code}`
           )
           .toPromise();
       }
@@ -43,6 +45,7 @@ export class VkService {
         try {
           authData = await this.getVkToken(auth.code);
         } catch (err) {
+          console.log(`[VK][SERVICE][ERROR][FORM][getVkToken] ${err}`)
           throw new BadRequestException("Wrong VK code");
         }
     
@@ -51,21 +54,15 @@ export class VkService {
         const user = (hasEmail)? await this.userService.getUserByEmail(authData.data.email) 
         : await this.userService.getUserByVkId(authData.data.user_id);
 
-        console.log(`[USER] == ${JSON.stringify(user)}`)
-
         if (user) {
-          const tokens = await this.authService.login({email: user.email, password: user.password}, true, user.id);
-          return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: user.email}
+          return await this.authService.login({email: user.email, password: user.password}, true, user.id);
         }
     
         try {
-          
-
           const { data } = await this.getUserDataFromVk(
             authData.data.user_id,
             authData.data.access_token
           );
-          console.log(`[USER] == ${JSON.stringify(data)}`)
           const profileFromVk = data.response[0];
 
           let userData = {
@@ -75,22 +72,8 @@ export class VkService {
           };
 
           const user = await this.userService.createUser({...userData});
-          console.log(`[LINK] == ${profileFromVk.photo_400}`)
-          const avatar = this.http
-          .get(
-            profileFromVk.photo_400, {
-              responseType: "text",
-              responseEncoding: "base64",
-            }).toPromise();
 
-            const ava = await avatar;
-            
-            const base64 = Buffer.from(ava.data, "base64");
-        
-          
-          console.log(`[AVATAR] == ${JSON.stringify(base64)}`)
-          const avatarId = await firstValueFrom(this.socialService.send( { cmd: 'upload-photo' }, base64 ));
-          console.log(`[AVATAR_ID] == ${JSON.stringify(avatarId)}`)
+          const avatarId = await firstValueFrom(this.socialService.send( { cmd: 'upload-avatar-by-link' }, profileFromVk.photo_400));
 
           let profileData = {
             user_id: user.id,
@@ -99,16 +82,16 @@ export class VkService {
             avatarId: avatarId
           };
 
-          console.log(JSON.stringify(profileData))
-
-          await this.socialService.send( { cmd: 'create-profile' }, profileData );
+          const uuid = await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, profileData ));
+          // const profile = await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, profileData ));
           // await firstValueFrom(this.socialService.send( { cmd: 'set-avatar' }, {profileId: profile.id, avatarId: avatarId} ));
-    
+          // аватар сетится при создании профиля
+          
           return await this.authService.login({email: userData.email, password: null}, true, user.id);
 
         } catch (err) {
+          console.log(`[VK][SERVICE][ERROR][FROM][getUserDataFromVk] ${err}`)
           throw new HttpRpcException(err, HttpStatus.BAD_REQUEST);
         }
       }
-    
 }

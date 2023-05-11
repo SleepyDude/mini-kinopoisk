@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Token } from './tokens.model';
+import { Token } from '../../models/tokens.model';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { HttpRpcException, UserDto } from '@hotels2023nestjs/shared';

@@ -1,4 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
+import { ClientProxy } from "@nestjs/microservices";
+import { firstValueFrom } from "rxjs";
 import { AuthService } from "src/auth/auth.service";
 import { UsersService } from "src/users/users.service";
 
@@ -6,21 +8,35 @@ import { UsersService } from "src/users/users.service";
 export class GoogleService {
   constructor(
     private authService: AuthService,
-    private userService: UsersService) {}
+    private userService: UsersService,
+    @Inject('SOCIAL-SERVICE') private readonly socialService: ClientProxy) {}
 
-  async googleLogin(user) {
-    if (!user) {
+  async googleLogin(ticketPayload) {
+    if (!ticketPayload) {
         return 'No user from google'
     }
     
-    const [email, firstName, lastName] = [user.email, user.firstName, user.lastName];
-    const candidate = await this.userService.getUserByEmail(email);
+    const [email, firstName, lastName] = [ticketPayload.email, ticketPayload.given_name, ticketPayload.family_name];
+    let candidate = await this.userService.getUserByEmail(email);
+    // console.log(`[ID] == ${candidate.id}`)
     if (!candidate) {
-      await this.userService.createUser({email: email, password: null});
-    }
+      candidate = await this.userService.createUser({email: email, password: null});
+      const avatarId = await firstValueFrom(this.socialService.send( { cmd: 'upload-avatar-by-link' }, ticketPayload.picture));
+    
     //create profile with firstName and lastName
-    const tokens = await this.authService.login({email: email, password: null}, true);
+    let profileData = {
+      user_id: candidate.id,
+      name: firstName,
+      lastName: lastName,
+      avatarId: avatarId
+    };
 
-    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: email};
+    // console.log(JSON.stringify(profileData))
+    await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, profileData ));
+    }
+    
+    return await this.authService.login({email: email, password: null}, true, candidate.id);
+
+    // return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: email, id: candidate.id};
   }
 }

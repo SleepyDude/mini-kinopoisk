@@ -26,18 +26,18 @@ export class AuthController {
         return await this.initService.createAdminAndRoles();
     }
 
-    @MessagePattern({ cmd: 'vk' })
+    @MessagePattern({ cmd: 'vk-login' })
     async vkAuth(
         @Payload() auth: AuthVK,
     ) {
         return await this.vkService.loginVk(auth); 
     }
 
-    @MessagePattern({ cmd: 'google-callback' })
+    @MessagePattern({ cmd: 'google-login' })
     async googleAuthRedirect(
-        @Payload() user: any
+        @Payload() ticketPayload: any
     ) {
-        return await this.googleService.googleLogin(user);
+        return await this.googleService.googleLogin(ticketPayload);
     }
 
     @MessagePattern({ cmd: 'login' })

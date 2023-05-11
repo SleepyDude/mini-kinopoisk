@@ -1,12 +1,14 @@
-import { Controller, Delete, Inject, Post, UploadedFile, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
+import { AvatarId, AvatarPathId, Link, Path2File } from "@hotels2023nestjs/shared";
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, UploadedFile, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { firstValueFrom } from "rxjs";
-import { AllExceptionsFilter } from "src/filters/all.exceptions.filter";
-import { initRoles } from "src/guards/init.roles";
-import { RoleAccess } from "src/guards/roles.decorator";
-import { RolesGuard } from "src/guards/roles.guard";
+import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
+import { initRoles } from '../guards/init.roles'
+import { RoleAccess } from "../guards/roles.decorator";
+import { RolesGuard } from "../guards/roles.guard";
+import { DtoValidationPipe } from "../pipes/dto-validation.pipe";
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с файлами')
@@ -19,7 +21,7 @@ export class FilesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess({minRoleVal: initRoles.ADMIN.value, allowSelf: true})
-  @ApiOperation({ summary: 'Удалить неиспользуемые файлы' })
+  @ApiOperation({ summary: 'Удалить файлы неиспользующиеся более ${REQ_TIME} милисекунд' })
   @ApiResponse({ status: 201, type: Boolean })
   @Delete('clean')
   async cleanFiles(
@@ -27,17 +29,29 @@ export class FilesController {
       return await firstValueFrom(this.socialService.send({ cmd: 'clean-files' }, {}));
   }
 
-  // @UseGuards(RolesGuard)
-  // @RoleAccess({minRoleVal: initRoles.ADMIN.value, allowSelf: true})
-  @ApiOperation({ summary: 'Загрузить файл' })
-  @ApiResponse({ status: 201, type: Number })
+  @UseGuards(RolesGuard)
+  @RoleAccess({minRoleVal: initRoles.ADMIN.value})
+  @ApiOperation({ summary: 'Загрузить аватар на сервер' })
+  @ApiResponse({ status: 201, type: AvatarPathId, description: 'Внутренний id файла в БД и путь к файлу на сервере' })
   @UseInterceptors(FileInterceptor('file'))
-  @Post('upload')
+  @Post('upload_avatar')
   async uploadFile(
-    @UploadedFile() file
+    @UploadedFile('file') file
   ) {
-    console.log(`[files][controller][run]`)
-      const fileId = await firstValueFrom(this.socialService.send({cmd: 'upload-file'}, file));
-      return {id: fileId};
+      const avatarId = await firstValueFrom(this.socialService.send({cmd: 'upload-avatar'}, file));
+      return {avatarId};
   }
+
+  @UseGuards(RolesGuard)
+  @RoleAccess({minRoleVal: initRoles.ADMIN.value})
+  @ApiOperation({ summary: 'Загрузить аватар по ссылке' })
+  @ApiResponse({ status: 201, type: AvatarPathId, description: 'Внутренний id файла в БД и путь к файлу на сервере' })
+  @Post('upload_avatar_by_link')
+  async uploadAvatarByLink(
+    @Body(DtoValidationPipe) link: Link
+  ) {
+      const avatarId = await firstValueFrom(this.socialService.send({cmd: 'upload-avatar-by-link'}, link.link));
+      return {avatarId};
+  }
+
 }

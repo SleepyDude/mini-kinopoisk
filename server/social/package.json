@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@hotels2023nestjs/shared": "file:../../shared",
+    "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/microservices": "^9.4.0",

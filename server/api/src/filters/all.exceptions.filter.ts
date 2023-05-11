@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, RpcExceptionFilter } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import { CustomHttpExceptionResponse } from "./http.exceptions.response.interface";
 
 @Catch()

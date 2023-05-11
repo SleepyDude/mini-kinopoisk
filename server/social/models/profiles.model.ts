@@ -17,9 +17,21 @@ export class Profile extends Model<ProfileAttrs, ProfileCreationAttrs> {
     @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
     id: number;
 
+    // @ApiProperty({ example: 'dsgserEEgsdg', description: 'Внутренний id профиля пользователя' })
+    // @Column({ type: DataType.STRING })
+    // uuid: string;
+
     @ApiProperty({ example: 'Ubivashka666', description: 'Имя пользователя' })
     @Column({ type: DataType.STRING })
     username: string;
+
+    @ApiProperty({ example: 'Минди', description: 'Имя' })
+    @Column({ type: DataType.STRING })
+    name: string;
+
+    @ApiProperty({ example: 'Макриди', description: 'Фамилия' })
+    @Column({ type: DataType.STRING })
+    lastName: string;
 
     @ApiProperty({ example: 'Пипец', description: 'Любимый фильм' })
     @Column({ type: DataType.STRING })

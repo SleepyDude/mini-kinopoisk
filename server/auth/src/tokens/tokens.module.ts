@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Token } from './tokens.model';
+import { Token } from '../../models/tokens.model';
 import { TokensController } from './tokens.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';

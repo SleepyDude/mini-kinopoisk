@@ -1,9 +1,8 @@
-import { Controller, Delete, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { DatabaseFilesService } from './files.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { profile } from 'console';
+import { Link } from '@hotels2023nestjs/shared';
 
 @Controller('files')
 @ApiTags('Files')
@@ -20,24 +19,39 @@ export class DbFilesController {
 
     @MessagePattern({ cmd: 'set-avatar' })
     async setAvatar(
-        @Payload() {profileId, avatarId}
+        @Payload() {id, avatarId}
     ) {
-        return await this.dbFilesService.setAvatar(profileId, avatarId);
+        return await this.dbFilesService.setAvatar(id, avatarId);
+    }
+
+    @MessagePattern({ cmd: 'get-avatar' })
+    async getAvatar(
+        @Payload() {id}
+    ) {
+        return await this.dbFilesService.getAvatar(id);
     }
 
     @MessagePattern({ cmd: 'unset-avatar' })
     async unsetAvatar(
-        @Payload() profileId : number
+        @Payload() id : number
     ) {
-        return await this.dbFilesService.unSetAvatar(profileId);
+        return await this.dbFilesService.unSetAvatar(id);
     }
 
-    @MessagePattern({ cmd: 'upload-file' })
+    @MessagePattern({ cmd: 'upload-avatar' })
     async uploadFile(
         @Payload() file
     ) {
-        console.log(`[CONTROLLER]`)
-        return await this.dbFilesService.uploadFile(file);
+        const buffer = Buffer.from(file.buffer)
+        return await this.dbFilesService.uploadAvatar(buffer);
     }
+
+    @MessagePattern({ cmd: 'upload-avatar-by-link' })
+    async uploadFileByLink(
+        @Payload() link: string
+    ) {
+        return await this.dbFilesService.uploadAvatarByLink(link);
+    }
+
 
 }

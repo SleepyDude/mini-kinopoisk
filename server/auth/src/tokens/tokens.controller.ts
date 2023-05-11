@@ -1,7 +1,7 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { Token } from './tokens.model';
+import { Token } from '../../models/tokens.model';
 import { ExceptionFilter } from '../rpc-exception.filter';
 
 @UseFilters(ExceptionFilter)

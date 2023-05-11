@@ -1,7 +1,6 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
-// import { DtoValidationPipe, HttpExceptionFilter, ObservableExceptionFilter, SharedService } from 'y/shared';
-import { CreateProfileDto, UpdateProfileDto } from '@hotels2023nestjs/shared';
+import { CreateProfileDto, UpdateAvatarDto, UpdateProfileDto } from '@hotels2023nestjs/shared';
 import { ProfilesService } from './profiles.service';
 import { ServiceRpcFilter } from '@hotels2023nestjs/shared';
 
@@ -21,7 +20,7 @@ export class ProfilesController {
     async createProfile(
         @Payload() dto: CreateProfileDto,
     ) {
-        console.log(`[social][profiles.controller][createProfile] id: ${dto.user_id}`);
+        // console.log(`[social][profiles.controller][createProfile] id: ${dto.user_id}`);
         return this.profilesService.createProfile(dto);
     }
 
@@ -29,7 +28,7 @@ export class ProfilesController {
     async getProfileByUserId(
         @Payload() id: number,
     ) {
-        console.log(`[social][profiles.controller][get-profile-by-id] id: ${id}`);
+        // console.log(`[social][profiles.controller][get-profile-by-id] id: ${id}`);
         return this.profilesService.getProfileByUserId(id); 
     }
 
@@ -40,5 +39,22 @@ export class ProfilesController {
     ) {
         return this.profilesService.updateProfileByUserId(id, dto);
     }
+
+    @MessagePattern({ cmd: 'update-avatar-by-user-id' })
+    async updateAvatarByUserId(
+        @Payload('id') id: number,
+        @Payload('dto') dto: UpdateAvatarDto,
+    ) {
+        return this.profilesService.updateAvatar(id, dto);
+    }
+
+    @MessagePattern({ cmd: 'delete-avatar-by-user-id' })
+    async deleteAvatarByUserId(
+        @Payload('id') id: number
+    ) {
+        return this.profilesService.deleteAvatar(id);
+    }
+
+    
 
 }

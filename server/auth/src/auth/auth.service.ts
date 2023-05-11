@@ -33,7 +33,7 @@ export class AuthService {
     const tokenData = new UserDto(user);
     const tokens = await this.tokenService.generateAndSaveToken(tokenData);
 
-    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: userDto.email};
+    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: userDto.email, id: user.id};
   }
 
   async registration(userDto: CreateUserDto) {
@@ -44,13 +44,13 @@ export class AuthService {
 
     const user = await this.userService.createUser({email: userDto.email, password: hashedPassword})
 
-    const profile = await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, {user_id: user.id} ));
+    await firstValueFrom(this.socialService.send( { cmd: 'create-profile' }, {user_id: user.id} ));
 
     const tokenData = new UserDto(user);
     const tokens = await this.tokenService.generateAndSaveToken(tokenData);
 
-    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: userDto.email, uuid: profile.uuid};
-  }
+    return {accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, email: userDto.email, id: user.id};
+  } 
 
   async logout(refreshToken) {
     return await this.tokenService.removeToken(refreshToken);

@@ -17,9 +17,10 @@ export * from './dto/roles/update-role.dto';
 export * from './dto/roles/update-role-param.dto';
 export * from './dto/roles/update-role.dto';
 
-export * from './dto/profiles/update-profile.dto';
-export * from './dto/profiles/create-profile.dto';
-export * from './dto/profiles/update-avatar.dto';
+export * from './dto/profiles_files/update-profile.dto';
+export * from './dto/profiles_files/create-profile.dto';
+export * from './dto/profiles_files/update-avatar.dto';
+export * from './dto/profiles_files/path2file.type'
 
 // models
 export * from './models/users/users.model';
@@ -27,7 +28,7 @@ export * from './models/users/roles.model';
 export * from './models/users/user-roles.model';
 export * from './dto/vk/vk.model'
 export * from './models/profiles/profiles.model';
-export * from './models/files/files.model'
+// export * from './models/files/files.model'
 
 // exceptions
 export * from './exceptions/http.rpc.exception';

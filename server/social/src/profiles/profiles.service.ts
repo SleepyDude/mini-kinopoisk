@@ -1,29 +1,25 @@
-import { CreateProfileDto, HttpRpcException, Profile, UpdateAvatarDto, UpdateProfileDto } from '@hotels2023nestjs/shared';
-import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { CreateProfileDto, HttpRpcException, UpdateAvatarDto, UpdateProfileDto } from '@hotels2023nestjs/shared';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { catchError, firstValueFrom, Observable, of, switchMap } from 'rxjs';
-// import { CreateProfileDto, RegisterProfileDto, UpdateProfileDto } from 'y/shared/dto';
-
 import { DatabaseFilesService } from 'src/databaseFiles/files.service';
-
-// import { ReturnProfile } from './types';
+import { Profile } from 'models/profiles.model';
 
 @Injectable()
 export class ProfilesService {
 
     constructor(
         @InjectModel(Profile) private profileRepository: typeof Profile,
-        // @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
         private fileService: DatabaseFilesService
     ) {}
 
     async createProfile(dto: CreateProfileDto): Promise<Profile> {
+        // console.log(`[dto] == ${JSON.stringify(dto)}`)
         const profile = await this.profileRepository.create(dto);
+        // console.log(`[profile created]`)
         if (dto.avatarId) {
-            this.fileService.setAvatar(profile.id, dto.avatarId)
+            await this.fileService.setAvatar(profile.id, dto.avatarId)
         }
-        return 
+        return profile;
     }
 
     async getAllProfiles() {

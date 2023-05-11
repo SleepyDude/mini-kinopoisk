@@ -10,17 +10,6 @@ import { Profile } from 'models/profiles.model';
     imports: [
         DatabaseFilesModule,
         SequelizeModule.forFeature([Profile]),
-        ClientsModule.register([
-            {
-                name: 'AUTH_SERVICE',
-                transport: Transport.RMQ,
-                options: {
-                    urls: [process.env.CLOUDAMQP_URL],
-                    queue: process.env.AUTH_QUEUE,
-                    queueOptions: { durable: false },
-                },
-            },
-        ]),
     ],
     controllers: [ProfilesController],
     providers: [ProfilesService],

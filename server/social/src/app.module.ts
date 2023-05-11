@@ -18,16 +18,6 @@ import { DatabaseFilesModule } from './databaseFiles/files.module';
             models: [],
             autoLoadModels: true,
         }),
-        ClientsModule.register([
-        {
-            name: 'AUTH-SERVICE',
-            transport: Transport.RMQ,
-            options: {
-                urls: [process.env.CLOUDAMQP_URL],
-                queue: process.env.AUTH_QUEUE,
-                queueOptions: { durable: false },
-            },
-        },]),
     ],
     controllers: [],
     providers: [],

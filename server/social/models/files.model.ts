@@ -25,7 +25,7 @@ export class DatabaseFile extends Model<DatabaseFile, DbFilesCreationAttrs> {
     @Column( {type: DataType.STRING, allowNull: false})    
     path2File: string;
 
-    @ApiProperty({example: 'textblock', description: 'Essence table'}) 
+    @ApiProperty({example: '0024dd23-8da4-4e69-bb6f-2ad62ecf2609', description: 'Внутренний UUID профиля'}) 
     @Column( {type: DataType.INTEGER, allowNull: true})    
     essenceProfileId: number;
 
