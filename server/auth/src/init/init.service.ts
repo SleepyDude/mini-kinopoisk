@@ -33,7 +33,8 @@ export class InitService {
         await this.roleService.createRole(initRoles['USER']);
 
         // Зарегистрируем владельца ресурса
-        await this.authService.registration({ email: process.env.OWNER_MAIL, password: process.env.OWNER_PASSWORD });
+        const loginDto = { email: process.env.OWNER_MAIL, password: process.env.OWNER_PASSWORD };
+        await this.authService.registration(loginDto);
         // const hashedPassword = await bcrypt.hash( process.env.OWNER_PASSWORD, +process.env.SALT );
         // const tokens = await this.userService.createUser({email: process.env.OWNER_MAIL, password: hashedPassword});
 
