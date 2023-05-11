@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString, IsUrl } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class UpdateProfileDto {
 
@@ -8,10 +8,15 @@ export class UpdateProfileDto {
     @IsOptional()
     readonly username: string;
 
-    @ApiProperty({ example: 'http://fantastic-movies/images/random.jpg', description: 'url изображения профиля' })
-    @IsUrl({}, { message: 'Должно быть валидным адресом' })
+    @ApiProperty({ example: 'Минди', description: 'Имя' })
+    @IsString({ message: 'Должно быть строкой' })
     @IsOptional()
-    readonly avatarUrl: string;
+    readonly name: string;
+
+    @ApiProperty({ example: 'Макриди', description: 'Фамилия' })
+    @IsString({ message: 'Должно быть строкой' })
+    @IsOptional()
+    readonly lastName: string;
 
     @ApiProperty({ example: 'Пипец', description: 'Любимый фильм' })
     @IsString({ message: 'Должно быть строкой' })

@@ -2,15 +2,14 @@ import { Module } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
-import {PersonsController} from "./controllers/persons.controller";
-import { MoviesController } from "./controllers/movies.controller";
+import { PersonsController } from './controllers/persons.controller';
+import { MoviesController } from './controllers/movies.controller';
 import { AuthController } from './controllers/auth.controller';
-import {ApiController} from "./api.controller";
 import { RolesController } from './controllers/roles.controller';
 import { ConfigModule } from '@nestjs/config';
 import { InitController } from './controllers/init.controller';
-import { GoogleStrategy } from './controllers/google.strategy';
 import { ProfilesController } from './controllers/profiles.controller';
+import { FilesController } from './controllers/files.controller';
 
 @Module({
   imports: [
@@ -54,18 +53,18 @@ import { ProfilesController } from './controllers/profiles.controller';
           queueOptions: { durable: false },
         },
       },
-    ])
+    ]),
   ],
   controllers: [
-      UsersController,
-      PersonsController,
-      AuthController,
-      ApiController,
-      RolesController,
-      MoviesController,
-      InitController,
-      ProfilesController,
+    UsersController,
+    PersonsController,
+    AuthController,
+    RolesController,
+    MoviesController,
+    InitController,
+    ProfilesController,
+    FilesController,
   ],
-  providers: [GoogleStrategy],
+  providers: [],
 })
 export class ApiModule {}

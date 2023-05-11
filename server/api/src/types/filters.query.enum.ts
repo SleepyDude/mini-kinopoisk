@@ -1,16 +1,16 @@
-export enum FiltersTypeQuery{
+export enum FiltersTypeQuery {
   film = 'FILM',
   serial = 'TV_SERIES',
 }
 
-export enum FiltersOrderByQuery{
+export enum FiltersOrderByQuery {
   alphabet = 'nameRu',
   year = 'year',
   voteCount = 'ratingKinopoiskVoteCount',
   rating = 'ratingKinopoisk',
 }
 
-export enum FiltersProfessionQuery{
+export enum FiltersProfessionQuery {
   director = 'режиссер',
-  actor = 'актер'
+  actor = 'актер',
 }
