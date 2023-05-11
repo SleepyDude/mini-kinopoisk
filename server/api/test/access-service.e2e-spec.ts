@@ -13,12 +13,14 @@ import { PoolClient } from 'pg';
 import { validateRefresh } from './validators/token.validator';
 
 import * as cookieParser from 'cookie-parser';
+import { socialPool } from './socialDb';
 
 // ДОБАВИТЬ ТЕСТЫ!!!
 
 describe('Access e2e', () => {
   let app: INestApplication;
-  let poolClient: PoolClient;
+  let userPoolClient: PoolClient;
+  let socialPoolClient: PoolClient;
 
   let ownerAccess: string; // OWNER
   let pawnAccess: string; // USER -> SMALLADMIN -> ..
@@ -45,12 +47,8 @@ describe('Access e2e', () => {
 
     await app.init();
 
-    poolClient = await usersPool.connect();
-
-    // Инициализируем сервер
-    await request(app.getHttpServer()).get('/init').expect(200);
-
-    const users = (await poolClient.query('SELECT * from users')).rows;
+    userPoolClient = await usersPool.connect();
+    socialPoolClient = await socialPool.connect();
 
     // получаем токены админа
     await request(app.getHttpServer())
@@ -160,11 +158,15 @@ describe('Access e2e', () => {
     });
 
     it('Проверяем базу', async () => {
-      const users = (await poolClient.query('SELECT * from users')).rows;
-      const usersRoles = (await poolClient.query('SELECT * from user_roles'))
+      const users = (await userPoolClient.query('SELECT * from users')).rows;
+      const usersRoles = (
+        await userPoolClient.query('SELECT * from user_roles')
+      ).rows;
+      const profiles = (await socialPoolClient.query('SELECT * from profiles'))
         .rows;
       expect(users).toHaveLength(6);
       expect(usersRoles).toHaveLength(7);
+      expect(profiles).toHaveLength(6);
     });
   });
 
@@ -270,7 +272,7 @@ describe('Access e2e', () => {
         .auth(ownerAccess, { type: 'bearer' })
         .expect(201);
       // Проверим, что в базе теперь 5 ролей (3 базовых + 2 новых)
-      const roles = (await poolClient.query('SELECT * from roles')).rows;
+      const roles = (await userPoolClient.query('SELECT * from roles')).rows;
       expect(roles).toHaveLength(5);
 
       return role;
@@ -484,7 +486,7 @@ describe('Access e2e', () => {
       // const refresh_name = 'refreshToken';
       // const tokens = (await poolClient.query(`SELECT * from tokens WHERE $1 = $2`, [refresh_name, pureRefresh])).rows;
       const tokens = (
-        await poolClient.query(`SELECT * from tokens WHERE id = $1`, [5])
+        await userPoolClient.query(`SELECT * from tokens WHERE id = $1`, [5])
       ).rows;
       // const tokens = (await poolClient.query(`SELECT * from tokens`)).rows;
       // console.log(`tokens: ${JSON.stringify(tokens, undefined, 2)}`);
@@ -513,7 +515,7 @@ describe('Access e2e', () => {
         });
       // Проверим, что запись о токене удалена из базы
       const tokens = (
-        await poolClient.query(`SELECT * from tokens WHERE id = $1`, [5])
+        await userPoolClient.query(`SELECT * from tokens WHERE id = $1`, [5])
       ).rows;
       expect(tokens).toHaveLength(0);
     });
@@ -521,14 +523,17 @@ describe('Access e2e', () => {
 
   afterAll(async () => {
     // Чистим таблицы
-    await poolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
-    await poolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
-    await poolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
+    await socialPoolClient.query('TRUNCATE profiles RESTART IDENTITY CASCADE');
 
     // console.log(queryResult.rows);
 
-    poolClient.release(true);
+    userPoolClient.release(true);
+    socialPoolClient.release(true);
     await usersPool.end();
+    await socialPool.end();
 
     await app.close();
   }, 6000);
