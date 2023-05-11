@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 dotenv.config({ path: process.env.NODE_ENV_LOCAL });
 dotenv.config({ path: process.env.NODE_ENV });

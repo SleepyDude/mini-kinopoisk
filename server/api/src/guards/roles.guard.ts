@@ -53,10 +53,15 @@ export class RolesGuard implements CanActivate {
     }
 
     const jwt = authHeaderParts[1];
+    // console.log(`JWT`)
 
     return this.authService.send({ cmd: 'verify-access-token' }, jwt).pipe(
       switchMap((value) => {
-        // console.log(`[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(value)}`);
+        // console.log(
+        //   `[roles.guard]['verify-access-token' pipe] value: ${JSON.stringify(
+        //     value,
+        //   )}`,
+        // );
         const { id, roles } = value as { id: number; roles: Array<any> };
 
         const { error } = value;
@@ -65,6 +70,10 @@ export class RolesGuard implements CanActivate {
           throw new HttpException(error, HttpStatus.UNAUTHORIZED);
         }
 
+        request.user = { id, roles }; // Устанавливаем в реквест параметры которые могут пригодиться
+        // console.log(
+        //   `ROLES GUARD:\n\nrequest.user: ${JSON.stringify(request.user)}\n\n`,
+        // );
         // Проверяем роли. Необходимость роли находится в метаданных гарда
         // Пытаемся достать метаданные из заголовка
         let roleParams = this.reflector.get<RoleDecoratorParams>(
@@ -79,10 +88,11 @@ export class RolesGuard implements CanActivate {
           );
         }
 
-        request.user = { id, roles };
-        // console.log(`[api][roles.guard] roleParams in meta: ${JSON.stringify(roleParams)}`);
         // Если их нет, то гард проходит проверку (авторизация уже прошла)
         if (!roleParams) return of(true);
+
+        // Как узнать, что пользователь собирается взять параметры о себе? Если мы договоримся, что
+        // берем данные о пользователе только как параметры и что эти данные только email либо id.
 
         if (roleParams.allowSelf) {
           if (request.params['id'] == id) return of(true);
@@ -91,6 +101,7 @@ export class RolesGuard implements CanActivate {
         }
 
         // Считаем максимальный уровень доступа для пользователя (записываем его в реквест чтобы можно было в декораторе достать)
+
         request.userMaxPermission = Math.max(
           ...roles.map((role) => role.value),
         );

@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 dotenv.config({ path: process.env.NODE_ENV_LOCAL });
 dotenv.config({ path: process.env.NODE_ENV });
@@ -50,6 +50,9 @@ describe('Access e2e', () => {
     userPoolClient = await usersPool.connect();
     socialPoolClient = await socialPool.connect();
 
+    // Инициализируем сервер
+    await request(app.getHttpServer()).get('/init').expect(200);
+
     // получаем токены админа
     await request(app.getHttpServer())
       .post('/auth/login')
@@ -58,6 +61,7 @@ describe('Access e2e', () => {
         password: process.env.OWNER_PASSWORD,
       })
       .expect((resp: any) => {
+        // console.log(`resp: ${JSON.stringify(resp)}`);
         ownerAccess = JSON.parse(resp.text).token;
       });
   });
@@ -92,7 +96,7 @@ describe('Access e2e', () => {
           expect(validateRefresh(refreshCookie)).toBeTruthy();
           expect(resp).toHaveProperty('text');
           const body = JSON.parse(resp.text);
-          expect(body.email).toBe('bob@mail.ru');
+          expect(body.id).toBe(2);
           expect(body).toHaveProperty('token');
           expect(body.token.length).toBeGreaterThan(1);
           bobAccess = body.token;
