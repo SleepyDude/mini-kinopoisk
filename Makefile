@@ -22,6 +22,9 @@ build-movies:
 run-social:
 	docker-compose --profile dev up postgres rabbitmq auth social
 
+run-social-test:
+	docker-compose --profile test up postgres rabbitmq auth social
+
 run-api:
 	docker-compose --profile dev up postgres rabbitmq auth social api
 
