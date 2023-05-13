@@ -7,7 +7,8 @@ import {
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { DatabaseFilesService } from 'src/databaseFiles/files.service';
-import { Profile } from 'models/profiles.model';
+// import { Review } from 'src/reviews/reviews.model';
+import { Profile } from '../../models/profiles.model';
 
 @Injectable()
 export class ProfilesService {

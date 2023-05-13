@@ -33,6 +33,7 @@ export class UsersService {
     try {
       const user = await this.userRepository.create(dto);
       await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+      user.roles = [role];
       return user;
     } catch (e) {
       throw new RpcException('Ошибка при создании пользователя');

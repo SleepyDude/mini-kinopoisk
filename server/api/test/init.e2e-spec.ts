@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 dotenv.config({ path: process.env.NODE_ENV_LOCAL });
 dotenv.config({ path: process.env.NODE_ENV });
@@ -11,10 +11,12 @@ import { ApiModule } from '../src/api.module';
 import { usersPool } from './userDb';
 import { PoolClient } from 'pg';
 import { validateRefresh } from './validators/token.validator';
+import { socialPool } from './socialDb';
 
 describe('Init e2e', () => {
   let app: INestApplication;
-  let poolClient: PoolClient;
+  let userPoolClient: PoolClient;
+  let socialPoolClient: PoolClient;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -24,7 +26,8 @@ describe('Init e2e', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    poolClient = await usersPool.connect();
+    userPoolClient = await usersPool.connect();
+    socialPoolClient = await socialPool.connect();
   });
 
   it('Пытаемся регистрировать пользователя до инициализации сервера - ошибка 400', async () => {
@@ -58,12 +61,10 @@ describe('Init e2e', () => {
   // });
 
   it('Инициализируем ресурс /api/init. Успех', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/init')
-      // .send({email: 'admin@mail.ru', password: 'admin' })
-      .expect(200);
+    const res = await request(app.getHttpServer()).get('/init').expect(200);
     // .expect((resp: any) => {
-    // console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
+    //     console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
+    // });
     // expect(resp).toHaveProperty('header');
     // const header = resp.header;
     // expect(header).toHaveProperty('set-cookie');
@@ -78,27 +79,33 @@ describe('Init e2e', () => {
     // expect(body.token.length).toBeGreaterThan(1);
     // });
     // Проверяем базу данных
-    const users = (await poolClient.query('SELECT * from users')).rows;
-    const roles = (await poolClient.query('SELECT * from roles')).rows;
-    const usersRoles = (await poolClient.query('SELECT * from user_roles'))
+    const users = (await userPoolClient.query('SELECT * from users')).rows;
+    const roles = (await userPoolClient.query('SELECT * from roles')).rows;
+    const usersRoles = (await userPoolClient.query('SELECT * from user_roles'))
+      .rows;
+    const profiles = (await socialPoolClient.query('SELECT * from profiles'))
       .rows;
     expect(users).toHaveLength(1);
     expect(roles).toHaveLength(3);
     expect(usersRoles).toHaveLength(2);
+    expect(profiles).toHaveLength(1);
     // return res;
   });
 
   afterAll(async () => {
     // Чистим таблицы
-    await poolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
-    await poolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
-    await poolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
+    await socialPoolClient.query('TRUNCATE profiles RESTART IDENTITY CASCADE');
 
     // console.log(queryResult.rows);
 
-    poolClient.release(true);
+    userPoolClient.release(true);
+    socialPoolClient.release(true);
     await usersPool.end();
+    await socialPool.end();
 
     await app.close();
-  }, 3000);
+  }, 6000);
 });

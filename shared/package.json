@@ -12,6 +12,16 @@
   "author": "Igor, Alex, Evgenii",
   "license": "ISC",
   "dependencies": {
+    "amqp-connection-manager": "^4.1.13",
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.4.0",
+    "@nestjs/microservices": "^9.4.0",
+    "@nestjs/swagger": "^6.3.0",
+    "amqplib": "^0.10.3",
+    "class-validator": "^0.14.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^6.31.0",
+    "sequelize-typescript": "^2.1.5"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
@@ -19,13 +29,5 @@
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/core": "^9.4.0",
-    "@nestjs/microservices": "^9.4.0",
-    "@nestjs/swagger": "^6.3.0",
-    "class-validator": "^0.14.0",
-    "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.31.0",
-    "sequelize-typescript": "^2.1.5"
   }
 }

@@ -27,12 +27,28 @@ import { initRoles } from '../guards/init.roles';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { firstValueFrom } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UserData } from '../decorators/user-data.decorator';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с профилем пользователя')
 @Controller('profiles')
 export class ProfilesController {
   constructor(@Inject('SOCIAL-SERVICE') private socialService: ClientProxy) {}
+
+  @UseGuards(RolesGuard)
+  @RoleAccess({ minRoleVal: initRoles.USER.value, allowSelf: true })
+  @ApiOperation({
+    summary: 'Получение своего профиля (профиля по данным в access токене)',
+  })
+  @ApiResponse({
+    status: 200,
+    type: Profile,
+    description: 'Профиль пользователя, доступ по токену авторизации',
+  })
+  @Get('/me')
+  async getMyProfile(@UserData('id', ParseIntPipe) id: number) {
+    return this.socialService.send({ cmd: 'get-profile-by-user-id' }, id);
+  }
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })

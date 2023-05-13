@@ -9,3 +9,15 @@ run-test:
 
 build-test:
 	docker compose --profile test build
+
+build-social:
+	docker-compose --profile dev build --no-cache social
+
+build-auth:
+	docker-compose --profile dev build --no-cache auth
+
+build-movies:
+	docker-compose --profile dev build --no-cache movies
+
+run-social-test:
+	docker-compose --profile test up postgres_test rabbitmq auth social
