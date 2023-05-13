@@ -2,39 +2,37 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
-
 describe('UsersController', () => {
-    let usersController: UsersController;
-    let spyService: UsersService;
+  let usersController: UsersController;
+  let spyService: UsersService;
 
-    beforeEach(async () => {
-        const UsersServiceProvider = {
-            provide: UsersService,
-            useFactory: () => ({
-                createUser: jest.fn( () => 13 ),
-            }),
-        };
+  beforeEach(async () => {
+    const UsersServiceProvider = {
+      provide: UsersService,
+      useFactory: () => ({
+        createUser: jest.fn(() => 13),
+      }),
+    };
 
-        const app: TestingModule = await Test.createTestingModule({
-            controllers: [UsersController],
-            providers: [UsersServiceProvider],
-        }).compile();
+    const app: TestingModule = await Test.createTestingModule({
+      controllers: [UsersController],
+      providers: [UsersServiceProvider],
+    }).compile();
 
-        usersController = app.get<UsersController>(UsersController);
-        spyService = app.get<UsersService>(UsersService);
+    usersController = app.get<UsersController>(UsersController);
+    spyService = app.get<UsersService>(UsersService);
+  });
+
+  describe('createUser', () => {
+    it('should call createUser', async () => {
+      const userDto = { email: 'user@mail.ru', password: 'password' };
+      usersController.createUser(userDto);
+      expect(spyService.createUser).toHaveBeenCalled();
     });
 
-    describe('createUser', () => {
-        it('should call createUser', async () => {
-            const userDto = {email: "user@mail.ru", password: "password"};
-            usersController.createUser(userDto);
-            expect(spyService.createUser).toHaveBeenCalled();
-        });
-
-        it('should return userId', async () => {
-            const userDto = {email: "user@mail.ru", password: "password"};
-            expect(spyService.createUser(userDto)).toBe(13);
-        });
+    it('should return userId', async () => {
+      const userDto = { email: 'user@mail.ru', password: 'password' };
+      expect(spyService.createUser(userDto)).toBe(13);
     });
-
-})
+  });
+});

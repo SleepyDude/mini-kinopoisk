@@ -10,7 +10,7 @@ async function bootstrap() {
     origin: process.env.CLIENT_HOST,
   });
   app.setGlobalPrefix('api');
-  app.use(cookieParser())
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
     .setTitle('Фильмы. Финальный проект')

@@ -1,10 +1,10 @@
-export enum PageQuery{
+export enum PageQuery {
   first = 1,
   two = 2,
-  three = 3
+  three = 3,
 }
 
-export enum SizeQuery{
+export enum SizeQuery {
   first = '10',
   two = '20',
 }

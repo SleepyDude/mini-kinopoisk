@@ -5,7 +5,7 @@ interface ProfileAttrs {
     id: number;
     username: string;
     favMovie: string;
-    avatarUrl: string;
+    avatarId: number;
     user_id: number;
 };
 
@@ -25,9 +25,9 @@ export class Profile extends Model<ProfileAttrs, ProfileCreationAttrs> {
     @Column({ type: DataType.STRING })
     favMovie: string;
 
-    @ApiProperty({ example: 'http://fantastic-movies/images/random.jpg', description: 'url изображения профиля' })
-    @Column({ type: DataType.STRING })
-    avatarUrl: string;
+    @ApiProperty({ example: '1', description: 'ID аватара' })
+    @Column({ type: DataType.INTEGER, allowNull: true })
+    avatarId: number;
 
     @ApiProperty({example: '42', description: 'id пользователя, который владеет данным профилем'}) 
     @Column({ type: DataType.INTEGER, unique: true, allowNull: false })

@@ -1,49 +1,64 @@
-import { HttpRpcException, UpdateProfileDto } from '@hotels2023nestjs/shared';
-import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import {
+  CreateProfileDto,
+  HttpRpcException,
+  UpdateAvatarDto,
+  UpdateProfileDto,
+} from '@hotels2023nestjs/shared';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { catchError, firstValueFrom, Observable, of, switchMap } from 'rxjs';
-// import { CreateProfileDto, RegisterProfileDto, UpdateProfileDto } from 'y/shared/dto';
-import { Profile } from '@hotels2023nestjs/shared';
-// import { ReturnProfile } from './types';
+import { DatabaseFilesService } from 'src/databaseFiles/files.service';
+// import { Review } from 'src/reviews/reviews.model';
+import { Profile } from '../../models/profiles.model';
 
 @Injectable()
 export class ProfilesService {
+  constructor(
+    @InjectModel(Profile) private profileRepository: typeof Profile,
+    private fileService: DatabaseFilesService,
+  ) {}
 
-    constructor(
-        @InjectModel(Profile) private profileRepository: typeof Profile,
-        @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
-    ) {}
-
-    async createProfile(id: number) {
-        return this.profileRepository.create({user_id: id});
+  async createProfile(dto: CreateProfileDto): Promise<Profile> {
+    // console.log(`[dto] == ${JSON.stringify(dto)}`)
+    const profile = await this.profileRepository.create(dto);
+    // console.log(`[profile created]`)
+    if (dto.avatarId) {
+      await this.fileService.setAvatar(profile.id, dto.avatarId);
     }
+    return profile;
+  }
 
-    private async findProfileByUserId(id: number): Promise<Profile> {
-        const profile = await this.profileRepository.findOne({ where: {user_id: id} });
-        if (profile) return profile;
-        throw new HttpRpcException('Профиль не найден', HttpStatus.NOT_FOUND);
-    }
+  async getAllProfiles() {
+    return await this.profileRepository.findAll();
+  }
 
-    async getAllProfiles() {
-        return await this.profileRepository.findAll();
-    }
+  async getProfileByUserId(id: number): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({
+      where: { user_id: id },
+    });
 
-    async getProfileByUserId(id: number): Promise<Profile> {
-    
-        const profile = await this.profileRepository.findOne({
-            where: { user_id: id }
-        });
+    if (profile) return profile;
 
-        return profile;
-    }
+    throw new HttpRpcException('Профиль не найден', HttpStatus.NOT_FOUND);
+  }
 
-    async updateProfileByUserId(id: number, updateProfileDto: UpdateProfileDto) {
-        
-        const profile = await this.findProfileByUserId(id);
+  async updateAvatar(id: number, dto: UpdateAvatarDto): Promise<Profile> {
+    const profile = await this.getProfileByUserId(id);
+    await this.fileService.unSetAvatar(profile.id);
+    await this.fileService.setAvatar(profile.id, dto.avatarId);
+    return await profile.update(dto);
+  }
 
-        await profile.update(updateProfileDto);
-        return profile
-    }
+  async deleteAvatar(id: number): Promise<Profile> {
+    const profile = await this.getProfileByUserId(id);
+    await this.fileService.unSetAvatar(profile.id);
+    return await profile.update({ avatarId: null });
+  }
 
+  async updateProfileByUserId(
+    id: number,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<Profile> {
+    const profile = await this.getProfileByUserId(id);
+    return await profile.update(updateProfileDto);
+  }
 }
