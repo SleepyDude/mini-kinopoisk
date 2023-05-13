@@ -86,7 +86,7 @@ services:
       - ./.env
     depends_on:
       - rabbitmq
-      - postgres
+      # - postgres
     volumes:
       - ./server/persons:/app/server/persons
       - /app/server/persons/node_modules
@@ -100,7 +100,7 @@ services:
       - ./.env
     depends_on:
       - rabbitmq
-      - postgres
+      # - postgres
     volumes:
       - ./server/movies:/app/server/movies
       - /app/server/movies/node_modules
