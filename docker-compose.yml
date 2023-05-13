@@ -34,7 +34,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     hostname: postgres
     volumes:
-      - ./initdb-scripts/testdb:/docker-entrypoint-initdb.d
+      # - ./initdb-scripts/testdb:/docker-entrypoint-initdb.d
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
