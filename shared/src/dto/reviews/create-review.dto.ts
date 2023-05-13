@@ -22,9 +22,8 @@ export class CreateReviewDto {
     @IsString({ message: 'Должно быть строкой'})
     readonly text: string;
 
-    @ApiProperty({ example: '1.3.8.', description: 'Значение свойства "path" родительского комментария' })
-    @IsString({ message: 'Должно быть строкой'})
-    @IsOptional()
-    readonly parentPath: string;
-
+    // @ApiProperty({ example: '1.3.8.', description: 'Значение свойства "path" родительского комментария' })
+    // @IsString({ message: 'Должно быть строкой'})
+    // @IsOptional()
+    // readonly parentPath: string;
 }

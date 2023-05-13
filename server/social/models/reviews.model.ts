@@ -10,6 +10,7 @@ import {
   Index,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { Profile } from './profiles.model';
 
@@ -44,6 +45,15 @@ export class Review extends Model<ReviewModelAttrs, ReviewModelCreationAttrs> {
   @BelongsTo(() => Profile)
   profile: Profile;
 
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  depth: number;
+
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  childsNum: number;
+
+  @Column({ type: DataType.INTEGER })
+  parent_id: number;
+
   // @ForeignKey(() => Review)
   // @Column({ type: DataType.INTEGER })
   // parent_id: number;
@@ -57,6 +67,6 @@ export class Review extends Model<ReviewModelAttrs, ReviewModelCreationAttrs> {
   // @HasMany(() => ReviewChildParent, 'child_id')
   // child_parents: ReviewChildParent[];
 
-  // @HasMany(() => Review, { as: "childs", sourceKey: 'id' })
+  // @HasMany(() => Review)
   // childs: Review[];
 }

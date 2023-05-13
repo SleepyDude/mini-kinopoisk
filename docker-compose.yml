@@ -56,7 +56,7 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - postgres
+      # - postgres
       - rabbitmq
     volumes:
       - ./server/auth:/app/server/auth
@@ -70,40 +70,40 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - postgres
+      # - postgres
       - rabbitmq
       - auth
     volumes:
       - ./server/social:/app/server/social
       - /app/server/social/node_modules
 
-  # persons:
-  #   container_name: persons-dns-movies
-  #   build:
-  #     dockerfile: ./server/persons/Dockerfile
-  #     context: ./
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - rabbitmq
-  #     - postgres
-  #   volumes:
-  #     - ./server/persons:/app/server/persons
-  #     - /app/server/persons/node_modules
+  persons:
+    container_name: persons-dns-movies
+    build:
+      dockerfile: ./server/persons/Dockerfile
+      context: ./
+    env_file:
+      - ./.env
+    depends_on:
+      - rabbitmq
+      - postgres
+    volumes:
+      - ./server/persons:/app/server/persons
+      - /app/server/persons/node_modules
 
-  # movies:
-  #   container_name: movies-dns-movies
-  #   build:
-  #     dockerfile: ./server/movies/Dockerfile
-  #     context: ./
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - rabbitmq
-  #     - postgres
-  #   volumes:
-  #     - ./server/movies:/app/server/movies
-  #     - /app/server/movies/node_modules
+  movies:
+    container_name: movies-dns-movies
+    build:
+      dockerfile: ./server/movies/Dockerfile
+      context: ./
+    env_file:
+      - ./.env
+    depends_on:
+      - rabbitmq
+      - postgres
+    volumes:
+      - ./server/movies:/app/server/movies
+      - /app/server/movies/node_modules
 
   api:
     container_name: api-dns-movies
@@ -116,8 +116,8 @@ services:
       - rabbitmq
       # - persons
       # - movies
-      - auth
-      - social
+      # - auth
+      # - social
     volumes:
       - ./server/api:/app/server/api
       - /app/server/api/node_modules

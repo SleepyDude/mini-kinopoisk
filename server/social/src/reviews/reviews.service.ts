@@ -1,10 +1,16 @@
-import { CreateReviewDto } from '@hotels2023nestjs/shared';
-import { Injectable } from '@nestjs/common';
+import {
+  CreateReviewDto,
+  HttpRpcException,
+  ReviewModelWithProfileAndChilds,
+} from '@hotels2023nestjs/shared';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 // import { Sequelize } from 'sequelize';
 import { Profile } from '../../models/profiles.model';
 // import { ReviewChildParent } from './child-parent.m2m.model';
 import { Review } from '../../models/reviews.model';
+import { ReviewWithChilds } from './review-with-childs';
 
 @Injectable()
 export class ReviewsService {
@@ -14,108 +20,171 @@ export class ReviewsService {
   ) {}
 
   async createReview(dto: CreateReviewDto, user_id: number) {
-    console.log(
-      `[social][reviews.service][createReview] dto: ${JSON.stringify(dto)}`,
-    );
     const { parent_id } = dto;
-    let { parentPath } = dto;
+    let parentPath = ''; // parentPath по умолчанию
+    let parentDepth = 0;
+    let parent: Review = undefined;
 
-    if (parent_id && parentPath) {
-      parentPath += parent_id + '.';
-    } else {
-      parentPath = '';
+    if (parent_id !== undefined) {
+      parent = await this.reviewsRepository.findByPk(parent_id);
+      if (!parent) {
+        throw new HttpRpcException(
+          `Отзыв с parent_id = ${parent_id} не найден`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (dto.film_id !== undefined && parent.film_id !== dto.film_id) {
+        throw new HttpRpcException(
+          `film_id родительского отзыва должен совпадать с film_id текущего отзыва, если последний задан`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      parentPath = parent.path + parent.id + '.';
+      parentDepth = parent.depth + 1;
     }
 
     const review = await this.reviewsRepository.create({
       profile_id: user_id, // Пока у нас инты, то id профиля и юзера равны
       ...dto,
+      path: parentPath,
+      childsNum: 0,
+      depth: parentDepth,
     });
+
+    if (parent) {
+      parent.set('childsNum', parent.childsNum + 1); // Добавить после обновления модели
+      await parent.save();
+    }
+
     return review;
   }
 
-  // const t = await this.sequelize.transaction();
+  async getReviewByReviewIdSingle(review_id: number) {
+    const review = await this.reviewsRepository.findByPk(review_id, {
+      include: {
+        model: Profile,
+        attributes: {
+          exclude: ['user_id', 'createdAt', 'updatedAt'],
+        },
+      },
+      attributes: {
+        exclude: ['profile_id'],
+      },
+    });
+    if (!review) {
+      throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
+    }
+    return review;
+  }
 
-  // try {
-  //     const { parent_id } = dto;
-  //     let depth = 0; // глубина по-умолчанию
-  //     if (parent_id) {
-  //         // проверим глубину родительского комментария
-  //         const parent = await this.reviewsRepository.findByPk(parent_id, { attributes: ['depth'] });
-  //         depth = parent.depth + 1; // глубина текущего комментария на 1 больше
-  //     }
+  private async collapseTree(reviews: Review[], findOne = false) {
+    // Если у нас выбран только один элемент (корневой родитель) - его и возвращаем
+    let i = 0;
 
-  //     // Создаем сам отзыв
-  //     const review = await this.reviewsRepository.create({
-  //         profile_id: user_id, // Пока у нас инты, то id профиля и юзера равны
-  //         ...dto,
-  //         depth: depth,
-  //     }, {transaction: t});
+    const results = [];
 
-  //     await this.m2mRepository.bulkCreate([
-  //         { child_id  : "Nathan", lastName: "Sebhastian" },
-  //     ])
+    const reviewStack = [];
 
-  //     // Создаем его связи
-  //     if (parent_id) {
+    while (true) {
+      if (i === reviews.length) break;
+      // Достаем очередное значение review из списка
+      const review = new ReviewWithChilds(reviews[i]);
+      // console.log(`processing review: ${JSON.stringify(review)}`);
 
-  //         const pair = new ReviewChildParent({child_id: review.id, parent_id: dto.parent_id});
-  //         pair.save();
+      if (!reviewStack.length) {
+        reviewStack.push(review);
+        results.push(review);
+        i += 1;
+        continue;
+      }
 
-  //     }
-  //     return review;
-  // } catch (error) {
-  //     console.log(`ERROR\n\n${JSON.stringify(error)}\n\n`);
-  //     throw new HttpRpcException('Ошибка при создании отзыва', HttpStatus.INTERNAL_SERVER_ERROR);
-  // }
+      if (reviewStack[reviewStack.length - 1].id === review.parent_id) {
+        reviewStack[reviewStack.length - 1].childs.push(review);
+        i += 1;
+      } else {
+        const fullParent = reviewStack.pop();
+        // Его дети могут также иметь детей, заносим их в стек в обратном порядке
+        for (let j = fullParent.childs.length - 1; j >= 0; j--) {
+          reviewStack.push(fullParent.childs[j]);
+        }
+        // Скипаем сверху тех из них, которые не являются родителем текущему или пока стек не опустеет
+        while (
+          reviewStack.length &&
+          reviewStack[reviewStack.length - 1].id !== review.parent_id
+        ) {
+          reviewStack.pop();
+        }
+      }
+    }
 
-  //   async getReviewTreeByReviewId(review_id: number){}
+    if (findOne) return results[0];
+    return results;
+  }
 
-  async getReviewByReviewId(review_id: number) {
-    // const getInc = (depth: number) => {
-    //     if (!depth) return [];
-    //     return [
-    //         {model: Review, include: getInc(depth-1)},
-    //         {model: Profile, attributes: ['username']},
-    //     ];
-    // }
+  async getReviewByReviewIdTree(review_id: number) {
+    const parentReview = await this.reviewsRepository.findByPk(review_id, {
+      attributes: ['path', 'film_id'],
+    });
 
-    // return this.reviewsRepository.findByPk(review_id, {
-    //     include: {model: Review},
-    // });
+    if (!parentReview) {
+      throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
+    }
 
-    // const res = await this.reviewsRepository.findAll({
-    //     include: [
-    //         {
-    //             model: Review,
-    //             // where: {
-    //             //     child_id: review_id,
-    //             // }
-    //         }
-    //     ],
-    //     where: {
-    //         id: review_id,
-    //     }
-    // })
-    // return res;
-    return ['1', '2'];
+    const reviews = await this.reviewsRepository.findAll({
+      where: {
+        path: {
+          [Op.startsWith]: parentReview.path,
+        },
+        film_id: parentReview.film_id,
+      },
+      include: {
+        model: Profile,
+        attributes: {
+          exclude: ['user_id', 'createdAt', 'updatedAt'],
+        },
+      },
+      attributes: {
+        exclude: ['profile_id'],
+      },
+      order: [
+        // ['depth', 'ASC'],
+        // ['createdAt', 'DESC'],
+        ['path', 'ASC'],
+        ['createdAt', 'DESC'],
+      ],
+    });
+
+    return this.collapseTree(reviews, true);
+  }
+
+  async getReviewsByFilmId(film_id: number) {
+    const reviews = await this.reviewsRepository.findAll({
+      where: {
+        film_id: film_id,
+      },
+      include: {
+        model: Profile,
+        attributes: {
+          exclude: ['user_id', 'createdAt', 'updatedAt'],
+        },
+      },
+      attributes: {
+        exclude: ['profile_id'],
+      },
+      order: [
+        ['path', 'ASC'],
+        ['createdAt', 'DESC'],
+      ],
+    });
+    return this.collapseTree(reviews);
   }
 
   async getReviewsByProfileId(profile_id: number) {
     return this.reviewsRepository.findAll({
       where: {
         profile_id,
-      },
-      include: [
-        { model: Review },
-        { model: Profile, attributes: ['id', 'username'] },
-      ],
-    });
-  }
-
-  async getReviewsByFilmId(film_id: number) {
-    return this.reviewsRepository.findAll({
-      where: {
-        film_id,
       },
       include: [
         { model: Review },

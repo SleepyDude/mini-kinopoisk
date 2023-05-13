@@ -6,11 +6,17 @@ export class ProfileModelAttrs {
     @ApiProperty({ example: 'Ubivashka666', description: 'Имя пользователя' })
     username: string;
 
+    @ApiProperty({ example: 'Минди', description: 'Имя' })
+    name: string;
+  
+    @ApiProperty({ example: 'Макриди', description: 'Фамилия' })
+    lastName: string;
+
     @ApiProperty({ example: 'Пипец', description: 'Любимый фильм' })
     favMovie: string;
 
-    @ApiProperty({ example: 'http://fantastic-movies/images/random.jpg', description: 'url изображения профиля' })
-    avatarUrl: string;
+    @ApiProperty({ example: '1', description: 'ID аватара' })
+    avatarId: number;
 
     @ApiProperty({example: '42', description: 'id пользователя, который владеет данным профилем'})
     user_id: number;

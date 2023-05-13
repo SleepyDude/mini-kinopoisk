@@ -1,8 +1,9 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateReviewDto } from '@hotels2023nestjs/shared';
+import { CreateReviewDto, ServiceRpcFilter } from '@hotels2023nestjs/shared';
 
+@UseFilters(ServiceRpcFilter)
 @Controller('reviews')
 export class ReviewsController {
   constructor(private reviewsService: ReviewsService) {}
@@ -15,9 +16,14 @@ export class ReviewsController {
     return await this.reviewsService.createReview(dto, user_id);
   }
 
-  @MessagePattern({ cmd: 'get-review-by-review-id' })
+  @MessagePattern({ cmd: 'get-review-by-review-id-single' })
   async getReviewByReviewId(@Payload() review_id: number) {
-    return await this.reviewsService.getReviewByReviewId(review_id);
+    return await this.reviewsService.getReviewByReviewIdSingle(review_id);
+  }
+
+  @MessagePattern({ cmd: 'get-review-by-review-id-tree' })
+  async getReviewTreeByReviewId(@Payload() review_id: number) {
+    return await this.reviewsService.getReviewByReviewIdTree(review_id);
   }
 
   @MessagePattern({ cmd: 'get-reviews-by-profile-id' })

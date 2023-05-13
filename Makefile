@@ -19,14 +19,5 @@ build-auth:
 build-movies:
 	docker-compose --profile dev build --no-cache movies
 
-run-social:
-	docker-compose --profile dev up postgres rabbitmq auth social
-
 run-social-test:
-	docker-compose --profile test up postgres rabbitmq auth social
-
-run-api:
-	docker-compose --profile dev up postgres rabbitmq auth social api
-
-build-api:
-	docker-compose --profile dev build --no-cache auth social api
+	docker-compose --profile test up postgres_test rabbitmq auth social
