@@ -80,12 +80,22 @@ export class ReviewsService {
   }
 
   private async collapseTree(reviews: Review[], findOne = false) {
-    // Если у нас выбран только один элемент (корневой родитель) - его и возвращаем
     let i = 0;
-
-    const results = [];
-
+    const roots = [];
     const reviewStack = [];
+
+    const rootPath = reviews[0].path;
+    while (i < reviews.length) {
+      if (rootPath !== reviews[i].path) break;
+      const review = new ReviewWithChilds(reviews[i]);
+      roots.push(review);
+      reviewStack.push(review);
+      i += 1;
+    }
+
+    reviewStack.reverse();
+
+    // console.log(`start reviewStack = ${reviewStack}`);
 
     while (true) {
       if (i === reviews.length) break;
@@ -93,12 +103,12 @@ export class ReviewsService {
       const review = new ReviewWithChilds(reviews[i]);
       // console.log(`processing review: ${JSON.stringify(review)}`);
 
-      if (!reviewStack.length) {
-        reviewStack.push(review);
-        results.push(review);
-        i += 1;
-        continue;
-      }
+      // if (!reviewStack.length) {
+      //   reviewStack.push(review);
+      //   results.push(review);
+      //   i += 1;
+      //   continue;
+      // }
 
       if (reviewStack[reviewStack.length - 1].id === review.parent_id) {
         reviewStack[reviewStack.length - 1].childs.push(review);
@@ -111,7 +121,7 @@ export class ReviewsService {
         }
         // Скипаем сверху тех из них, которые не являются родителем текущему или пока стек не опустеет
         while (
-          reviewStack.length &&
+          // reviewStack.length &&
           reviewStack[reviewStack.length - 1].id !== review.parent_id
         ) {
           reviewStack.pop();
@@ -119,8 +129,8 @@ export class ReviewsService {
       }
     }
 
-    if (findOne) return results[0];
-    return results;
+    if (findOne) return roots[0];
+    return roots;
   }
 
   async getReviewByReviewIdTree(review_id: number) {
