@@ -18,7 +18,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=./../../.env NODE_ENV_LOCAL=.env.api.test jest --config ./test/jest-e2e.json --detectOpenHandles"
+    "test:e2e": "cross-env NODE_ENV=./../../.env NODE_ENV_LOCAL=.env.api.test jest --config ./test/jest-e2e.json --detectOpenHandles",
+    "test-movies": "cross-env NODE_ENV=./../../.env NODE_ENV_LOCAL=.env.api.test jest --config ./test/jest-e2e.json --detectOpenHandles test/films.e2e-spec.ts test/persons.e2e-spec.ts",
+    "test-social": "cross-env NODE_ENV=./../../.env NODE_ENV_LOCAL=.env.api.test jest --config ./test/jest-e2e.json --detectOpenHandles test/init.e2e-spec.ts test/access-service.e2e-spec.ts test/reviews.e2e-spec.ts"
   },
   "dependencies": {
     "@hotels2023nestjs/shared": "file:../../shared",

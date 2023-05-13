@@ -34,7 +34,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     hostname: postgres
     volumes:
-      - ./initdb-scripts/testdb:/docker-entrypoint-initdb.d
+      # - ./initdb-scripts/testdb:/docker-entrypoint-initdb.d
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
@@ -86,7 +87,7 @@ services:
       - ./.env
     depends_on:
       - rabbitmq
-      - postgres
+      # - postgres
     volumes:
       - ./server/persons:/app/server/persons
       - /app/server/persons/node_modules
@@ -100,7 +101,7 @@ services:
       - ./.env
     depends_on:
       - rabbitmq
-      - postgres
+      # - postgres
     volumes:
       - ./server/movies:/app/server/movies
       - /app/server/movies/node_modules

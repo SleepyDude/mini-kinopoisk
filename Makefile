@@ -21,3 +21,6 @@ build-movies:
 
 run-social-test:
 	docker-compose --profile test up postgres_test rabbitmq auth social
+
+run-all-test:
+	docker-compose --profile test up postgres_test rabbitmq auth social persons movies
