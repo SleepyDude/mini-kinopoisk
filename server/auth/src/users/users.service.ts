@@ -60,6 +60,15 @@ export class UsersService {
     return user;
   }
 
+  async getUserPublicById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      include: { all: true },
+      attributes: ['email'],
+    });
+    return user;
+  }
+
   async getUserByVkId(id: number) {
     const user = await this.userRepository.findOne({
       where: { vk_id: id },

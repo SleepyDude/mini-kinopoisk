@@ -6,6 +6,7 @@ import {
   Inject,
   Param,
   Post,
+  Type,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -17,12 +18,34 @@ import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { initRoles } from '../guards/init.roles';
+import { UserData } from '../decorators/user-data.decorator';
+import { UserPublic } from '../user.public.interface';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с пользователями')
 @Controller('users')
 export class UsersController {
   constructor(@Inject('AUTH-SERVICE') private authService: ClientProxy) {}
+
+  @UseGuards(RolesGuard)
+  @RoleAccess({ minRoleVal: initRoles.USER.value, allowSelf: true })
+  @ApiOperation({
+    summary: 'Получение своих данных пользователя (email и роли)',
+  })
+  @ApiResponse({
+    status: 200,
+    type: UserPublic,
+    description: 'Объект может получить только сам пользователь',
+  })
+  @Get('me')
+  async getMyUserData(@UserData('id') id: number) {
+    return this.authService.send(
+      {
+        cmd: 'get-user-public-by-id',
+      },
+      id,
+    );
+  }
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
