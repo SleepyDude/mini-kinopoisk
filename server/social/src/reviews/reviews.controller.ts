@@ -1,7 +1,11 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateReviewDto, ServiceRpcFilter } from '@hotels2023nestjs/shared';
+import {
+  CreateReviewDto,
+  ReviewQueryDto,
+  ServiceRpcFilter,
+} from '@hotels2023nestjs/shared';
 
 @UseFilters(ServiceRpcFilter)
 @Controller('reviews')
@@ -32,8 +36,14 @@ export class ReviewsController {
   }
 
   @MessagePattern({ cmd: 'get-reviews-by-film-id' })
-  async getReviewsByFilmId(@Payload() film_id: number) {
-    return await this.reviewsService.getReviewsByFilmId(film_id);
+  async getReviewsByFilmId(
+    @Payload('film_id') film_id: number,
+    @Payload('reviewQueryDto') reviewQueryDto: ReviewQueryDto,
+  ) {
+    return await this.reviewsService.getReviewsByFilmId(
+      film_id,
+      reviewQueryDto,
+    );
   }
 
   @MessagePattern({ cmd: 'delete-review-by-review-id' })

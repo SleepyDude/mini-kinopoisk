@@ -6,21 +6,19 @@ dotenv.config({ path: process.env.NODE_ENV });
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ApiModule } from '../src/api.module';
+import { ApiModule } from '../../src/api.module';
 
-import { usersPool } from './userDb';
+import { usersPool } from './../userDb';
 import { PoolClient } from 'pg';
-import { validateRefresh } from './validators/token.validator';
 
 import * as cookieParser from 'cookie-parser';
-import { socialPool } from './socialDb';
+import { socialPool } from './../socialDb';
 import {
   Profile,
   ReviewModelAttrs,
   ReviewModelWithProfile,
   ReviewModelWithProfileAndChilds,
 } from '@hotels2023nestjs/shared';
-import { profile } from 'console';
 
 type RespError = {
   text: string;

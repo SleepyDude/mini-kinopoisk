@@ -8,10 +8,11 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -23,6 +24,7 @@ import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { ReviewModelReturnAttrs } from '@hotels2023nestjs/shared';
 import { UserData } from '../decorators/user-data.decorator';
+import { ReviewQueryDto } from '../types/reviews.query.dto';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с отзывами')
@@ -110,8 +112,15 @@ export class ReviewsController {
     description: 'Массив отзывов со всеми своими потомками',
   })
   @Get('film/:film_id')
-  async getReviewsByFilmId(@Param('film_id', ParseIntPipe) film_id: number) {
-    return this.socialService.send({ cmd: 'get-reviews-by-film-id' }, film_id);
+  async getReviewsByFilmId(
+    @Param('film_id', ParseIntPipe) film_id: number,
+    @Query(DtoValidationPipe) reviewQueryDto: ReviewQueryDto,
+  ) {
+    console.log(`review query dto: ${JSON.stringify(reviewQueryDto)}`);
+    return this.socialService.send(
+      { cmd: 'get-reviews-by-film-id' },
+      { film_id, reviewQueryDto },
+    );
   }
 
   // @UseGuards(RolesGuard)

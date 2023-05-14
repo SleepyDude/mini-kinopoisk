@@ -1,7 +1,8 @@
 import {
   CreateReviewDto,
   HttpRpcException,
-  ReviewModelWithProfileAndChilds,
+  ReviewQueryDto,
+  // ReviewQueryDto,
 } from '@hotels2023nestjs/shared';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -169,11 +170,30 @@ export class ReviewsService {
     return this.collapseTree(reviews, true);
   }
 
-  async getReviewsByFilmId(film_id: number) {
+  async getReviewsByFilmId(film_id: number, reviewQueryDto: ReviewQueryDto) {
+    const { size, depth } = reviewQueryDto;
+    let { page } = reviewQueryDto;
+    console.log(
+      `[reviews.service] size: ${size} page: ${page} depth: ${depth}`,
+    );
+    let offset = 0;
+    if (size) {
+      if (page === undefined) page = 0;
+      offset = page * size;
+    }
+
+    const where = {
+      film_id: film_id,
+    } as { film_id: number; depth: any };
+
+    if (depth) {
+      where.depth = {
+        [Op.lte]: depth,
+      };
+    }
+
     const reviews = await this.reviewsRepository.findAll({
-      where: {
-        film_id: film_id,
-      },
+      where: where,
       include: {
         model: Profile,
         attributes: {
