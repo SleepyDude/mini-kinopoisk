@@ -6,7 +6,7 @@ import {
   PersonsQueryDto,
   StaffQueryDto,
 } from './dto/persons.query.dto';
-import { ServiceRpcFilter } from './exceptions/exception.filter';
+import { ServiceRpcFilter } from '@hotels2023nestjs/shared';
 
 @Controller('persons')
 export class PersonsController {
