@@ -26,8 +26,11 @@ export class ReviewsController {
   }
 
   @MessagePattern({ cmd: 'get-review-by-review-id-tree' })
-  async getReviewTreeByReviewId(@Payload() review_id: number) {
-    return await this.reviewsService.getReviewByReviewIdTree(review_id);
+  async getReviewTreeByReviewId(
+    @Payload('review_id') review_id: number,
+    @Payload('depth') depth: number,
+  ) {
+    return await this.reviewsService.getReviewByReviewIdTree(review_id, depth);
   }
 
   @MessagePattern({ cmd: 'get-reviews-by-profile-id' })
@@ -41,6 +44,17 @@ export class ReviewsController {
     @Payload('reviewQueryDto') reviewQueryDto: ReviewQueryDto,
   ) {
     return await this.reviewsService.getReviewsByFilmId(
+      film_id,
+      reviewQueryDto,
+    );
+  }
+
+  @MessagePattern({ cmd: 'get-top-reviews-by-film-id' })
+  async getTopReviewsByFilmId(
+    @Payload('film_id') film_id: number,
+    @Payload('reviewQueryDto') reviewQueryDto: ReviewQueryDto,
+  ) {
+    return await this.reviewsService.getTopReviewsByFilmId(
       film_id,
       reviewQueryDto,
     );
