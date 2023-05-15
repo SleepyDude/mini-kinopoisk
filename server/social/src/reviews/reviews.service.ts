@@ -1,11 +1,13 @@
 import {
   CreateReviewDto,
   HttpRpcException,
-  ReviewModelWithProfileAndChilds,
+  ReviewModelAttrs,
+  ReviewQueryDto,
+  // ReviewQueryDto,
 } from '@hotels2023nestjs/shared';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { FindOptions, Op, WhereOptions } from 'sequelize';
 // import { Sequelize } from 'sequelize';
 import { Profile } from '../../models/profiles.model';
 // import { ReviewChildParent } from './child-parent.m2m.model';
@@ -80,9 +82,14 @@ export class ReviewsService {
   }
 
   private async collapseTree(reviews: Review[], findOne = false) {
+    // console.log(
+    //   `collapse tree reviews: ${JSON.stringify(reviews, undefined, 2)}`,
+    // );
     let i = 0;
     const roots = [];
     const reviewStack = [];
+
+    if (!reviews.length) return [];
 
     const rootPath = reviews[0].path;
     while (i < reviews.length) {
@@ -133,22 +140,47 @@ export class ReviewsService {
     return roots;
   }
 
-  async getReviewByReviewIdTree(review_id: number) {
+  async getReviewByReviewIdTree(review_id: number, depth: number) {
+    // console.log(
+    //   `\n\n[reviews.service][gerReviewTree] review_id: ${JSON.stringify(
+    //     review_id,
+    //   )}\n\n`,
+    // );
     const parentReview = await this.reviewsRepository.findByPk(review_id, {
-      attributes: ['path', 'film_id'],
+      include: {
+        model: Profile,
+        attributes: {
+          exclude: ['user_id', 'createdAt', 'updatedAt'],
+        },
+      },
+      attributes: {
+        exclude: ['profile_id'],
+      },
     });
+
+    const pathToStart = `${parentReview.path}${review_id}.`;
+    console.log(pathToStart);
+
+    const whereOptions: WhereOptions<ReviewModelAttrs> = {
+      path: {
+        [Op.startsWith]: pathToStart,
+      },
+      film_id: parentReview.film_id,
+    };
+
+    if (depth !== undefined) {
+      // console.log(`depth != undef: ${depth}`);
+      whereOptions.depth = {
+        [Op.lte]: parentReview.depth + depth,
+      };
+    }
 
     if (!parentReview) {
       throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
     }
 
     const reviews = await this.reviewsRepository.findAll({
-      where: {
-        path: {
-          [Op.startsWith]: parentReview.path,
-        },
-        film_id: parentReview.film_id,
-      },
+      where: whereOptions,
       include: {
         model: Profile,
         attributes: {
@@ -166,14 +198,33 @@ export class ReviewsService {
       ],
     });
 
-    return this.collapseTree(reviews, true);
+    return this.collapseTree([parentReview, ...reviews], true);
   }
 
-  async getReviewsByFilmId(film_id: number) {
+  async getReviewsByFilmId(film_id: number, reviewQueryDto: ReviewQueryDto) {
+    const { size, depth } = reviewQueryDto;
+    let { page } = reviewQueryDto;
+    console.log(
+      `[reviews.service] size: ${size} page: ${page} depth: ${depth}`,
+    );
+    let offset = 0;
+    if (size) {
+      if (page === undefined) page = 0;
+      offset = page * size;
+    }
+
+    const where = {
+      film_id: film_id,
+    } as { film_id: number; depth: any };
+
+    if (depth) {
+      where.depth = {
+        [Op.lte]: depth,
+      };
+    }
+
     const reviews = await this.reviewsRepository.findAll({
-      where: {
-        film_id: film_id,
-      },
+      where: where,
       include: {
         model: Profile,
         attributes: {
@@ -189,6 +240,41 @@ export class ReviewsService {
       ],
     });
     return this.collapseTree(reviews);
+  }
+
+  async getTopReviewsByFilmId(film_id: number, reviewQueryDto: ReviewQueryDto) {
+    const { size, page } = reviewQueryDto;
+
+    const findOptions: FindOptions<ReviewModelAttrs> = {
+      where: {
+        film_id: film_id,
+        depth: 0,
+      },
+      include: {
+        model: Profile,
+        attributes: {
+          exclude: ['user_id', 'createdAt', 'updatedAt'],
+        },
+      },
+      attributes: {
+        exclude: ['profile_id'],
+      },
+      order: [
+        ['path', 'ASC'],
+        ['createdAt', 'DESC'],
+      ],
+    };
+
+    if (size) {
+      findOptions.limit = size;
+      if (page === undefined) findOptions.offset = 0;
+      findOptions.offset = page * size;
+    }
+
+    const reviews = await this.reviewsRepository.findAndCountAll(findOptions);
+    // const rows = this.collapseTree(reviews.rows);
+    return reviews;
+    // return { rows: rows, count: reviews.count };
   }
 
   async getReviewsByProfileId(profile_id: number) {

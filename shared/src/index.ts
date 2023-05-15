@@ -23,6 +23,7 @@ export * from './dto/profiles_files/update-avatar.dto';
 export * from './dto/profiles_files/path2file.type'
 
 export { CreateReviewDto } from './dto/reviews/create-review.dto';
+export * from './dto/reviews/review-query.dto';
 
 // models
 export * from './models/users/users.model';

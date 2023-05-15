@@ -20,6 +20,12 @@ export class UsersController {
     return await this.usersService.getUserById(id);
   }
 
+  // Отдает публичные данные пользователя - email и roles
+  @MessagePattern({ cmd: 'get-user-public-by-id' })
+  async getUserPublicById(@Payload() id: number) {
+    return await this.usersService.getUserPublicById(id);
+  }
+
   @MessagePattern({ cmd: 'create-user' })
   async createUser(@Payload() dto: CreateUserDto) {
     return await this.usersService.createUser(dto);

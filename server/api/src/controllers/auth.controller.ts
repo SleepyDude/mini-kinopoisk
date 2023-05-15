@@ -33,7 +33,8 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     type: TokenId,
-    description: 'Refresh token записывает в куки',
+    description:
+      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
   })
   @Post('registration')
   async registration(
@@ -55,7 +56,8 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     type: TokenId,
-    description: 'Refresh token запишет в куки',
+    description:
+      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
   })
   @Post('login')
   async login(
@@ -120,7 +122,8 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     type: TokenEmailId,
-    description: 'Refresh token записывает в куки',
+    description:
+      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
   })
   @Post('vk')
   async vkLogin(
@@ -146,7 +149,8 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     type: TokenEmailId,
-    description: 'Refresh token записывает в куки',
+    description:
+      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
   })
   @Post('google')
   async googleLogin(

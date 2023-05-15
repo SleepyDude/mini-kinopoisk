@@ -4,13 +4,12 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ReviewsController } from './reviews.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Review } from '../../models/reviews.model';
-import { ReviewChildParent } from './child-parent.m2m.model';
 
 @Module({
   controllers: [ReviewsController],
   providers: [ReviewsService],
   imports: [
-    SequelizeModule.forFeature([Review, ReviewChildParent]),
+    SequelizeModule.forFeature([Review]),
     // ClientsModule.register([
     //   {
     //     name: 'REVIEWS-SERVICE',
