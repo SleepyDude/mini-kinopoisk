@@ -1,4 +1,4 @@
-import { Profile } from '@hotels2023nestjs/shared';
+import { Profile } from '../../models/profiles.model';
 import { Review } from '../../models/reviews.model';
 
 export class ReviewWithChilds {

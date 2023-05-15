@@ -26,6 +26,15 @@ import { TrailersModule } from '../trailers/trailers.module';
           queueOptions: { durable: false },
         },
       },
+      {
+        name: 'SOCIAL-SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.CLOUDAMQP_URL],
+          queue: process.env.SOCIAL_QUEUE,
+          queueOptions: { durable: false },
+        },
+      },
     ]),
     BudgetModule,
     TrailersModule,

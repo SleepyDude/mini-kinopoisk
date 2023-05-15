@@ -8,14 +8,16 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   CreateReviewDto,
+  ReviewModelAttrs,
   ReviewModelWithProfile,
   ReviewModelWithProfileAndChilds,
 } from '@hotels2023nestjs/shared';
@@ -23,6 +25,11 @@ import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { ReviewModelReturnAttrs } from '@hotels2023nestjs/shared';
 import { UserData } from '../decorators/user-data.decorator';
+import {
+  DepthQueryDto,
+  PaginationQueryDto,
+  ReviewQueryDto,
+} from '../types/reviews.query.dto';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с отзывами')
@@ -68,7 +75,8 @@ export class ReviewsController {
   }
 
   @ApiOperation({
-    summary: 'Получение дерева отзывов по id отзыва верхнего уровня',
+    summary:
+      'Получение дерева отзывов по id отзыва верхнего уровня c опциональным ограничением на глубину в query',
   })
   @ApiResponse({
     status: 200,
@@ -78,10 +86,12 @@ export class ReviewsController {
   @Get('tree/:review_id')
   async getReviewTreeByReviewId(
     @Param('review_id', ParseIntPipe) review_id: number,
+    @Query(DtoValidationPipe) dto: DepthQueryDto,
   ) {
+    // console.log(`\n\n depth dto: = ${JSON.stringify(dto)}\n\n`);
     return this.socialService.send(
       { cmd: 'get-review-by-review-id-tree' },
-      review_id,
+      { review_id, depth: dto.depth },
     );
   }
 
@@ -110,8 +120,33 @@ export class ReviewsController {
     description: 'Массив отзывов со всеми своими потомками',
   })
   @Get('film/:film_id')
-  async getReviewsByFilmId(@Param('film_id', ParseIntPipe) film_id: number) {
-    return this.socialService.send({ cmd: 'get-reviews-by-film-id' }, film_id);
+  async getReviewsByFilmId(
+    @Param('film_id', ParseIntPipe) film_id: number,
+    @Query(DtoValidationPipe) reviewQueryDto: ReviewQueryDto,
+  ) {
+    // console.log(`review query dto: ${JSON.stringify(reviewQueryDto)}`);
+    return this.socialService.send(
+      { cmd: 'get-reviews-by-film-id' },
+      { film_id, reviewQueryDto },
+    );
+  }
+
+  @ApiOperation({ summary: 'Получение отзывов верхнего уровня по id фильма' })
+  @ApiResponse({
+    status: 200,
+    type: [ReviewModelAttrs],
+    description: 'Массив отзывов без потомков',
+  })
+  @Get('film/top/:film_id')
+  async getTopReviewsByFilmId(
+    @Param('film_id', ParseIntPipe) film_id: number,
+    @Query(DtoValidationPipe) reviewQueryDto: PaginationQueryDto,
+  ) {
+    // console.log(`review query dto: ${JSON.stringify(reviewQueryDto)}`);
+    return this.socialService.send(
+      { cmd: 'get-top-reviews-by-film-id' },
+      { film_id, reviewQueryDto },
+    );
   }
 
   // @UseGuards(RolesGuard)
