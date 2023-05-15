@@ -30,6 +30,7 @@ import { TrailersService } from '../trailers/trailers.service';
 export class FilmsService {
   constructor(
     @Inject('PERSONS-SERVICE') private personsClient: ClientProxy,
+    @Inject('SOCIAL-SERVICE') private socialClient: ClientProxy,
     @InjectModel(Films) private filmsRepository: typeof Films,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private budgetService: BudgetService,
@@ -123,13 +124,21 @@ export class FilmsService {
           { id: film.id, size: 10 },
         ),
       );
+      const reviews = await lastValueFrom(
+        this.socialClient.send(
+          { cmd: 'get-top-reviews-by-film-id' },
+          { film_id: filmId.id, reviewQueryDto: { size: 10, page: 0 } },
+        ),
+      );
       await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
         film,
         staff,
+        reviews,
       });
       return {
         film,
         staff,
+        reviews,
       };
     } catch (err) {
       return new HttpException('Айди не зарегистрирован', HttpStatus.NOT_FOUND);
