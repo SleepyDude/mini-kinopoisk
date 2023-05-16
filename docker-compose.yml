@@ -3,13 +3,13 @@ version: '3.8'
 services:
 
   postgres:
-    container_name: postgres-dns-movies
+    container_name: postgres
     image: postgres:15.2
     restart: always
     profiles:
       - dev
     env_file:
-      - ./.env
+      - .env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -21,106 +21,95 @@ services:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
   postgres_test:
-    container_name: postgres-dns-movies-test
+    container_name: postgres-test
     image: postgres:15.2
     restart: always
     profiles:
       - test
     env_file:
-      - ./.env
+      - .env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     hostname: postgres
     volumes:
-      # - ./initdb-scripts/testdb:/docker-entrypoint-initdb.d
       - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
     ports:
       - ${POSTGRES_PORT_OUTSIDE}:${POSTGRES_PORT_INSIDE}
 
   rabbitmq:
-    container_name: rabbitmq-dns-movies
+    container_name: rabbitmq
     image: rabbitmq
     hostname: rabbitmq
     restart: always
     env_file:
-      - ./.env
+      - .env
     ports:
       - ${RABBITMQ_PORT_OUTSIDE}:${RABBITMQ_PORT_INSIDE}
 
   auth:
-    container_name: auth-dns-movies
+    container_name: auth
     build:
-      dockerfile: ./server/auth/Dockerfile
       context: ./
+      dockerfile: ./apps/auth/Dockerfile
     env_file:
-      - ./.env
+      - .env
     depends_on:
-      # - postgres
       - rabbitmq
     volumes:
-      - ./server/auth:/app/server/auth
-      - /app/server/auth/node_modules
+      - .:/app
+      - /app/node_modules
 
   social:
-    container_name: social-dns-movies
+    container_name: social
     build:
-      dockerfile: ./server/social/Dockerfile
       context: ./
+      dockerfile: ./apps/social/Dockerfile
     env_file:
-      - ./.env
+      - .env
     depends_on:
-      # - postgres
       - rabbitmq
       - auth
     volumes:
-      - ./server/social:/app/server/social
-      - /app/server/social/node_modules
+      - .:/app
+      - /app/node_modules
 
   persons:
-    container_name: persons-dns-movies
+    container_name: persons
     build:
-      dockerfile: ./server/persons/Dockerfile
       context: ./
+      dockerfile: ./apps/persons/Dockerfile
     env_file:
-      - ./.env
+      - .env
     depends_on:
       - rabbitmq
-      # - postgres
     volumes:
-      - ./server/persons:/app/server/persons
-      - /app/server/persons/node_modules
+      - .:/app
+      - /app/node_modules
 
   movies:
-    container_name: movies-dns-movies
+    container_name: movies
     build:
-      dockerfile: ./server/movies/Dockerfile
       context: ./
+      dockerfile: ./apps/movies/Dockerfile
     env_file:
-      - ./.env
+      - .env
     depends_on:
       - rabbitmq
-      # - postgres
     volumes:
-      - ./server/movies:/app/server/movies
-      - /app/server/movies/node_modules
+      - .:/app
+      - /app/node_modules
 
   api:
-    container_name: api-dns-movies
+    container_name: api
     build:
-      dockerfile: ./server/api/Dockerfile
       context: ./
+      dockerfile: ./apps/api/Dockerfile
     env_file:
-      - ./.env
+      - .env
     depends_on:
       - rabbitmq
-      # - persons
-      # - movies
-      # - auth
-      # - social
     volumes:
-      - ./server/api:/app/server/api
-      - /app/server/api/node_modules
-    ports:
-      - ${API_GATEWAY_PORT}:3000
+      - .:/app
+      - /app/node_modules
