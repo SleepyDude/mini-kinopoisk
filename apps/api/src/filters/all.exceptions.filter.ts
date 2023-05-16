@@ -19,9 +19,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let errorMessage: string | object;
 
     if (exception instanceof HttpException) {
-      console.log(
-        `Получена ошибка HttpException:\n\n${JSON.stringify(exception)}\n\n`,
-      );
+      // console.log(
+      //   `Получена ошибка HttpException:\n\n${JSON.stringify(exception)}\n\n`,
+      // );
       status = exception.getStatus();
       errorMessage = exception.getResponse();
       if (typeof errorMessage == 'object') {
@@ -40,11 +40,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         }
       }
     } else {
-      console.log(
-        `Получена ошибка отличная от HttpException:\n\n${JSON.stringify(
-          exception,
-        )}\n\n`,
-      );
+      // console.log(
+      //   `Получена ошибка отличная от HttpException:\n\n${JSON.stringify(
+      //     exception,
+      //   )}\n\n`,
+      // );
       const { message, statusCode } = exception as {
         message: string;
         statusCode: number;

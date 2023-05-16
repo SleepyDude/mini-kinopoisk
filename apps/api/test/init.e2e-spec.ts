@@ -33,9 +33,9 @@ describe('Init e2e', () => {
     return await request(app.getHttpServer())
       .post('/auth/registration')
       .send({ email: 'user@mail.ru', password: '123321' })
-      // .expect(418)
+      .expect(418)
       .expect((resp: any) => {
-        console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
+        // console.log(`resp: ${JSON.stringify(resp, undefined, 2)}`);
         expect(resp).toHaveProperty('text');
         const body = JSON.parse(resp.text);
         // console.log(`got response body: ${JSON.stringify(body, undefined, 2)}`);

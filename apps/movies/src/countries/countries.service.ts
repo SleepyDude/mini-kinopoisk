@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Countries } from './countries.model';
 import { CountriesFilms } from './countries.m2m.model';
-import { UpdateCountryDto } from '@hotels2023nestjs/shared';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { UpdateCountryDto } from '@shared/dto';
 
 @Injectable()
 export class CountriesService {

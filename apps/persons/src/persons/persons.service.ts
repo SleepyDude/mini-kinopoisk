@@ -10,7 +10,7 @@ import {
 } from './dto/persons.query.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { HttpRpcException } from '@hotels2023nestjs/shared';
+import { HttpRpcException } from '@shared';
 
 @Injectable()
 export class PersonsService {

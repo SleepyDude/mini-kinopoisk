@@ -43,7 +43,6 @@ export class ProfilesController {
   })
   @Get('/me')
   async getMyProfile(@UserData('id', ParseIntPipe) id: number) {
-    console.log(`\n\n  user id: ${id}  \n\n`);
     return this.socialService.send({ cmd: 'get-profile-by-user-id' }, id);
   }
 
