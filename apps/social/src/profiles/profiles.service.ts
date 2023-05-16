@@ -32,7 +32,7 @@ export class ProfilesService {
 
   async getProfileByUserId(id: number): Promise<Profile> {
     const profile = await this.profileRepository.findOne({
-      where: { user_id: id },
+      where: { userId: id },
     });
 
     if (profile) return profile;

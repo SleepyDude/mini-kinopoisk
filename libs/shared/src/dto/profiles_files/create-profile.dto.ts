@@ -4,7 +4,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 export class CreateProfileDto {
   @ApiProperty({ example: '2', description: 'ID юзера' })
   @IsNumber({}, { message: 'Должно быть числом' })
-  readonly user_id: number;
+  readonly userId: number;
 
   @ApiProperty({ example: 'Ubivashka666', description: 'Никнейм' })
   @IsString({ message: 'Должно быть строкой' })

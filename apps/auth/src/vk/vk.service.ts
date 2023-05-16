@@ -92,7 +92,7 @@ export class VkService {
       );
 
       const profileData = {
-        user_id: user.id,
+        userId: user.id,
         name: profileFromVk.first_name,
         lastName: profileFromVk.last_name,
         avatarId: avatarId,

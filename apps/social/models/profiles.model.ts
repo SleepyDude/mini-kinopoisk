@@ -6,10 +6,10 @@ interface ProfileAttrs {
   username: string;
   favMovie: string;
   avatarId: number;
-  user_id: number;
+  userId: number;
 }
 
-type ProfileCreationAttrs = Pick<ProfileAttrs, 'user_id'>;
+type ProfileCreationAttrs = Pick<ProfileAttrs, 'userId'>;
 
 @Table({ tableName: 'profiles' })
 export class Profile extends Model<ProfileAttrs, ProfileCreationAttrs> {
@@ -50,5 +50,5 @@ export class Profile extends Model<ProfileAttrs, ProfileCreationAttrs> {
     description: 'id пользователя, который владеет данным профилем',
   })
   @Column({ type: DataType.INTEGER, unique: true, allowNull: false })
-  user_id: number;
+  userId: number;
 }

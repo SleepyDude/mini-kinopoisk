@@ -38,7 +38,7 @@ export class GoogleService {
 
       //create profile with firstName and lastName
       const profileData = {
-        user_id: candidate.id,
+        userId: candidate.id,
         name: firstName,
         lastName: lastName,
         avatarId: avatarId,

@@ -72,7 +72,7 @@ export class AuthService {
     });
 
     await firstValueFrom(
-      this.socialService.send({ cmd: 'create-profile' }, { user_id: user.id }),
+      this.socialService.send({ cmd: 'create-profile' }, { userId: user.id }),
     );
 
     const tokenData = new UserDto(user);
