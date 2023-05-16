@@ -10,7 +10,9 @@ import { CacheModule } from '@nestjs/cache-manager';
   controllers: [CountriesController],
   providers: [CountriesService],
   imports: [
-    CacheModule.register(),
+    CacheModule.register({
+      ttl: 5000,
+    }),
     SequelizeModule.forFeature([Countries, CountriesFilms]),
   ],
   exports: [CountriesService],

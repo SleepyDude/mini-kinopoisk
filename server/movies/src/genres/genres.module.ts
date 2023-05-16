@@ -10,7 +10,9 @@ import { CacheModule } from '@nestjs/cache-manager';
   controllers: [GenresController],
   providers: [GenresService],
   imports: [
-    CacheModule.register(),
+    CacheModule.register({
+      ttl: 5000,
+    }),
     SequelizeModule.forFeature([Genres, GenresFilms]),
   ],
   exports: [GenresService],

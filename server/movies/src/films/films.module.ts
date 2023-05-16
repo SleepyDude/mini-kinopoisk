@@ -14,7 +14,9 @@ import { TrailersModule } from '../trailers/trailers.module';
   controllers: [FilmsController],
   providers: [FilmsService],
   imports: [
-    CacheModule.register(),
+    CacheModule.register({
+      ttl: 5000,
+    }),
     SequelizeModule.forFeature([Films, Similar, SimilarFilms]),
     ClientsModule.register([
       {
