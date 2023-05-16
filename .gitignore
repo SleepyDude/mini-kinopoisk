@@ -150,3 +150,5 @@ pgdata-test
 
 # social
 /server/social/package-lock.json
+
+package-lock.json
