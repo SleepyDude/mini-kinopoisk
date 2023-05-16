@@ -113,3 +113,5 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    ports:
+      - ${API_GATEWAY_PORT}:3000
