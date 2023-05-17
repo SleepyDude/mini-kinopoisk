@@ -41,3 +41,7 @@ export * from './filters/service-rpc.filter';
 // interfaces
 export * from './interfaces/reviews.interface';
 export * from './interfaces/profiles.interface';
+
+// models
+export * from './models/persons/persons.model';
+export * from './models/persons/persons.staff.m2m.model';
