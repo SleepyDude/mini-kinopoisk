@@ -234,7 +234,9 @@ export class FilmsService {
     }
     return await this.filmsRepository
       .findAll({
-        where: filmsId,
+        where: {
+          [Op.or]: filmsId,
+        },
         attributes: [
           'kinopoiskId',
           'year',
