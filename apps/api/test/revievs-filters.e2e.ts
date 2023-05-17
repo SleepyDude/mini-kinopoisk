@@ -6,15 +6,15 @@ dotenv.config({ path: process.env.NODE_ENV });
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ApiModule } from '../../src/api.module';
+import { ApiModule } from '../src/api.module';
 
-import { usersPool } from './../userDb';
+import { usersPool } from './dbPools/userDb';
 import { PoolClient } from 'pg';
 
 import * as cookieParser from 'cookie-parser';
-import { socialPool } from './../socialDb';
-import { registerUserHelper } from '../helpers/register.user';
-import { CreateReviewHelper } from '../helpers/create.review';
+import { socialPool } from './dbPools/socialDb';
+import { registerUserHelper } from './helpers/register.user';
+import { CreateReviewHelper } from './helpers/create.review';
 
 describe('Reviews e2e', () => {
   let app: INestApplication;
@@ -59,6 +59,26 @@ describe('Reviews e2e', () => {
     bobAccess = await registerUserHelper(app, 'Bob');
     aliceAccess = await registerUserHelper(app, 'Alice');
   });
+
+  // 1. Bob
+  // 2. Bob
+  // 3. Alice
+  // 4. Alice
+  // ├── 6. Bob
+  // │   ├── 7. Alice
+  // │   ├── 9. Alice
+  // │   ├── 10. Bob
+  // │   ├── 11. Bob
+  // │   │   ├── 13. Alice
+  // │   │   ├── 18. Alice
+  // │   │   └── 19. Alice
+  // │   ├── 12. Alice
+  // │   └── 17. Alice
+  // ├── 14. Bob
+  // └── 15. Bob
+  // 5. Bob
+  // 8. Alice
+  // 16. Bob
 
   it('Создаем множество комментариев для фильма с id=13', async () => {
     const aliceHelper = new CreateReviewHelper(app, aliceAccess, 13);

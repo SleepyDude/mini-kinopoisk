@@ -6,13 +6,13 @@ dotenv.config({ path: process.env.NODE_ENV });
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ApiModule } from '../../src/api.module';
+import { ApiModule } from '../src/api.module';
 
-import { usersPool } from './../userDb';
+import { usersPool } from './dbPools/userDb';
+import { socialPool } from './dbPools/socialDb';
 import { PoolClient } from 'pg';
 
 import * as cookieParser from 'cookie-parser';
-import { socialPool } from './../socialDb';
 import {
   ProfilePublic,
   ReviewModelAttrs,

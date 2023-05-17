@@ -7,10 +7,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { ApiModule } from '../src/api.module';
-
-import { usersPool } from './userDb';
 import { PoolClient } from 'pg';
-import { socialPool } from './socialDb';
+import { usersPool } from './dbPools/userDb';
+import { socialPool } from './dbPools/socialDb';
 
 describe('Init e2e', () => {
   let app: INestApplication;
