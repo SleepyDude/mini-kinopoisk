@@ -4,16 +4,13 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { GenresModule } from './genres/genres.module';
 import { CountriesModule } from './countries/countries.module';
 import { BudgetModule } from './budget/budget.module';
-import { ReviewsModule } from './reviews/reviews.module';
 import { TrailersModule } from './trailers/trailers.module';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
-    CacheModule.register({
-      ttl: 1000 * 60,
-    }),
+    CacheModule.register(),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -28,7 +25,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     GenresModule,
     CountriesModule,
     BudgetModule,
-    ReviewsModule,
     TrailersModule,
   ],
   controllers: [],

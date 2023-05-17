@@ -7,16 +7,6 @@ export class TrailersService {
   constructor(
     @InjectModel(Trailers) private trailersRepository: typeof Trailers,
   ) {}
-  async createTrailer(trailerData) {
-    const isTrailer = await this.trailersRepository.findOne({
-      where: { kinopoiskFilmId: trailerData.id },
-    });
-    if (!isTrailer) {
-      return await this.trailersRepository.create(trailerData.trailer);
-    }
-    return isTrailer;
-  }
-
   async deleteTrailersBuFilmId(filmId) {
     return await this.trailersRepository.destroy({
       where: { kinopoiskFilmId: filmId },

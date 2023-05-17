@@ -14,7 +14,9 @@ import { TrailersModule } from '../trailers/trailers.module';
   controllers: [FilmsController],
   providers: [FilmsService],
   imports: [
-    CacheModule.register(),
+    CacheModule.register({
+      ttl: 5000,
+    }),
     SequelizeModule.forFeature([Films, Similar, SimilarFilms]),
     ClientsModule.register([
       {
@@ -23,6 +25,15 @@ import { TrailersModule } from '../trailers/trailers.module';
         options: {
           urls: [process.env.CLOUDAMQP_URL],
           queue: process.env.PERSONS_QUEUE,
+          queueOptions: { durable: false },
+        },
+      },
+      {
+        name: 'SOCIAL-SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.CLOUDAMQP_URL],
+          queue: process.env.SOCIAL_QUEUE,
           queueOptions: { durable: false },
         },
       },

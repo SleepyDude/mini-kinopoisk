@@ -6,7 +6,6 @@ import { lastValueFrom } from 'rxjs';
 import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
-import { Reviews } from '../reviews/reviews.model';
 import { FilmsQueryDto } from './dto/films.query.dto';
 import { FilmsUpdateDto } from './dto/films.update.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -14,22 +13,11 @@ import { Cache } from 'cache-manager';
 import { BudgetService } from '../budget/budget.service';
 import { TrailersService } from '../trailers/trailers.service';
 
-`***
-У получения списка фильмов есть пагинация и поиск по русскому имени.
-В получении фильма по айди стоит строгое ограничение на получение
-комментариев, для показа остальных реализована другая функция.
-Все связи с моделью фильмов реализовывать через поле kinopoiskId.
-Функция фильтра работает с квери строкой, поля жанров и стран
-могут быть накопительными, работают с оператором ИЛИ. В нем же
-реализована сортировка и пагинация. Есть функция превью фильмов,
-она нужна для модели персон. Отдельно есть функция для использования
-автосаджеста на поиск по имени фильма.
-***`;
-
 @Injectable()
 export class FilmsService {
   constructor(
     @Inject('PERSONS-SERVICE') private personsClient: ClientProxy,
+    @Inject('SOCIAL-SERVICE') private socialClient: ClientProxy,
     @InjectModel(Films) private filmsRepository: typeof Films,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private budgetService: BudgetService,
@@ -108,12 +96,6 @@ export class FilmsService {
         },
         include: [
           { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-          {
-            model: Reviews,
-            limit: 15,
-            attributes: { exclude: ['updatedAt', 'userId', 'filmIdFK'] },
-            where: { parentId: { [Op.is]: null } },
-          },
         ],
         where: { kinopoiskId: filmId.id },
       });
@@ -123,13 +105,21 @@ export class FilmsService {
           { id: film.id, size: 10 },
         ),
       );
+      const reviews = await lastValueFrom(
+        this.socialClient.send(
+          { cmd: 'get-top-reviews-by-film-id' },
+          { film_id: filmId.id, reviewQueryDto: { size: 10, page: 0 } },
+        ),
+      );
       await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
         film,
         staff,
+        reviews,
       });
       return {
         film,
         staff,
+        reviews,
       };
     } catch (err) {
       return new HttpException('Айди не зарегистрирован', HttpStatus.NOT_FOUND);
