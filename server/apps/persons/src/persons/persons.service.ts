@@ -1,16 +1,11 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { PersonsFilms } from './persons.staff.m2m.model';
-import { Persons } from './persons.model';
 import { Op } from 'sequelize';
-import {
-  PersonsAutosagestGto,
-  PersonsQueryDto,
-  StaffQueryDto,
-} from './dto/persons.query.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { HttpRpcException } from '@shared';
+import { HttpRpcException, Persons, PersonsFilms } from '@shared';
+import { PersonsAutosagestDto, PersonsQueryDto, StaffQueryDto } from '@shared/dto';
+import { PaginationInterface } from '@shared/interfaces';
 
 @Injectable()
 export class PersonsService {
@@ -21,9 +16,9 @@ export class PersonsService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getPersonById(id: number) {
+  async getPersonById(personId: number): Promise<any> {
     const cache = await this.cacheManager.get(
-      `getPersonById${JSON.stringify(id)}`,
+      `getPersonById${JSON.stringify(personId)}`,
     );
     if (cache) {
       return cache;
@@ -32,7 +27,7 @@ export class PersonsService {
       attributes: {
         exclude: ['createdAt', 'updatedAt'],
       },
-      where: { personId: id },
+      where: { personId: personId },
     });
     if (!person) {
       throw new HttpRpcException(
@@ -42,9 +37,9 @@ export class PersonsService {
     }
     const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
       attributes: [['filmId', 'id']],
-      where: { staffId: id },
+      where: { staffId: personId },
     });
-    await this.cacheManager.set(`getPersonById${JSON.stringify(id)}`, {
+    await this.cacheManager.set(`getPersonById${JSON.stringify(personId)}`, {
       filmsId: filmsId,
       person: person,
     });
@@ -54,7 +49,7 @@ export class PersonsService {
     };
   }
 
-  async getAllPersons(params: PersonsQueryDto) {
+  async getAllPersons(params: PersonsQueryDto): Promise<any> {
     const cache = await this.cacheManager.get(
       `getAllPersons${JSON.stringify(params)}`,
     );
@@ -80,7 +75,7 @@ export class PersonsService {
       });
   }
 
-  async getPersonsAutosagest(params: PersonsAutosagestGto) {
+  async getPersonsAutosagest(params: PersonsAutosagestDto): Promise<any> {
     const cache = await this.cacheManager.get(
       `getPersonsAutosagest${JSON.stringify(params)}`,
     );
@@ -139,9 +134,9 @@ export class PersonsService {
       });
   }
 
-  private getPagination(page, size) {
-    const limit = size ? +size : 10;
-    const offset = page ? page * limit : 0;
+  private getPagination(page: number, size: number): PaginationInterface {
+    const limit: number = size ? +size : 10;
+    const offset: number = page ? page * limit : 0;
 
     return { limit, offset };
   }

@@ -3,22 +3,20 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Query,
   UseFilters,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { FiltersProfessionQuery } from '../types/filters.query.enum';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
+import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
+import { PersonByIdObjectInterface } from '@shared/interfaces';
 
-@ApiTags('Актеры и прочий состав')
+@UseFilters(AllExceptionsFilter)
+@ApiTags('Работа с персонами из фильмов')
 @Controller('persons')
 export class PersonsController {
   constructor(
@@ -26,29 +24,25 @@ export class PersonsController {
     @Inject('MOVIES-SERVICE') private moviesService: ClientProxy,
   ) {}
 
-  @ApiQuery({ name: 'page' })
-  @ApiQuery({ name: 'size' })
   @ApiOperation({ summary: 'Получение всех персон, с пагинацией' })
   @ApiResponse({
     status: 200,
-    description: 'Выводи тсписок актеров с пагинацией',
+    description: 'Выводит список актеров с пагинацией',
   })
   @Get()
-  getAllPersons(@Query() param) {
+  getAllPersons(@Query(DtoValidationPipe) param: PersonsQueryDto) {
     return this.personsClient.send({ cmd: 'get-all-persons' }, param);
   }
 
-  @ApiParam({ name: 'id' })
-  @ApiOperation({ summary: 'О персоне по айди' })
+  @ApiOperation({ summary: 'Информация о персоне по полю personId' })
   @ApiResponse({
     status: 200,
     description: 'Выводит всю информацию о актере по айди',
   })
-  @UseFilters(AllExceptionsFilter)
   @Get('/about/:id')
-  async getPersonById(@Param('id') id) {
-    const person = await lastValueFrom(
-      this.personsClient.send({ cmd: 'get-person-byId' }, id),
+  async getPersonById(@Param('id', ParseIntPipe) personId: number) {
+    const person: PersonByIdObjectInterface = await lastValueFrom(
+      this.personsClient.send({ cmd: 'get-person-byId' }, personId),
     );
     const films = await lastValueFrom(
       this.moviesService.send(
@@ -59,19 +53,15 @@ export class PersonsController {
     return { person: person.person, films };
   }
 
-  @ApiQuery({
-    name: 'profession',
-    enum: FiltersProfessionQuery,
-    description: 'Актер или режиссер',
-  })
-  @ApiQuery({ name: 'name', description: 'Только русское имя' })
   @ApiOperation({ summary: 'Автосаджест по персонам' })
   @ApiResponse({
     status: 200,
     description: 'Выводит имена и айди актеров по квери параметрам',
   })
   @Get('/search')
-  async getPersonsAutosagest(@Query() params) {
+  async getPersonsAutosagest(
+    @Query(DtoValidationPipe) params: PersonsAutosagestDto,
+  ) {
     return this.personsClient.send({ cmd: 'get-persons-autosagest' }, params);
   }
 }
