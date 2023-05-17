@@ -4,7 +4,11 @@ import { Op } from 'sequelize';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { HttpRpcException, Persons, PersonsFilms } from '@shared';
-import { PersonsAutosagestDto, PersonsQueryDto, StaffQueryDto } from '@shared/dto';
+import {
+  PersonsAutosagestDto,
+  PersonsQueryDto,
+  StaffQueryDto,
+} from '@shared/dto';
 import { PaginationInterface } from '@shared/interfaces';
 
 @Injectable()

@@ -2,7 +2,11 @@ import { Controller, UseFilters } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ServiceRpcFilter } from '@shared';
-import { PersonsAutosagestDto, PersonsQueryDto, StaffQueryDto } from '@shared/dto';
+import {
+  PersonsAutosagestDto,
+  PersonsQueryDto,
+  StaffQueryDto,
+} from '@shared/dto';
 
 @Controller('persons')
 export class PersonsController {
