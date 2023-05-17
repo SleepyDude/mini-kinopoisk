@@ -108,7 +108,7 @@ export class FilmsService {
       const reviews = await lastValueFrom(
         this.socialClient.send(
           { cmd: 'get-top-reviews-by-film-id' },
-          { film_id: filmId.id, reviewQueryDto: { size: 10, page: 0 } },
+          { filmId: filmId.id, paginationQueryDto: { size: 10, page: 0 } },
         ),
       );
       await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {

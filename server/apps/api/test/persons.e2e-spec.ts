@@ -61,7 +61,7 @@ describe('Persons e2e', () => {
         // console.log(`get query: ${JSON.stringify(query)}`);
         expect(query.count).toBe(3);
         expect(query.rows.length).toBe(3);
-        expect(query.rows[0].nameRu).toBe('Грегори Балди');
+        expect(query.rows[0].nameRu).toBe('Грегори Баке');
       })
       .expect(HttpStatus.OK);
   });

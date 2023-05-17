@@ -93,6 +93,7 @@ export class PersonsService {
           ],
         },
         limit: size,
+        order: ['nameRu'],
       })
       .then(async (result) => {
         await this.cacheManager.set(
