@@ -8,6 +8,7 @@ import {
   UpdateProfileDto,
 } from '@shared/dto';
 import { HttpRpcException } from '@shared';
+import { generateUsername } from './utils/username-generator';
 
 @Injectable()
 export class ProfilesService {
@@ -18,7 +19,11 @@ export class ProfilesService {
 
   async createProfile(dto: CreateProfileDto): Promise<Profile> {
     // console.log(`[dto] == ${JSON.stringify(dto)}`)
-    const profile = await this.profileRepository.create(dto);
+    let { username } = dto;
+    if (!username) {
+      username = generateUsername();
+    }
+    const profile = await this.profileRepository.create({ ...dto, username });
     console.log(`[profile created]`);
     if (dto.avatarId) {
       await this.fileService.setAvatar(profile.id, dto.avatarId);

@@ -9,7 +9,7 @@ interface ProfileAttrs {
   userId: number;
 }
 
-type ProfileCreationAttrs = Pick<ProfileAttrs, 'userId'>;
+type ProfileCreationAttrs = Omit<ProfileAttrs, 'id'>;
 
 @Table({ tableName: 'profiles' })
 export class Profile extends Model<ProfileAttrs, ProfileCreationAttrs> {
