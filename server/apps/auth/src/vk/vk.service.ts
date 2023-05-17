@@ -95,7 +95,7 @@ export class VkService {
         userId: user.id,
         name: profileFromVk.first_name,
         lastName: profileFromVk.last_name,
-        avatarId: avatarId,
+        avatarId: avatarId.avatarId,
       };
 
       const uuid = await firstValueFrom(
