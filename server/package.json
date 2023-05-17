@@ -18,9 +18,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=.env NODE_ENV_LOCAL=.env.test jest --config ./apps/api/test/jest-e2e.json --runInBand",
-    "test-social:e2e": "cross-env NODE_ENV=.env NODE_ENV_LOCAL=.env.test jest --config ./apps/api/test/jest-e2e.json --runInBand apps/api/test/init.e2e-spec.ts apps/api/test/access.e2e-spec.ts apps/api/test/reviews/reviews.e2e-spec.ts",
-    "test-s:e2e": "cross-env NODE_ENV=.env NODE_ENV_LOCAL=.env.test jest --config ./apps/api/test/jest-e2e.json --runInBand apps/api/test/init.e2e-spec.ts apps/api/test/access.e2e-spec.ts"
+    "test:e2e": "cross-env NODE_ENV=../.env NODE_ENV_LOCAL=.env.test jest --config ./apps/api/test/jest-e2e.json --runInBand",
+    "test-social:e2e": "cross-env NODE_ENV=../.env NODE_ENV_LOCAL=.env.test jest --config ./apps/api/test/jest-e2e.json --runInBand apps/api/test/init.e2e-spec.ts apps/api/test/access.e2e-spec.ts apps/api/test/reviews/reviews.e2e-spec.ts",
+    "test-s:e2e": "cross-env NODE_ENV=../.env NODE_ENV_LOCAL=.env.test jest --config ./apps/api/test/jest-e2e.json --runInBand apps/api/test/init.e2e-spec.ts apps/api/test/access.e2e-spec.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^2.0.0",

@@ -82,9 +82,9 @@ export class ReviewTreePublic extends ReviewPublic {
     description:
       'Дети текущего отзыва (может быть пустым в виду ограничения на глубину)',
     isArray: true,
-    type: [ReviewPublic],
+    type: [ReviewTreePublic],
   })
-  childs: ReviewPublic[];
+  childs: ReviewTreePublic[];
 }
 
 // export class ReviewModelWithProfileAndChilds extends OmitType(

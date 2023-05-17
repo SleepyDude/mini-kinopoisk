@@ -8,12 +8,12 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { ApiModule } from '../src/api.module';
 
-import { usersPool } from './userDb';
+import { usersPool } from './dbPools/userDb';
 import { PoolClient } from 'pg';
 import { validateRefresh } from './validators/token.validator';
 
 import * as cookieParser from 'cookie-parser';
-import { socialPool } from './socialDb';
+import { socialPool } from './dbPools/socialDb';
 
 // ДОБАВИТЬ ТЕСТЫ!!!
 

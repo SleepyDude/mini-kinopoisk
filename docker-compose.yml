@@ -51,20 +51,20 @@ services:
   auth:
     container_name: auth
     build:
-      context: ./
+      context: ./server
       dockerfile: ./apps/auth/Dockerfile
     env_file:
       - .env
     depends_on:
       - rabbitmq
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
 
   social:
     container_name: social
     build:
-      context: ./
+      context: ./server
       dockerfile: ./apps/social/Dockerfile
     env_file:
       - .env
@@ -72,46 +72,46 @@ services:
       - rabbitmq
       - auth
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
 
   persons:
     container_name: persons
     build:
-      context: ./
+      context: ./server
       dockerfile: ./apps/persons/Dockerfile
     env_file:
       - .env
     depends_on:
       - rabbitmq
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
 
   movies:
     container_name: movies
     build:
-      context: ./
+      context: ./server
       dockerfile: ./apps/movies/Dockerfile
     env_file:
       - .env
     depends_on:
       - rabbitmq
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
 
   api:
     container_name: api
     build:
-      context: ./
+      context: ./server
       dockerfile: ./apps/api/Dockerfile
     env_file:
       - .env
     depends_on:
       - rabbitmq
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
     ports:
       - ${API_GATEWAY_PORT}:3000

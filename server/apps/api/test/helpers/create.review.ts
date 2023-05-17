@@ -23,8 +23,8 @@ export class CreateReviewHelper {
       .auth(this.accessToken, { type: 'bearer' })
       .send({
         text: text,
-        film_id: this.filmId,
-        parent_id: parentId,
+        filmId: this.filmId,
+        parentId: parentId,
         title: title,
       })
       .expect(201);

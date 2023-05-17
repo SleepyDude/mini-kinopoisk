@@ -9,8 +9,8 @@ import * as request from 'supertest';
 import { ApiModule } from '../src/api.module';
 
 import * as cookieParser from 'cookie-parser';
-import { usersPool } from './userDb';
-import { socialPool } from './socialDb';
+import { usersPool } from './dbPools/userDb';
+import { socialPool } from './dbPools/socialDb';
 import { PoolClient } from 'pg';
 
 // ДОБАВИТЬ ТЕСТЫ!!!
