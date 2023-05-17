@@ -15,11 +15,17 @@ import * as cookieParser from 'cookie-parser';
 import { socialPool } from './dbPools/socialDb';
 import { registerUserHelper } from './helpers/register.user';
 import { CreateReviewHelper } from './helpers/create.review';
+import { ReviewTreePublic } from '@shared';
 
 describe('Reviews e2e', () => {
   let app: INestApplication;
   let userPoolClient: PoolClient;
   let socialPoolClient: PoolClient;
+
+  let reviewRootchilds: ReviewTreePublic[];
+  let review4childs: ReviewTreePublic[];
+  let review6childs: ReviewTreePublic[];
+  let review11childs: ReviewTreePublic[];
 
   let ownerAccess: string; // OWNER
 
@@ -105,13 +111,83 @@ describe('Reviews e2e', () => {
     await aliceHelper.createReviewHelper(19, 11);
   });
 
+  describe('GET /api/reviews/:filmid Выбираем всю глубину', () => {
+    it('Выбираем все дерево отзывов (всю глубину) для фильма с id=13', async () => {
+      reviewRootchilds = JSON.parse(
+        (await request(app.getHttpServer()).get('/reviews/film/13').expect(200))
+          .text,
+      );
+    });
+
+    describe('Проверка корневых элементов', () => {
+      it('Верхний 0-й уровень состоит из 7 элементов', () => {
+        expect(reviewRootchilds).toHaveLength(7);
+      });
+
+      it('Отзывы отсортированы от поздних к ранним', () => {
+        expect(reviewRootchilds[0].title).toBe('Rev 16');
+        expect(reviewRootchilds[1].title).toBe('Rev 8');
+        expect(reviewRootchilds[2].title).toBe('Rev 5');
+        expect(reviewRootchilds[3].title).toBe('Rev 4');
+        expect(reviewRootchilds[4].title).toBe('Rev 3');
+        expect(reviewRootchilds[5].title).toBe('Rev 2');
+        expect(reviewRootchilds[6].title).toBe('Rev 1');
+      });
+
+      it('4й отзыв имеет 3х детей по записи и по факту', () => {
+        expect(reviewRootchilds[3].childsNum).toBe(3);
+        expect(reviewRootchilds[3].childs).toHaveLength(3);
+        review4childs = reviewRootchilds[3].childs;
+      });
+    });
+
+    describe('Проверка детей 4го отзыва', () => {
+      it('Дети в порядке 15->14->6', () => {
+        expect(review4childs[0].title).toBe('Rev 15');
+        expect(review4childs[1].title).toBe('Rev 14');
+        expect(review4childs[2].title).toBe('Rev 6');
+      });
+
+      it('6й отзыв имеет 3х детей по записи и по факту', () => {
+        expect(review4childs[2].childsNum).toBe(6);
+        expect(review4childs[2].childs).toHaveLength(6);
+        review6childs = review4childs[2].childs;
+      });
+    });
+
+    describe('Проверка детей 6го отзыва', () => {
+      it('Дети в порядке 17->12->11->10->9->7', () => {
+        expect(review6childs[0].title).toBe('Rev 17');
+        expect(review6childs[1].title).toBe('Rev 12');
+        expect(review6childs[2].title).toBe('Rev 11');
+        expect(review6childs[3].title).toBe('Rev 10');
+        expect(review6childs[4].title).toBe('Rev 9');
+        expect(review6childs[5].title).toBe('Rev 7');
+      });
+
+      it('11й отзыв имеет 3х детей по записи и по факту', () => {
+        expect(review6childs[2].childsNum).toBe(3);
+        expect(review6childs[2].childs).toHaveLength(3);
+        review11childs = review6childs[2].childs;
+      });
+    });
+
+    describe('Проверка детей 11 отзыва', () => {
+      it('Дети в порядке 19->18->13', () => {
+        expect(review11childs[0].title).toBe('Rev 19');
+        expect(review11childs[1].title).toBe('Rev 18');
+        expect(review11childs[2].title).toBe('Rev 13');
+      });
+    });
+  });
+
   afterAll(async () => {
     // Чистим таблицы
-    // await userPoolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
-    // await userPoolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
-    // await userPoolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
-    // await socialPoolClient.query('TRUNCATE profiles RESTART IDENTITY CASCADE');
-    // await socialPoolClient.query('TRUNCATE reviews RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE roles RESTART IDENTITY CASCADE');
+    await userPoolClient.query('TRUNCATE tokens RESTART IDENTITY CASCADE');
+    await socialPoolClient.query('TRUNCATE profiles RESTART IDENTITY CASCADE');
+    await socialPoolClient.query('TRUNCATE reviews RESTART IDENTITY CASCADE');
 
     // console.log(queryResult.rows);
 

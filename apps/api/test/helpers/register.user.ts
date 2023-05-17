@@ -1,5 +1,5 @@
-import { Profile } from '@hotels2023nestjs/shared';
 import { INestApplication } from '@nestjs/common';
+import { ProfilePublic } from '@shared';
 import * as request from 'supertest';
 
 // Регистрирует пользователя, задает его имя в профиле
@@ -38,7 +38,7 @@ export async function registerUserHelper(
         .auth(accessToken, { type: 'bearer' })
         .expect(200)
     ).text,
-  ) as Profile;
+  ) as ProfilePublic;
 
   // Изменение имени в профиле
   await request(app.getHttpServer())
