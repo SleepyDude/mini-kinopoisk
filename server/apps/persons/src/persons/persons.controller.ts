@@ -6,7 +6,7 @@ import {
   PersonsQueryDto,
   StaffQueryDto,
 } from './dto/persons.query.dto';
-import { ServiceRpcFilter } from '@hotels2023nestjs/shared';
+import { ServiceRpcFilter } from '@shared';
 
 @Controller('persons')
 export class PersonsController {

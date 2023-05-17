@@ -6,7 +6,6 @@ import { lastValueFrom } from 'rxjs';
 import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
-import { Reviews } from '../reviews/reviews.model';
 import { FilmsQueryDto } from './dto/films.query.dto';
 import { FilmsUpdateDto } from './dto/films.update.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -97,12 +96,6 @@ export class FilmsService {
         },
         include: [
           { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-          {
-            model: Reviews,
-            limit: 15,
-            attributes: { exclude: ['updatedAt', 'userId', 'filmIdFK'] },
-            where: { parentId: { [Op.is]: null } },
-          },
         ],
         where: { kinopoiskId: filmId.id },
       });
