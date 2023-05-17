@@ -34,3 +34,6 @@ export * from './reviews/review-tree.dto';
 // query
 export * from './query/pagination.query.dto';
 export * from './query/depth.query.dto';
+
+// persons
+export * from './persons/persons.query.dto';
