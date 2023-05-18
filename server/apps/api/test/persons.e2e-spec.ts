@@ -27,7 +27,6 @@ describe('Persons e2e', () => {
       .get('/persons')
       .expect((response: request.Response) => {
         query = response.body;
-        console.log(query);
         expect(query.count).toBe(176001);
         expect(query.rows.length).toBe(10);
       })

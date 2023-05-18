@@ -186,7 +186,7 @@ describe('Films e2e', () => {
       .set('authorization', acessToken)
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body).toBe({});
+        expect(body).toStrictEqual({});
       })
       .expect(HttpStatus.OK);
   });

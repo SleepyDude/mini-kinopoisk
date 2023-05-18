@@ -308,8 +308,19 @@ export class FilmsService {
   async deleteFilmById(filmId: number) {
     await this.budgetService.deleteBudgetByFilmId(filmId);
     await this.trailersService.deleteTrailersBuFilmId(filmId);
-    return await this.filmsRepository.destroy({
-      where: { id: filmId },
-    });
+    return await this.filmsRepository
+      .destroy({
+        where: { kinopoiskId: filmId },
+      })
+      .then((result) => {
+        if (result) {
+          return 'Фильм был удален';
+        } else {
+          return new HttpException(
+            'Удаление не удалось',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      });
   }
 }
