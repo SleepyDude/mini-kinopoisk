@@ -39,10 +39,10 @@ export class ReviewsController {
   })
   @Post()
   async createReview(
-    @UserData('id') user_id: number,
+    @UserData('id') userId: number,
     @Body(DtoValidationPipe) dto: CreateReviewDto,
   ) {
-    return this.socialService.send({ cmd: 'create-review' }, { dto, user_id });
+    return this.socialService.send({ cmd: 'create-review' }, { dto, userId });
   }
 
   @ApiOperation({ summary: 'Получение изолированного отзыва по его id' })
@@ -51,13 +51,11 @@ export class ReviewsController {
     type: ReviewPublic,
     description: 'Отзыв без потомков с данными профиля',
   })
-  @Get('single/:review_id')
-  async getReviewByReviewId(
-    @Param('review_id', ParseIntPipe) review_id: number,
-  ) {
+  @Get('single/:reviewId')
+  async getReviewByReviewId(@Param('reviewId', ParseIntPipe) reviewId: number) {
     return this.socialService.send(
       { cmd: 'get-review-by-review-id-single' },
-      review_id,
+      reviewId,
     );
   }
 
@@ -70,15 +68,15 @@ export class ReviewsController {
     type: ReviewTreePublic,
     description: 'Древовидная структура отзывов и их детей',
   })
-  @Get('tree/:review_id')
+  @Get('tree/:reviewId')
   async getReviewTreeByReviewId(
-    @Param('review_id', ParseIntPipe) review_id: number,
+    @Param('reviewId', ParseIntPipe) reviewId: number,
     @Query(DtoValidationPipe) dto: DepthQueryDto,
   ) {
     // console.log(`\n\n depth dto: = ${JSON.stringify(dto)}\n\n`);
     return this.socialService.send(
       { cmd: 'get-review-by-review-id-tree' },
-      { review_id, depth: dto.depth },
+      { reviewId, depth: dto.depth },
     );
   }
 
@@ -114,7 +112,7 @@ export class ReviewsController {
   })
   @Get('film/top/:filmId')
   async getTopReviewsByFilmId(
-    @Param('film_id', ParseIntPipe) filmId: number,
+    @Param('filmId', ParseIntPipe) filmId: number,
     @Query(DtoValidationPipe) paginationQueryDto: PaginationQueryDto,
   ) {
     console.log(
@@ -135,13 +133,13 @@ export class ReviewsController {
   //   type: ReviewModelReturnAttrs,
   //   description: 'Измененный отзыв',
   // })
-  // @Delete(':review_id')
+  // @Delete(':reviewId')
   // async deleteReviewByReviewId(
-  //   @Param('film_id', ParseIntPipe) film_id: number,
+  //   @Param('filmId', ParseIntPipe) filmId: number,
   // ) {
   //   return this.socialService.send(
   //     { cmd: 'delete-review-by-review-id' },
-  //     film_id,
+  //     filmId,
   //   );
   // }
 }
