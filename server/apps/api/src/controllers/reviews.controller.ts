@@ -1,13 +1,11 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Inject,
   Param,
   ParseIntPipe,
   Post,
-  Put,
   Query,
   UseFilters,
   UseGuards,
@@ -18,13 +16,12 @@ import { ClientProxy } from '@nestjs/microservices';
 import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { UserData } from '../decorators/user-data.decorator';
+import { ReviewPublic, ReviewPublicCount, ReviewTreePublic } from '@shared';
 import {
+  CreateReviewDto,
   DepthQueryDto,
   PaginationQueryDto,
-  ReviewQueryDto,
-} from '../types/reviews.query.dto';
-import { ReviewPublic, ReviewPublicCount, ReviewTreePublic } from '@shared';
-import { CreateReviewDto } from '@shared/dto';
+} from '@shared/dto';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с отзывами')
