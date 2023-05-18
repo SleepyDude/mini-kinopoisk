@@ -12,27 +12,27 @@ export class ReviewsController {
   @MessagePattern({ cmd: 'create-review' })
   async createReview(
     @Payload('dto') dto: CreateReviewDto,
-    @Payload('user_id') user_id: number,
+    @Payload('userId') userId: number,
   ) {
-    return await this.reviewsService.createReview(dto, user_id);
+    return await this.reviewsService.createReview(dto, userId);
   }
 
   @MessagePattern({ cmd: 'get-review-by-review-id-single' })
-  async getReviewByReviewId(@Payload() review_id: number) {
-    return await this.reviewsService.getReviewByReviewIdSingle(review_id);
+  async getReviewByReviewId(@Payload() reviewId: number) {
+    return await this.reviewsService.getReviewByReviewIdSingle(reviewId);
   }
 
   @MessagePattern({ cmd: 'get-review-by-review-id-tree' })
   async getReviewTreeByReviewId(
-    @Payload('review_id') review_id: number,
+    @Payload('reviewId') reviewId: number,
     @Payload('depth') depth: number,
   ) {
-    return await this.reviewsService.getReviewByReviewIdTree(review_id, depth);
+    return await this.reviewsService.getReviewByReviewIdTree(reviewId, depth);
   }
 
   @MessagePattern({ cmd: 'get-reviews-by-profile-id' })
-  async getReviewsByProfileId(@Payload() profile_id: number) {
-    return await this.reviewsService.getReviewsByProfileId(profile_id);
+  async getReviewsByProfileId(@Payload() profileId: number) {
+    return await this.reviewsService.getReviewsByProfileId(profileId);
   }
 
   @MessagePattern({ cmd: 'get-reviews-by-film-id' })
@@ -55,7 +55,7 @@ export class ReviewsController {
   }
 
   @MessagePattern({ cmd: 'delete-review-by-review-id' })
-  async deleteReviewByReviewId(@Payload() review_id: number) {
-    return await this.reviewsService.deleteReviewByReviewId(review_id);
+  async deleteReviewByReviewId(@Payload() reviewId: number) {
+    return await this.reviewsService.deleteReviewByReviewId(reviewId);
   }
 }
