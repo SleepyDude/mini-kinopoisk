@@ -41,6 +41,8 @@ export * from './filters/service-rpc.filter';
 // interfaces
 export * from './interfaces/reviews.interface';
 export * from './interfaces/profiles.interface';
+export * from './interfaces/movies.interface';
+export * from './interfaces/genres.interface';
 
 // models
 export * from './models/persons/persons.model';

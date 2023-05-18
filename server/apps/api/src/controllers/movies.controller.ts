@@ -5,33 +5,34 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Post,
+  Put,
   Query,
   Req,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { UpdateCountryDto, UpdateGenreDto, CreateReviewDto } from '@shared/dto';
+import {
+  UpdateCountryDto,
+  UpdateGenreDto,
+  CreateReviewDto,
+  MoviesQueryDto,
+  MoviesFiltersQueryDto,
+  MoviesQueryAutosagestDto,
+  MoviesUpdateFilmDto,
+} from '@shared/dto';
 
 import { RolesGuard } from '../guards/roles.guard';
 import { RoleAccess } from '../guards/roles.decorator';
 import { initRoles } from '../guards/init.roles';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
-import {
-  FiltersOrderByQuery,
-  FiltersTypeQuery,
-} from '../types/filters.query.enum';
-import { GenreQuery, PageQuery } from '../types/pagination.query.enum';
+import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 
+@UseFilters(AllExceptionsFilter)
 @ApiTags('Фильмы')
 @Controller('movies')
 export class MoviesController {
@@ -41,73 +42,50 @@ export class MoviesController {
   ) {}
 
   // ФИЛЬМЫ:
-  @ApiQuery({
-    name: 'page',
-    enum: PageQuery,
-    isArray: true,
-    description: 'Доступные квери: page, size, name',
-  })
-  @ApiOperation({ summary: 'Каталог фильмов' })
+  @ApiOperation({ summary: 'Каталог фильмов c пагинацией и поиском по имени' })
   @ApiResponse({
     status: 200,
-    description: 'Список фильмов с пагинацией для каталога',
+    description: 'Список фильмов по запросу',
   })
   @Get()
-  getAllFilms(@Query() param) {
+  getAllFilms(@Query(DtoValidationPipe) param: MoviesQueryDto) {
     return this.moviesService.send({ cmd: 'get-all-films' }, param);
   }
 
-  @ApiParam({ name: 'id' })
-  @ApiOperation({ summary: 'Все о фильме по айди' })
+  @ApiOperation({ summary: 'Информация о фильме по айди' })
   @ApiResponse({ status: 200, description: 'Вся информация о фильме' })
-  @UseFilters(AllExceptionsFilter)
   @Get('/about/:id')
-  getFilmById(@Param() filmId: number) {
+  getFilmById(@Param('id', ParseIntPipe) filmId: number) {
     return this.moviesService.send({ cmd: 'get-film-byId' }, filmId);
   }
 
-  @ApiQuery({
-    name: 'orderBy',
-    enum: FiltersOrderByQuery,
-    description: 'Сортировка',
-  })
-  @ApiQuery({
-    name: 'genreId',
-    enum: GenreQuery,
-    isArray: true,
-    description:
-      'Квери: genreId, countryId, page, size, year, ratingKinopoisk, ratingKinopoiskVoteCount',
-  })
-  @ApiQuery({
-    name: 'type',
-    enum: FiltersTypeQuery,
-    description: 'Фильмы или сериалы',
-  })
   @ApiOperation({ summary: 'Фильтр по фильмам' })
   @ApiResponse({ status: 200, description: 'Фильтрация по квери строке' })
   @Get('/filters')
-  getFilmsByFilters(@Query() params) {
+  getFilmsByFilters(@Query(DtoValidationPipe) params: MoviesFiltersQueryDto) {
     return this.moviesService.send({ cmd: 'get-films-byFilters' }, params);
   }
 
-  @ApiQuery({ name: 'nameRu', required: false })
-  @ApiQuery({ name: 'nameOriginal', required: false })
   @ApiOperation({ summary: 'Автосаджест фильмов' })
   @ApiResponse({
     status: 200,
     description: 'выводит по 10 элементов из запроса',
   })
   @Get('/name')
-  getFilmsAutosagest(@Query() query: string) {
+  getFilmsAutosagest(
+    @Query(DtoValidationPipe) query: MoviesQueryAutosagestDto,
+  ) {
     return this.moviesService.send({ cmd: 'get-films-autosagest' }, query);
   }
 
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
-  @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Обновление имени фильма по айди' })
-  @Post('/about/:id')
-  updateFilmById(@Param('id') id, @Body() filmData) {
+  @Put('/about/:id')
+  updateFilmById(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() filmData: MoviesUpdateFilmDto,
+  ) {
     return this.moviesService.send(
       { cmd: 'update-film-byId' },
       { id: id, film: filmData },
@@ -116,47 +94,46 @@ export class MoviesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
-  @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Удаление фильма по айди' })
   @Delete('/about/:id')
-  deleteFilmById(@Param('id') filmId) {
+  deleteFilmById(@Param('id', ParseIntPipe) filmId: number) {
     return this.moviesService.send({ cmd: 'delete-film-byId' }, filmId);
   }
 
   //ЖАНРЫ:
-  @ApiOperation({ summary: 'Получение списка жанров' })
-  @ApiResponse({ status: 200, description: 'Выводит список всех жанров' })
-  @Get('/genres')
-  getAllGenres() {
-    return this.moviesService.send({ cmd: 'get-all-genres' }, {});
-  }
-
-  @ApiOperation({ summary: 'Получение жанра по айди' })
-  @ApiResponse({ status: 200, description: 'Выводит один жанр' })
-  @Get('/genres/:id')
-  getGenreById(@Param('id') id) {
-    return this.moviesService.send({ cmd: 'get-genre-byId' }, id);
-  }
-
-  @UseGuards(RolesGuard)
-  @RoleAccess(initRoles.ADMIN.value)
-  @ApiOperation({ summary: 'Удаление жанра по айди' })
-  @Delete('/genres/:id')
-  deleteGenreById(@Param('id') id) {
-    return this.moviesService.send({ cmd: 'delete-genre-byId' }, id);
-  }
-
-  @UseGuards(RolesGuard)
-  @RoleAccess(initRoles.ADMIN.value)
-  @ApiOperation({ summary: 'Апдейт жанров по айди' })
-  @ApiResponse({ status: 201, description: 'Обновление жанорв' })
-  @Post('/genres/:id')
-  updateGenreById(@Body() genre: UpdateGenreDto, @Param('id') id) {
-    return this.moviesService.send(
-      { cmd: 'update-genre-byId' },
-      { id: id, genre: genre },
-    );
-  }
+  // @ApiOperation({ summary: 'Получение списка жанров' })
+  // @ApiResponse({ status: 200, description: 'Выводит список всех жанров' })
+  // @Get('/genres')
+  // getAllGenres() {
+  //   return this.moviesService.send({ cmd: 'get-all-genres' }, {});
+  // }
+  //
+  // @ApiOperation({ summary: 'Получение жанра по айди' })
+  // @ApiResponse({ status: 200, description: 'Выводит один жанр' })
+  // @Get('/genres/:id')
+  // getGenreById(@Param('id') id) {
+  //   return this.moviesService.send({ cmd: 'get-genre-byId' }, id);
+  // }
+  //
+  // @UseGuards(RolesGuard)
+  // @RoleAccess(initRoles.ADMIN.value)
+  // @ApiOperation({ summary: 'Удаление жанра по айди' })
+  // @Delete('/genres/:id')
+  // deleteGenreById(@Param('id') id) {
+  //   return this.moviesService.send({ cmd: 'delete-genre-byId' }, id);
+  // }
+  //
+  // @UseGuards(RolesGuard)
+  // @RoleAccess(initRoles.ADMIN.value)
+  // @ApiOperation({ summary: 'Апдейт жанров по айди' })
+  // @ApiResponse({ status: 201, description: 'Обновление жанорв' })
+  // @Post('/genres/:id')
+  // updateGenreById(@Body() genre: UpdateGenreDto, @Param('id') id) {
+  //   return this.moviesService.send(
+  //     { cmd: 'update-genre-byId' },
+  //     { id: id, genre: genre },
+  //   );
+  // }
 
   //СТРАНЫ:
   @ApiOperation({ summary: 'Получение списка стран' })

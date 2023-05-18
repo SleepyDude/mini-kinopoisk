@@ -17,6 +17,7 @@ export * from './profiles_files/update-profile.dto';
 // movies
 export * from './movies/update-country.dto';
 export * from './movies/update-genre.dto';
+export * from './movies/movies-query.dto';
 
 // roles
 export * from './roles/create-role.dto';
@@ -36,4 +37,4 @@ export * from './query/pagination.query.dto';
 export * from './query/depth.query.dto';
 
 // persons
-export * from './persons/persons.query.dto';
+export * from './persons/persons-query.dto';
