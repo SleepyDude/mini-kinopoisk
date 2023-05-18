@@ -46,6 +46,7 @@ export class CountriesService {
       })
       .then(async (result) => {
         await this.cacheManager.set(`getAllCountries`, result);
+        return result;
       });
   }
 
