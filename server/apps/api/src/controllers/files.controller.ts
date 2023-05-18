@@ -29,11 +29,11 @@ export class FilesController {
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
   @ApiOperation({
-    summary: 'Удалить файлы неиспользующиеся более ${REQ_TIME} милисекунд',
+    summary: `Удалить файлы неиспользующиеся более ${process.env.REQ_TIME} милисекунд`,
   })
   @ApiResponse({ status: 201, type: Boolean })
   @Delete('clean')
-  async cleanFiles() {
+  async cleanFiles(): Promise<boolean> {
     return await firstValueFrom(
       this.socialService.send({ cmd: 'clean-files' }, {}),
     );
@@ -49,11 +49,11 @@ export class FilesController {
   })
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload_avatar')
-  async uploadFile(@UploadedFile('file') file) {
-    const avatarId = await firstValueFrom(
+  async uploadFile(@UploadedFile('file') file): Promise<AvatarPathId> {
+    const avatarPathId: AvatarPathId = await firstValueFrom(
       this.socialService.send({ cmd: 'upload-avatar' }, file),
     );
-    return { avatarId };
+    return avatarPathId;
   }
 
   @UseGuards(RolesGuard)
@@ -65,10 +65,12 @@ export class FilesController {
     description: 'Внутренний id файла в БД и путь к файлу на сервере',
   })
   @Post('upload_avatar_by_link')
-  async uploadAvatarByLink(@Body(DtoValidationPipe) link: Link) {
-    const avatarId = await firstValueFrom(
+  async uploadAvatarByLink(
+    @Body(DtoValidationPipe) link: Link,
+  ): Promise<AvatarPathId> {
+    const avatarPathId: AvatarPathId = await firstValueFrom(
       this.socialService.send({ cmd: 'upload-avatar-by-link' }, link.link),
     );
-    return { avatarId };
+    return avatarPathId;
   }
 }

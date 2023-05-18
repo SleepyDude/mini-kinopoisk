@@ -6,7 +6,6 @@ import {
   Req,
   Res,
   UseFilters,
-  ValidationPipe,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -14,9 +13,9 @@ import { Request, Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
-import { Token, TokenEmailId, TokenId } from '../types/token.return.type';
 import { AuthVKDto, CreateUserDto } from '@shared/dto';
 import { OAuth2Client } from 'google-auth-library';
+import { Token, TokenEmailId, TokenId } from '@shared/interfaces';
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -40,7 +39,7 @@ export class AuthController {
   async registration(
     @Body(DtoValidationPipe) dto: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<TokenId> {
     const { accessToken, refreshToken, id } = await firstValueFrom(
       this.authService.send({ cmd: 'registration' }, dto),
     );
@@ -63,7 +62,7 @@ export class AuthController {
   async login(
     @Body(DtoValidationPipe) dto: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<TokenId> {
     const { accessToken, refreshToken, id } = await firstValueFrom(
       this.authService.send({ cmd: 'login' }, dto),
     );
@@ -78,6 +77,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Логаут' })
   @ApiResponse({
     status: 200,
+    type: Boolean,
     description:
       'Удалит refresh token из куков и из БД, если всё успешно возвращает true',
   })
@@ -85,7 +85,7 @@ export class AuthController {
   async logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<boolean> {
     const { refreshToken } = request.cookies;
     response.clearCookie('refreshToken');
     const success = await firstValueFrom(
@@ -105,7 +105,7 @@ export class AuthController {
   async refresh(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<Token> {
     const { refreshToken } = request.cookies;
     const { accessToken, newRefreshToken } = await firstValueFrom(
       this.authService.send({ cmd: 'refresh' }, refreshToken),
@@ -129,7 +129,7 @@ export class AuthController {
   async vkLogin(
     @Body(DtoValidationPipe) auth: AuthVKDto,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<TokenEmailId> {
     const dataFromVk = await firstValueFrom(
       this.authService.send({ cmd: 'vk-login' }, auth),
     );
@@ -156,7 +156,7 @@ export class AuthController {
   async googleLogin(
     @Body() token: Token,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<TokenEmailId> {
     const ticket = await googleClient.verifyIdToken({
       idToken: token.token,
       audience: process.env.GOOGLE_CLIENT_ID,

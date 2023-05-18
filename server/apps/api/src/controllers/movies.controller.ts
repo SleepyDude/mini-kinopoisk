@@ -19,17 +19,18 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
+import { UpdateCountryDto, UpdateGenreDto, CreateReviewDto } from '@shared/dto';
+
+import { RolesGuard } from '../guards/roles.guard';
+import { RoleAccess } from '../guards/roles.decorator';
+import { initRoles } from '../guards/init.roles';
+import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import {
   FiltersOrderByQuery,
   FiltersTypeQuery,
 } from '../types/filters.query.enum';
-import { UpdateCountryDto, UpdateGenreDto, CreateReviewDto } from '@shared/dto';
-import { Request } from 'express';
-import { RolesGuard } from '../guards/roles.guard';
-import { RoleAccess } from '../guards/roles.decorator';
 import { GenreQuery, PageQuery } from '../types/pagination.query.enum';
-import { initRoles } from '../guards/init.roles';
-import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 
 @ApiTags('Фильмы')
 @Controller('movies')

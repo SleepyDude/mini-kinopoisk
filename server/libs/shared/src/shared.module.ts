@@ -16,18 +16,18 @@ export class SharedModule {
               queue: queue,
               queueOptions: {
                 durable: false,
-              }
-            }
+              },
+            },
           });
         },
-        inject: []
+        inject: [],
       },
     ];
 
     return {
-        module: SharedModule,
-        providers,
-        exports: providers,
+      module: SharedModule,
+      providers,
+      exports: providers,
     };
   }
 }

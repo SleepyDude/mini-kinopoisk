@@ -72,7 +72,7 @@ export class ReviewPublicCount {
   @ApiProperty({
     description: 'Массив отзывов данного уровня на странице',
     isArray: true,
-    type: [ReviewPublic],
+    type: () => ReviewPublic,
   })
   rows: ReviewPublic[];
 }
@@ -82,7 +82,7 @@ export class ReviewTreePublic extends ReviewPublic {
     description:
       'Дети текущего отзыва (может быть пустым в виду ограничения на глубину)',
     isArray: true,
-    type: [ReviewTreePublic],
+    type: () => ReviewPublic,
   })
   childs: ReviewTreePublic[];
 }

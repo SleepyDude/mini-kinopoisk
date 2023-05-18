@@ -5,7 +5,6 @@ import {
   Inject,
   Param,
   Post,
-  Type,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
