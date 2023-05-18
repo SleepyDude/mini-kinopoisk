@@ -22,7 +22,7 @@ describe('Persons e2e', () => {
     await app.init();
   });
 
-  it('get all persons', () => {
+  it('get all persons, check count, limit', () => {
     return request(app.getHttpServer())
       .get('/persons')
       .expect((response: request.Response) => {
@@ -33,23 +33,28 @@ describe('Persons e2e', () => {
       .expect(HttpStatus.OK);
   });
 
-  it('get person by id', () => {
+  it('get person by id, check name, id and defined films array', () => {
     return request(app.getHttpServer())
       .get('/persons/about/1')
       .expect((response: request.Response) => {
         query = response.body;
         expect(query.person.personId).toBe(1);
+        expect(query.films).toBeDefined();
+        expect(query.person.nameRu).toBe('Стивен Карпентер');
       })
       .expect(HttpStatus.OK);
   });
 
-  it('get person by id bad req', () => {
+  it('get person by id bad req, check err message', () => {
     return request(app.getHttpServer())
       .get('/persons/about/999999')
+      .expect((response: request.Response) => {
+        expect(response.body.error).toBe('Такой айди не зарегистрирован');
+      })
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('get autosagest', () => {
+  it('get autosagest, check count array, length array, first name', () => {
     return request(app.getHttpServer())
       .get('/persons/search')
       .query({
@@ -58,12 +63,26 @@ describe('Persons e2e', () => {
       })
       .expect((response: request.Response) => {
         query = response.body;
-        // console.log(`get query: ${JSON.stringify(query)}`);
         expect(query.count).toBe(3);
         expect(query.rows.length).toBe(3);
         expect(query.rows[0].nameRu).toBe('Грегори Баке');
       })
       .expect(HttpStatus.OK);
+  });
+
+  it('get autosagest, bad req, not found profession', () => {
+    return request(app.getHttpServer())
+      .get('/persons/search')
+      .query({
+        name: 'Грегори б',
+      })
+      .expect((response: request.Response) => {
+        query = response.body;
+        expect(query.error).toStrictEqual({
+          profession: 'profession should not be null or undefined',
+        });
+      })
+      .expect(HttpStatus.BAD_REQUEST);
   });
 
   afterAll(async () => {
