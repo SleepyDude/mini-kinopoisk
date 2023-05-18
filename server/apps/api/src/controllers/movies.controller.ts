@@ -18,7 +18,6 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import {
   UpdateCountryDto,
-  UpdateGenreDto,
   CreateReviewDto,
   MoviesQueryDto,
   MoviesFiltersQueryDto,
@@ -99,41 +98,6 @@ export class MoviesController {
   deleteFilmById(@Param('id', ParseIntPipe) filmId: number) {
     return this.moviesService.send({ cmd: 'delete-film-byId' }, filmId);
   }
-
-  //ЖАНРЫ:
-  // @ApiOperation({ summary: 'Получение списка жанров' })
-  // @ApiResponse({ status: 200, description: 'Выводит список всех жанров' })
-  // @Get('/genres')
-  // getAllGenres() {
-  //   return this.moviesService.send({ cmd: 'get-all-genres' }, {});
-  // }
-  //
-  // @ApiOperation({ summary: 'Получение жанра по айди' })
-  // @ApiResponse({ status: 200, description: 'Выводит один жанр' })
-  // @Get('/genres/:id')
-  // getGenreById(@Param('id') id) {
-  //   return this.moviesService.send({ cmd: 'get-genre-byId' }, id);
-  // }
-  //
-  // @UseGuards(RolesGuard)
-  // @RoleAccess(initRoles.ADMIN.value)
-  // @ApiOperation({ summary: 'Удаление жанра по айди' })
-  // @Delete('/genres/:id')
-  // deleteGenreById(@Param('id') id) {
-  //   return this.moviesService.send({ cmd: 'delete-genre-byId' }, id);
-  // }
-  //
-  // @UseGuards(RolesGuard)
-  // @RoleAccess(initRoles.ADMIN.value)
-  // @ApiOperation({ summary: 'Апдейт жанров по айди' })
-  // @ApiResponse({ status: 201, description: 'Обновление жанорв' })
-  // @Post('/genres/:id')
-  // updateGenreById(@Body() genre: UpdateGenreDto, @Param('id') id) {
-  //   return this.moviesService.send(
-  //     { cmd: 'update-genre-byId' },
-  //     { id: id, genre: genre },
-  //   );
-  // }
 
   //СТРАНЫ:
   @ApiOperation({ summary: 'Получение списка стран' })
