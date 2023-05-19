@@ -6,22 +6,19 @@ import {
   Inject,
   Param,
   ParseIntPipe,
-  Post,
   Put,
   Query,
-  Req,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
-  CreateReviewDto,
   MoviesQueryDto,
   MoviesFiltersQueryDto,
   MoviesQueryAutosagestDto,
-  MoviesUpdateFilmDto, MoviesGetStaffByFilmIdDto
+  MoviesUpdateFilmDto,
+  MoviesGetStaffByFilmIdDto,
 } from '@shared/dto';
 
 import { RolesGuard } from '../guards/roles.guard';
@@ -39,7 +36,6 @@ export class MoviesController {
     @Inject('PERSONS-SERVICE') private personsService: ClientProxy,
   ) {}
 
-  // ФИЛЬМЫ:
   @ApiOperation({ summary: 'Каталог фильмов c пагинацией и поиском по имени' })
   @ApiResponse({
     status: 200,
@@ -112,37 +108,5 @@ export class MoviesController {
       { cmd: 'get-staff-by-filmId' },
       { id, ...params },
     );
-  }
-
-  //КОММЕНТАРИИ:
-  @ApiOperation({ summary: 'Создание комментария' })
-  @ApiResponse({ status: 201, description: 'Комментарий создан' })
-  @Post('/about/:filmId/reviews')
-  createReview(
-    @Body() review: CreateReviewDto,
-    @Param('filmId') filmId: number,
-    @Req() req: Request,
-  ) {
-    return this.moviesService.send(
-      { cmd: 'create-review' },
-      { review: review, filmId: filmId, req: req.cookies },
-    );
-  }
-
-  @ApiOperation({ summary: 'Получить коментарии по kinopoiskId фильма' })
-  @ApiResponse({ status: 200, description: 'Копентарии к фильму' })
-  @Get('/about/:filmId/reviews')
-  getReviewsByFilmId(@Param() filmId: number, @Query() query) {
-    return this.moviesService.send(
-      { cmd: 'get-reviews-byFilmId' },
-      { filmId: filmId, query: query },
-    );
-  }
-
-  @UseGuards(RolesGuard)
-  @RoleAccess(initRoles.ADMIN.value)
-  @Delete('/about/:filmId/reviews/:reviewId')
-  deleteReview(@Param('reviewId') reviewId: number) {
-    return this.moviesService.send({ cmd: 'delete-review' }, reviewId);
   }
 }
