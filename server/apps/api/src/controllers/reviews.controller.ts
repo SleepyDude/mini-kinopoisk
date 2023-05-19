@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   ParseIntPipe,
@@ -10,7 +12,13 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { ClientProxy } from '@nestjs/microservices';
 import { RolesGuard } from '../guards/roles.guard';
@@ -22,6 +30,10 @@ import {
   DepthQueryDto,
   PaginationQueryDto,
 } from '@shared/dto';
+import { CustomHttpExceptionResponse } from '../filters/http.exceptions.response.interface';
+import { RoleAccess } from '../guards/roles.decorator';
+import { initRoles } from '../guards/init.roles';
+import { firstValueFrom } from 'rxjs';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с отзывами')
@@ -84,11 +96,14 @@ export class ReviewsController {
     summary:
       'Получение дерева отзывов по id фильма (которое соответствует kinopoiskId в таблице фильмов) с опциональным ограничением на глубину',
   })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: [ReviewTreePublic],
     description:
       'Массив отзывов со всеми своими потомками c возможным ограничением по глубине',
+  })
+  @ApiNotFoundResponse({
+    description: 'Родительский отзыв по переданному reviewId не найден',
+    type: CustomHttpExceptionResponse,
   })
   @Get('film/:filmId')
   async getReviewsByFilmId(
@@ -126,20 +141,25 @@ export class ReviewsController {
     );
   }
 
-  // @UseGuards(RolesGuard)
-  // @ApiOperation({ summary: 'Удаление отзыва (сам отзыв остается)' })
-  // @ApiResponse({
-  //   status: 200,
-  //   type: ReviewModelReturnAttrs,
-  //   description: 'Измененный отзыв',
-  // })
-  // @Delete(':reviewId')
-  // async deleteReviewByReviewId(
-  //   @Param('filmId', ParseIntPipe) filmId: number,
-  // ) {
-  //   return this.socialService.send(
-  //     { cmd: 'delete-review-by-review-id' },
-  //     filmId,
-  //   );
-  // }
+  @UseGuards(RolesGuard)
+  @RoleAccess(initRoles.ADMIN.value)
+  @ApiOperation({
+    summary:
+      'Удаление отзыва рекурсивно со всем своим поддеревом. Дотсупно только для администраторов',
+  })
+  @ApiResponse({
+    status: 204,
+    description:
+      'Не возвращает тело, только статус. Нельзя узнать удачно ли удаление, результат снаружи всегда одинаков даже при несуществующем reviewId',
+  })
+  @HttpCode(204)
+  @Delete(':reviewId')
+  async deleteReviewByReviewId(
+    @Param('reviewId', ParseIntPipe) reviewId: number,
+  ) {
+    await firstValueFrom(
+      this.socialService.send({ cmd: 'delete-review-by-review-id' }, reviewId),
+    );
+    return;
+  }
 }
