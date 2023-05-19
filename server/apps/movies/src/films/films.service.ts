@@ -6,15 +6,15 @@ import { lastValueFrom } from 'rxjs';
 import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
-import { FilmsUpdateDto } from './dto/films.update.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { BudgetService } from '../budget/budget.service';
 import { TrailersService } from '../trailers/trailers.service';
 import {
+  FilmsUpdateDto,
   MoviesFiltersQueryDto,
   MoviesQueryAutosagestDto,
-  MoviesQueryDto,
+  MoviesQueryDto
 } from '@shared/dto';
 import { PaginationInterface } from '@shared/interfaces';
 import { MoviesUpdateFilmWithFilmIdDto } from '@shared';
