@@ -231,7 +231,7 @@ export class FilmsService {
       });
   }
 
-  async getFilmsByIdPrevious(filmsId) {
+  async getFilmsByIdPrevious(filmsId: Array<{ id: number }>): Promise<any> {
     const cache = await this.cacheManager.get(
       `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
     );
