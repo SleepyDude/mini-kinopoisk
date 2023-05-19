@@ -82,7 +82,7 @@
       "ts"
     ],
     "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*\\-spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
@@ -96,7 +96,10 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@shared/shared(|/.*)$": "<rootDir>/libs/shared/src/$1"
+      "^@shared/shared(|/.*)$": "<rootDir>/libs/shared/src/$1",
+      "^@shared/interfaces": "<rootDir>/libs/shared/src",
+      "^@shared/dto": "<rootDir>/libs/shared/src/dto",
+      "^@shared": "<rootDir>/libs/shared/src"
     }
   }
 }

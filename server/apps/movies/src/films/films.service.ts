@@ -6,12 +6,18 @@ import { lastValueFrom } from 'rxjs';
 import { Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
-import { FilmsQueryDto } from './dto/films.query.dto';
 import { FilmsUpdateDto } from './dto/films.update.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { BudgetService } from '../budget/budget.service';
 import { TrailersService } from '../trailers/trailers.service';
+import {
+  MoviesFiltersQueryDto,
+  MoviesQueryAutosagestDto,
+  MoviesQueryDto,
+} from '@shared/dto';
+import { PaginationInterface } from '@shared/interfaces';
+import { MoviesUpdateFilmWithFilmIdDto } from '@shared';
 
 @Injectable()
 export class FilmsService {
@@ -23,7 +29,7 @@ export class FilmsService {
     private budgetService: BudgetService,
     private trailersService: TrailersService,
   ) {}
-  async getAllFilms(params: FilmsQueryDto) {
+  async getAllFilms(params: MoviesQueryDto): Promise<any> {
     const cache = await this.cacheManager.get(
       `getAllFilms${JSON.stringify(params)}`,
     );
@@ -72,7 +78,7 @@ export class FilmsService {
       });
   }
 
-  async getFilmById(filmId) {
+  async getFilmById(filmId: number): Promise<any> {
     const cache = await this.cacheManager.get(
       `getFilmById${JSON.stringify(filmId)}`,
     );
@@ -97,7 +103,7 @@ export class FilmsService {
         include: [
           { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
         ],
-        where: { kinopoiskId: filmId.id },
+        where: { kinopoiskId: filmId },
       });
       const staff = await lastValueFrom(
         this.personsClient.send(
@@ -108,7 +114,7 @@ export class FilmsService {
       const reviews = await lastValueFrom(
         this.socialClient.send(
           { cmd: 'get-top-reviews-by-film-id' },
-          { filmId: filmId.id, paginationQueryDto: { size: 10, page: 0 } },
+          { filmId: filmId, paginationQueryDto: { size: 10, page: 0 } },
         ),
       );
       await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
@@ -126,7 +132,7 @@ export class FilmsService {
     }
   }
 
-  async getFilmsByFilers(params) {
+  async getFilmsByFilers(params: MoviesFiltersQueryDto): Promise<any> {
     const cache = await this.cacheManager.get(
       `getFilmsByFilers${JSON.stringify(params)}`,
     );
@@ -258,7 +264,7 @@ export class FilmsService {
       });
   }
 
-  async filmsAutosagest(params) {
+  async filmsAutosagest(params: MoviesQueryAutosagestDto): Promise<any> {
     const cache = await this.cacheManager.get(
       `filmsAutosagest${JSON.stringify(params)}`,
     );
@@ -284,14 +290,14 @@ export class FilmsService {
       });
   }
 
-  private getPagination(page, size) {
+  private getPagination(page, size): PaginationInterface {
     const limit = size ? +size : 10;
     const offset = page ? page * limit : 0;
 
     return { limit, offset };
   }
 
-  async updateFilmById(film) {
+  async updateFilmById(film: MoviesUpdateFilmWithFilmIdDto): Promise<any> {
     const filmData: FilmsUpdateDto = film.film;
     const currentFilm = await this.filmsRepository.findOne({
       where: { kinopoiskId: film.id },
@@ -299,11 +305,22 @@ export class FilmsService {
     return await currentFilm.update(filmData);
   }
 
-  async deleteFilmById(filmId) {
+  async deleteFilmById(filmId: number) {
     await this.budgetService.deleteBudgetByFilmId(filmId);
     await this.trailersService.deleteTrailersBuFilmId(filmId);
-    return await this.filmsRepository.destroy({
-      where: { id: filmId },
-    });
+    return await this.filmsRepository
+      .destroy({
+        where: { kinopoiskId: filmId },
+      })
+      .then((result) => {
+        if (result) {
+          return 'Фильм был удален';
+        } else {
+          return new HttpException(
+            'Удаление не удалось',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      });
   }
 }

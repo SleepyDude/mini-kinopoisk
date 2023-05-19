@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Countries } from './countries.model';
 import { CountriesFilms } from './countries.m2m.model';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { UpdateCountryDto } from '@shared/dto';
+import { CountriesUpdateInterface } from '@shared';
 
 @Injectable()
 export class CountriesService {
@@ -15,7 +16,7 @@ export class CountriesService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getCountryById(countryId: number) {
+  async getCountryById(countryId: number): Promise<any> {
     const cache = await this.cacheManager.get(
       `getCountryById${JSON.stringify(countryId)}`,
     );
@@ -33,7 +34,7 @@ export class CountriesService {
       });
   }
 
-  async getAllCountries() {
+  async getAllCountries(): Promise<any> {
     const cache = await this.cacheManager.get(`getAllCountries`);
     if (cache) {
       return cache;
@@ -50,7 +51,7 @@ export class CountriesService {
       });
   }
 
-  async updateCountryById(country) {
+  async updateCountryById(country: CountriesUpdateInterface): Promise<any> {
     const countryDto: UpdateCountryDto = country.country;
     const currentCountry = await this.countriesRepository.findOne({
       where: { id: country.id },
@@ -59,10 +60,20 @@ export class CountriesService {
     return currentCountry;
   }
 
-  async deleteCountryById(countryId) {
-    const country = await this.countriesRepository.findOne({
-      where: { id: countryId },
-    });
-    return country.destroy();
+  async deleteCountryById(countryId: number) {
+    return await this.countriesRepository
+      .destroy({
+        where: { id: countryId },
+      })
+      .then((result) => {
+        if (result) {
+          return 'Страна была удалена';
+        } else {
+          return new HttpException(
+            'Удаление не удалось',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      });
   }
 }

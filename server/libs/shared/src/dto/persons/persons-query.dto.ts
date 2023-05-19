@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDefined, IsOptional, IsString } from 'class-validator';
-import { FiltersProfessionQuery } from '@shared/dto/persons/filters.query.enum';
+import { FiltersProfessionQuery } from '@shared/dto/persons/filters-query-persons.enum';
 
 export class PersonsQueryDto {
   @ApiProperty({
@@ -49,10 +49,5 @@ export class PersonsAutosagestDto {
     required: false,
   })
   @IsOptional()
-  size?: number;
-}
-
-export class StaffQueryDto {
-  id: number;
   size?: number;
 }

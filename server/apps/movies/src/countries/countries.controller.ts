@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { CountriesService } from './countries.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { CountriesUpdateInterface } from '@shared';
 
 @Controller('countries')
 export class CountriesController {
@@ -12,17 +13,17 @@ export class CountriesController {
   }
 
   @MessagePattern({ cmd: 'get-country-byId' })
-  async getCountryById(@Payload() countryId) {
+  async getCountryById(@Payload() countryId: number) {
     return await this.countriesService.getCountryById(countryId);
   }
 
   @MessagePattern({ cmd: 'update-country-byId' })
-  async updateCountryById(@Payload() country) {
+  async updateCountryById(@Payload() country: CountriesUpdateInterface) {
     return await this.countriesService.updateCountryById(country);
   }
 
   @MessagePattern({ cmd: 'delete-country' })
-  async deleteCountryById(@Payload() countryId) {
+  async deleteCountryById(@Payload() countryId: number) {
     return await this.countriesService.deleteCountryById(countryId);
   }
 }
