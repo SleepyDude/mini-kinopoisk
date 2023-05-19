@@ -12,6 +12,7 @@ import { ProfilesController } from './controllers/profiles.controller';
 import { ReviewsController } from './controllers/reviews.controller';
 import { FilesController } from './controllers/files.controller';
 import { MoviesGenresController } from './controllers/movies-genres.controller';
+import { MoviesCountriesController } from './controllers/movies-countries.controller';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { MoviesGenresController } from './controllers/movies-genres.controller';
     ReviewsController,
     FilesController,
     MoviesGenresController,
+    MoviesCountriesController,
   ],
   providers: [],
 })

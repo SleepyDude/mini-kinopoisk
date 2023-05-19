@@ -17,7 +17,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import {
-  UpdateCountryDto,
   CreateReviewDto,
   MoviesQueryDto,
   MoviesFiltersQueryDto,
@@ -97,41 +96,6 @@ export class MoviesController {
   @Delete('/about/:id')
   deleteFilmById(@Param('id', ParseIntPipe) filmId: number) {
     return this.moviesService.send({ cmd: 'delete-film-byId' }, filmId);
-  }
-
-  //СТРАНЫ:
-  @ApiOperation({ summary: 'Получение списка стран' })
-  @ApiResponse({ status: 200, description: 'Выводит список всех стран' })
-  @Get('/countries')
-  getAllCountries() {
-    return this.moviesService.send({ cmd: 'get-all-countries' }, {});
-  }
-
-  @ApiOperation({ summary: 'Получение страны по айди' })
-  @ApiResponse({ status: 200, description: 'Выводит страны по айди' })
-  @Get('/countries/:id')
-  getCountriesById(@Param('id') countryId) {
-    return this.moviesService.send({ cmd: 'get-country-byId' }, countryId);
-  }
-
-  @UseGuards(RolesGuard)
-  @RoleAccess(initRoles.ADMIN.value)
-  @ApiOperation({ summary: 'Апдейт стран по айди' })
-  @ApiResponse({ status: 201, description: 'Обновление стран' })
-  @Post('/countries/:id')
-  updateCountryById(@Body() country: UpdateCountryDto, @Param('id') id) {
-    return this.moviesService.send(
-      { cmd: 'update-country-byId' },
-      { id: id, country: country },
-    );
-  }
-
-  @UseGuards(RolesGuard)
-  @RoleAccess(initRoles.ADMIN.value)
-  @ApiOperation({ summary: 'Удаление страны по айди' })
-  @Delete('/countries/:id')
-  deleteCountriesById(@Param('id') countryId) {
-    return this.moviesService.send({ cmd: 'get-country-byId' }, countryId);
   }
 
   //ПЕРСОНЫ:

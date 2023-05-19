@@ -43,6 +43,7 @@ export * from './interfaces/reviews.interface';
 export * from './interfaces/profiles.interface';
 export * from './interfaces/movies.interface';
 export * from './interfaces/genres.interface';
+export * from './interfaces/countries.interface';
 
 // models
 export * from './models/persons/persons.model';

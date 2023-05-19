@@ -66,9 +66,19 @@ export class GenresService {
   }
 
   async deleteGenreById(genreId: number) {
-    const currentGenre = await this.genresRepository.findOne({
-      where: { id: genreId },
-    });
-    return currentGenre.destroy();
+    return await this.genresRepository
+      .destroy({
+        where: { id: genreId },
+      })
+      .then((result) => {
+        if (result) {
+          return 'Жанр был удален';
+        } else {
+          return new HttpException(
+            'Удаление не удалось',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      });
   }
 }
