@@ -14,7 +14,7 @@ import {
   FilmsUpdateDto,
   MoviesFiltersQueryDto,
   MoviesQueryAutosagestDto,
-  MoviesQueryDto
+  MoviesQueryDto,
 } from '@shared/dto';
 import { PaginationInterface } from '@shared/interfaces';
 import { MoviesUpdateFilmWithFilmIdDto } from '@shared';
