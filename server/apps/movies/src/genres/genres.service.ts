@@ -56,7 +56,7 @@ export class GenresService {
       });
   }
 
-  async updateGenreById(genre: GenresUpdateInterface) {
+  async updateGenreById(genre: GenresUpdateInterface): Promise<any> {
     const genreDto: UpdateGenreDto = genre.genre;
     const currentGenre = await this.genresRepository.findOne({
       where: { id: genre.id },

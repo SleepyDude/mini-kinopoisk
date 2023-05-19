@@ -23,7 +23,7 @@ export class FilmsController {
   }
 
   @MessagePattern({ cmd: 'get-films-byId-previous' })
-  async getFilmsByIdPrevious(@Payload() filmsId) {
+  async getFilmsByIdPrevious(@Payload() filmsId: Array<{ id: number }>) {
     return await this.filmsService.getFilmsByIdPrevious(filmsId);
   }
 
