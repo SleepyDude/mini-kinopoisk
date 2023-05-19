@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDefined, IsOptional, IsString } from 'class-validator';
 import { FiltersProfessionQuery } from '@shared/dto/persons/filters-query-persons.enum';
-import { MoviesGetStaffByFilmIdDto } from '@shared/dto';
 
 export class PersonsQueryDto {
   @ApiProperty({

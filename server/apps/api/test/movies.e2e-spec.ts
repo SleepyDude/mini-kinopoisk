@@ -19,8 +19,6 @@ describe('Films e2e', () => {
   let socialPoolClient: PoolClient;
 
   let user;
-  let genreUpdateData;
-  let genreOldData;
   let filmUpdateData;
   let filmOldData;
 
@@ -48,21 +46,12 @@ describe('Films e2e', () => {
       .expect((response: request.Response) => {
         user = response.body;
       });
-
-    genreUpdateData = {
-      genreNameRu: 'тест',
-      genreNameEng: 'test',
-    };
-    genreOldData = {
-      genreNameRu: 'криминал',
-      genreNameEng: 'crime',
-    };
     filmUpdateData = {
       nameRu: 'AVATAR NEW',
     };
     filmOldData = {
       nameRu: 'Аватар: Легенда об Аанге',
-    }
+    };
   });
 
   it('Get all movies, check default count, 200', async () => {

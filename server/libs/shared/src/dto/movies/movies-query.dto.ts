@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { FiltersMoviesOrderBy, FiltersMoviesTypes } from '@shared/dto/movies/filters-movies-query.enum';
+import {
+  FiltersMoviesOrderBy,
+  FiltersMoviesTypes,
+} from '@shared/dto/movies/filters-movies-query.enum';
 
 export class MoviesQueryDto {
   @ApiProperty({
