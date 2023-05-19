@@ -61,7 +61,7 @@ describe('films-genres e2e tests', () => {
       .get('/movies/countries')
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body.length).toBe(69);
+        expect(body.length).toBe(71);
       })
       .expect(HttpStatus.OK);
   });
