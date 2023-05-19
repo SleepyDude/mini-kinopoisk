@@ -21,7 +21,7 @@ import {
   MoviesQueryDto,
   MoviesFiltersQueryDto,
   MoviesQueryAutosagestDto,
-  MoviesUpdateFilmDto,
+  MoviesUpdateFilmDto, MoviesGetStaffByFilmIdDto
 } from '@shared/dto';
 
 import { RolesGuard } from '../guards/roles.guard';
@@ -98,15 +98,16 @@ export class MoviesController {
     return this.moviesService.send({ cmd: 'delete-film-byId' }, filmId);
   }
 
-  //ПЕРСОНЫ:
-  @ApiParam({ name: 'id', description: 'Это долгий запрос' })
   @ApiOperation({ summary: 'Полный список персонала фильма' })
   @ApiResponse({
     status: 200,
     description: 'Выводит полный список актеров по фильм айди',
   })
   @Get('/about/:id/staff')
-  getStaffByFilmId(@Param('id') id: number, @Query() params) {
+  getStaffByFilmId(
+    @Param('id', ParseIntPipe) id: number,
+    @Query(DtoValidationPipe) params: MoviesGetStaffByFilmIdDto,
+  ) {
     return this.personsService.send(
       { cmd: 'get-staff-by-filmId' },
       { id, ...params },

@@ -4,12 +4,11 @@ import { Op } from 'sequelize';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { HttpRpcException, Persons, PersonsFilms } from '@shared';
+import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
 import {
-  PersonsAutosagestDto,
-  PersonsQueryDto,
-  StaffQueryDto,
-} from '@shared/dto';
-import { PaginationInterface } from '@shared/interfaces';
+  GetStaffByFilmIdInterface,
+  PaginationInterface,
+} from '@shared/interfaces';
 
 @Injectable()
 export class PersonsService {
@@ -108,7 +107,7 @@ export class PersonsService {
       });
   }
 
-  async getStaffByFilmId(params: StaffQueryDto) {
+  async getStaffByFilmId(params: GetStaffByFilmIdInterface): Promise<any> {
     const cache = await this.cacheManager.get(
       `getStaffByFilmId${JSON.stringify(params)}`,
     );

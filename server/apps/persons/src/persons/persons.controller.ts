@@ -2,11 +2,8 @@ import { Controller, UseFilters } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ServiceRpcFilter } from '@shared';
-import {
-  PersonsAutosagestDto,
-  PersonsQueryDto,
-  StaffQueryDto,
-} from '@shared/dto';
+import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
+import { GetStaffByFilmIdInterface } from '@shared/interfaces';
 
 @Controller('persons')
 export class PersonsController {
@@ -24,7 +21,7 @@ export class PersonsController {
   }
 
   @MessagePattern({ cmd: 'get-staff-by-filmId' })
-  async getStaffByFilmId(@Payload() params: StaffQueryDto) {
+  async getStaffByFilmId(@Payload() params: GetStaffByFilmIdInterface) {
     return await this.personsService.getStaffByFilmId(params);
   }
 

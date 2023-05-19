@@ -161,3 +161,13 @@ export class MoviesUpdateFilmDto {
   @IsOptional()
   nameOriginal?: string;
 }
+
+export class MoviesGetStaffByFilmIdDto {
+  @ApiProperty({
+    example: '1',
+    description: 'Лимит вывода',
+    required: false,
+  })
+  @IsOptional()
+  size?: number;
+}
