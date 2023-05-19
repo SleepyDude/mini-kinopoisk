@@ -196,6 +196,18 @@ describe('Films e2e', () => {
       .expect(HttpStatus.OK);
   });
 
+  it('Get staff by film id', async () => {
+    return await request(app.getHttpServer())
+      .get('/movies/about/343/staff')
+      .query({ size: 5 })
+      .expect((response: request.Response) => {
+        const body = response.body;
+        expect(body.length).toBe(5);
+        expect(body[0].nameRu).toBe('Эдди Марсан');
+      })
+      .expect(HttpStatus.OK);
+  });
+
   // it('Delete film by id', async () => {
   //   const acessToken = `Bearer ${user.token}`;
   //   return await request(app.getHttpServer())
