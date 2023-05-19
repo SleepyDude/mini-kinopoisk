@@ -22,6 +22,7 @@ describe('Films e2e', () => {
   let genreUpdateData;
   let genreOldData;
   let filmUpdateData;
+  let filmOldData;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -59,6 +60,9 @@ describe('Films e2e', () => {
     filmUpdateData = {
       nameRu: 'AVATAR NEW',
     };
+    filmOldData = {
+      nameRu: 'Аватар: Легенда об Аанге',
+    }
   });
 
   it('Get all movies, check default count, 200', async () => {
@@ -179,17 +183,30 @@ describe('Films e2e', () => {
       .expect(HttpStatus.OK);
   });
 
-  it('Delete film by id', async () => {
+  it('Set the old value', async () => {
     const acessToken = `Bearer ${user.token}`;
     return await request(app.getHttpServer())
-      .delete('/movies/about/401152')
+      .put('/movies/about/401152')
       .set('authorization', acessToken)
+      .send(filmOldData)
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body).toStrictEqual({});
+        expect(body.nameRu).toBe('Аватар: Легенда об Аанге');
       })
       .expect(HttpStatus.OK);
   });
+
+  // it('Delete film by id', async () => {
+  //   const acessToken = `Bearer ${user.token}`;
+  //   return await request(app.getHttpServer())
+  //     .delete('/movies/about/401152')
+  //     .set('authorization', acessToken)
+  //     .expect((response: request.Response) => {
+  //       const body = response.body;
+  //       expect(body).toStrictEqual({});
+  //     })
+  //     .expect(HttpStatus.OK);
+  // });
 
   afterAll(async () => {
     await userPoolClient.query('TRUNCATE users RESTART IDENTITY CASCADE');

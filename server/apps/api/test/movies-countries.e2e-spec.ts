@@ -18,8 +18,8 @@ describe('films-genres e2e tests', () => {
   let socialPoolClient: PoolClient;
 
   let user;
-  let genreUpdateData;
-  let genreOldData;
+  let countryUpdateData;
+  let countryOldData;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -46,46 +46,45 @@ describe('films-genres e2e tests', () => {
         user = response.body;
       });
 
-    genreUpdateData = {
-      genreNameRu: 'тест',
-      genreNameEng: 'test',
+    countryUpdateData = {
+      countryNameRu: 'тест',
+      countryNameEng: 'test',
     };
-    genreOldData = {
-      genreNameRu: 'криминал',
-      genreNameEng: 'crime',
+    countryOldData = {
+      countryNameRu: 'Франция',
+      countryNameEng: 'France',
     };
   });
 
-  it('Get all genres', async () => {
+  it('Get all countries', async () => {
     return await request(app.getHttpServer())
-      .get('/movies/genres')
+      .get('/movies/countries')
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body.length).toBe(26);
+        expect(body.length).toBe(69);
       })
       .expect(HttpStatus.OK);
   });
 
-  it('Get genre by id', async () => {
+  it('Get country by id', async () => {
     return await request(app.getHttpServer())
-      .get('/movies/genres/2')
+      .get('/movies/countries/3')
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body.id).toBe(2);
+        expect(body.countryNameRu).toBe('Франция');
       })
       .expect(HttpStatus.OK);
   });
 
-  it('Update genre by id', async () => {
+  it('Update country by id', async () => {
     const acessToken = `Bearer ${user.token}`;
     return await request(app.getHttpServer())
-      .put('/movies/genres/1')
+      .put('/movies/countries/3')
       .set('authorization', acessToken)
-      .send(genreUpdateData)
+      .send(countryUpdateData)
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body.genreNameRu).toBe('тест');
-        expect(body.genreNameEng).toBe('test');
+        expect(body.countryNameRu).toBe('тест');
       })
       .expect(HttpStatus.OK);
   });
@@ -93,31 +92,24 @@ describe('films-genres e2e tests', () => {
   it('Set the old value', async () => {
     const acessToken = `Bearer ${user.token}`;
     return await request(app.getHttpServer())
-      .put('/movies/genres/1')
+      .put('/movies/countries/3')
       .set('authorization', acessToken)
-      .send(genreOldData)
+      .send(countryOldData)
       .expect((response: request.Response) => {
         const body = response.body;
-        expect(body.genreNameRu).toBe('криминал');
-        expect(body.genreNameEng).toBe('crime');
+        expect(body.countryNameRu).toBe('Франция');
       })
       .expect(HttpStatus.OK);
   });
 
-  // it('Delete genre by id', async () => {
+  // it('Delete country by id', async () => {
   //   const acessToken = `Bearer ${user.token}`;
   //   return await request(app.getHttpServer())
-  //     .delete('/movies/genres/1')
+  //     .delete('/movies/countries/3')
   //     .set('authorization', acessToken)
-  //     .expect(HttpStatus.OK);
-  // });
-  //
-  // it('Get genre by id after delete', async () => {
-  //   return await request(app.getHttpServer())
-  //     .get('/movies/genres/1')
   //     .expect((response: request.Response) => {
   //       const body = response.body;
-  //       expect(body.message).toBe('Айди не зарегистрирован');
+  //       expect(body).toStrictEqual({});
   //     })
   //     .expect(HttpStatus.OK);
   // });

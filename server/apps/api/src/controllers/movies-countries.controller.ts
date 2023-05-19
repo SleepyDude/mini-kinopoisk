@@ -6,9 +6,9 @@ import {
   Inject,
   Param,
   ParseIntPipe,
-  Post, Put,
+  Put,
   UseFilters,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -35,7 +35,7 @@ export class MoviesCountriesController {
   @ApiOperation({ summary: 'Получение страны по айди' })
   @ApiResponse({ status: 200, description: 'Выводит страну по айди' })
   @Get('/countries/:id')
-  getCountriesById(@Param('id', ParseIntPipe) countryId: number) {
+  getCountryById(@Param('id', ParseIntPipe) countryId: number) {
     return this.moviesService.send({ cmd: 'get-country-byId' }, countryId);
   }
 
