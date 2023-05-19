@@ -31,7 +31,7 @@ export class PersonsController {
   }
 
   @MessagePattern({ cmd: 'get-filmsId-byPersonId' })
-  async getFilmsIdByPersonId(@Payload() personQuery) {
+  async getFilmsIdByPersonId(@Payload() personQuery: Array<any>) {
     return await this.personsService.getFilmsIdByPersonId(personQuery);
   }
 }
