@@ -13,6 +13,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -43,11 +45,17 @@ export class ReviewsController {
 
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Создание отзыва' })
-  @ApiResponse({
-    status: 201,
+  @ApiCreatedResponse({
     type: ReviewPublic,
     description:
       'Создание нового отзыва, id пользователя берется из токена авторизации',
+  })
+  @ApiNotFoundResponse({
+    description: 'Родитель с переданным parentId не найден',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'filmId для переданного родителя и текущего отзыва не совпадают',
   })
   @Post()
   async createReview(
@@ -58,10 +66,12 @@ export class ReviewsController {
   }
 
   @ApiOperation({ summary: 'Получение изолированного отзыва по его id' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: ReviewPublic,
     description: 'Отзыв без потомков с данными профиля',
+  })
+  @ApiNotFoundResponse({
+    description: 'Отзыв по данному id не найден',
   })
   @Get('single/:reviewId')
   async getReviewByReviewId(@Param('reviewId', ParseIntPipe) reviewId: number) {
@@ -75,10 +85,12 @@ export class ReviewsController {
     summary:
       'Получение дерева отзывов по id отзыва верхнего уровня c опциональным ограничением на глубину в query',
   })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: ReviewTreePublic,
     description: 'Древовидная структура отзывов и их детей',
+  })
+  @ApiNotFoundResponse({
+    description: 'Корневой отзыв по данному id не найден',
   })
   @Get('tree/:reviewId')
   async getReviewTreeByReviewId(

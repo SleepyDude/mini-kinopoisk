@@ -24,7 +24,7 @@ export class ReviewsService {
       if (!parent) {
         throw new HttpRpcException(
           `Отзыв с parentId = ${parentId} не найден`,
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.NOT_FOUND,
         );
       }
 
@@ -68,7 +68,7 @@ export class ReviewsService {
       },
     });
     if (!review) {
-      throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
+      throw new HttpRpcException('Отзыв не найден', HttpStatus.NOT_FOUND);
     }
     return review;
   }
@@ -143,7 +143,7 @@ export class ReviewsService {
     });
 
     if (!parentReview) {
-      throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
+      throw new HttpRpcException('Отзыв не найден', HttpStatus.NOT_FOUND);
     }
 
     const pathToStart = `${parentReview.path}${reviewId}.`;
