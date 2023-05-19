@@ -192,7 +192,7 @@ describe('Films e2e', () => {
       .expect((response: request.Response) => {
         const body = response.body;
         expect(body.length).toBe(5);
-        expect(body[0].nameRu).toBe('Эдди Марсан');
+        expect(body[0].nameRu).toBe('Джейми Белл');
       })
       .expect(HttpStatus.OK);
   });

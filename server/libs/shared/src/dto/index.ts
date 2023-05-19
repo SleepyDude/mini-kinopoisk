@@ -18,6 +18,7 @@ export * from './profiles_files/update-profile.dto';
 export * from './movies/update-country.dto';
 export * from './movies/update-genre.dto';
 export * from './movies/movies-query.dto';
+export * from './movies/update-film.dto';
 
 // roles
 export * from './roles/create-role.dto';

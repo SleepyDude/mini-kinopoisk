@@ -128,6 +128,7 @@ export class PersonsService {
         where: {
           [Op.or]: staff,
         },
+        order: ['nameRu'],
       })
       .then(async (result) => {
         await this.cacheManager.set(
