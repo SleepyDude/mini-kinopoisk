@@ -126,11 +126,7 @@ describe('Films e2e', () => {
   it('Get film by id, bad req, res error', async () => {
     return await request(app.getHttpServer())
       .get('/movies/about/1')
-      .expect((response: request.Response) => {
-        const body = response.body;
-        expect(body.status).toBe(404);
-      })
-      .expect(HttpStatus.OK);
+      .expect(HttpStatus.NOT_FOUND);
   });
 
   it('Get films by filter', async () => {

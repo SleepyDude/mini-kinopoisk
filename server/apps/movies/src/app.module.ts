@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, UseFilters } from '@nestjs/common';
 import { FilmsModule } from './films/films.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { GenresModule } from './genres/genres.module';
@@ -6,7 +6,8 @@ import { CountriesModule } from './countries/countries.module';
 import { BudgetModule } from './budget/budget.module';
 import { TrailersModule } from './trailers/trailers.module';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ServiceRpcFilter } from '@shared';
 import { SharedModule } from '@shared';
 
 @Module({
@@ -34,6 +35,10 @@ import { SharedModule } from '@shared';
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ServiceRpcFilter,
     },
   ],
 })

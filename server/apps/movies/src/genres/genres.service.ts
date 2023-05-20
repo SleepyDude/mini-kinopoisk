@@ -4,7 +4,7 @@ import { Genres } from './genres.model';
 import { GenresFilms } from './genres.m2m.model';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { GenresUpdateInterface } from '@shared';
+import { GenresUpdateInterface, HttpRpcException } from '@shared';
 import { UpdateGenreDto } from '@shared/dto';
 
 @Injectable()
@@ -51,6 +51,12 @@ export class GenresService {
         },
       })
       .then(async (result) => {
+        if (!result) {
+          throw new HttpRpcException(
+            'Что то пошло не так',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
         await this.cacheManager.set(`getAllGenres`, result);
         return result;
       });
@@ -61,6 +67,12 @@ export class GenresService {
     const currentGenre = await this.genresRepository.findOne({
       where: { id: genre.id },
     });
+    if (!currentGenre) {
+      throw new HttpRpcException(
+        'Не удалось найти жанр по айди',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     await currentGenre.update(genreDto);
     return currentGenre;
   }
@@ -72,13 +84,12 @@ export class GenresService {
       })
       .then((result) => {
         if (result) {
-          return 'Жанр был удален';
-        } else {
-          return new HttpException(
-            'Удаление не удалось',
-            HttpStatus.BAD_REQUEST,
-          );
+          return true;
         }
+        throw new HttpRpcException(
+          'Жанр с таким айди не найден',
+          HttpStatus.BAD_REQUEST,
+        );
       });
   }
 }

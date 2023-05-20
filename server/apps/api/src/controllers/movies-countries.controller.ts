@@ -2,13 +2,13 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode, HttpStatus,
   Inject,
   Param,
   ParseIntPipe,
   Put,
   UseFilters,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -57,6 +57,7 @@ export class MoviesCountriesController {
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
   @ApiOperation({ summary: 'Удаление страны по айди' })
+  @HttpCode(204)
   @Delete('/countries/:id')
   deleteCountriesById(@Param('id', ParseIntPipe) countryId: number) {
     return this.moviesService.send({ cmd: 'delete-country' }, countryId);
