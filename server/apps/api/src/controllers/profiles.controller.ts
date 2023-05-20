@@ -73,7 +73,6 @@ export class ProfilesController {
   })
   @Get(':id')
   async getProfileByUserId(@Param('id', ParseIntPipe) id: number) {
-    // console.log(`[api][profiles.controller][getSelfProfile] id: ${id}`);
     return this.socialService.send({ cmd: 'get-profile-by-user-id' }, id);
   }
 
@@ -97,7 +96,6 @@ export class ProfilesController {
     @Param('id', ParseIntPipe) id: number,
     @Body(DtoValidationPipe) dto: UpdateProfileDto,
   ) {
-    // console.log(`[api][profiles.controller][getSelfProfile] id:\n ${id} \n\n dto: ${JSON.stringify(dto)} \n\n`);
     return this.socialService.send(
       { cmd: 'update-profile-by-user-id' },
       { id, dto },

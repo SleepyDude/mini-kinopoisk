@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   ParseIntPipe,
@@ -57,6 +58,7 @@ export class MoviesCountriesController {
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
   @ApiOperation({ summary: 'Удаление страны по айди' })
+  @HttpCode(204)
   @Delete('/countries/:id')
   deleteCountriesById(@Param('id', ParseIntPipe) countryId: number) {
     return this.moviesService.send({ cmd: 'delete-country' }, countryId);

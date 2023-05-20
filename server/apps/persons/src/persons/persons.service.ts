@@ -62,20 +62,26 @@ export class PersonsService {
     const { page, size, name } = params;
     const condition = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
-
-    return await this.personsRepository
-      .findAndCountAll({
-        where: condition,
-        limit,
-        offset,
-      })
-      .then(async (result) => {
-        await this.cacheManager.set(
-          `getAllPersons${JSON.stringify(params)}`,
-          result,
-        );
-        return result;
-      });
+    try {
+      return await this.personsRepository
+        .findAndCountAll({
+          where: condition,
+          limit,
+          offset,
+        })
+        .then(async (result) => {
+          await this.cacheManager.set(
+            `getAllPersons${JSON.stringify(params)}`,
+            result,
+          );
+          return result;
+        });
+    } catch (e) {
+      throw new HttpRpcException(
+        'Что то пошло не так',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async getPersonsAutosagest(params: PersonsAutosagestDto): Promise<any> {
@@ -104,6 +110,12 @@ export class PersonsService {
           result,
         );
         return result;
+      })
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       });
   }
 
@@ -136,6 +148,12 @@ export class PersonsService {
           result,
         );
         return result;
+      })
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       });
   }
 

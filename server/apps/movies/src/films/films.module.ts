@@ -9,6 +9,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BudgetModule } from '../budget/budget.module';
 import { TrailersModule } from '../trailers/trailers.module';
+import { SharedModule } from '@shared';
 
 @Module({
   controllers: [FilmsController],
@@ -18,26 +19,28 @@ import { TrailersModule } from '../trailers/trailers.module';
       ttl: 5000,
     }),
     SequelizeModule.forFeature([Films, Similar, SimilarFilms]),
-    ClientsModule.register([
-      {
-        name: 'PERSONS-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.PERSONS_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-      {
-        name: 'SOCIAL-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.SOCIAL_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-    ]),
+    SharedModule.registerRmq('PERSONS-SERVICE', process.env.PERSONS_QUEUE),
+    SharedModule.registerRmq('SOCIAL-SERVICE', process.env.SOCIAL_QUEUE),
+    // ClientsModule.register([
+    //   {
+    //     name: 'PERSONS-SERVICE',
+    //     transport: Transport.RMQ,
+    //     options: {
+    //       urls: [process.env.CLOUDAMQP_URL],
+    //       queue: process.env.PERSONS_QUEUE,
+    //       queueOptions: { durable: false },
+    //     },
+    //   },
+    //   {
+    //     name: 'SOCIAL-SERVICE',
+    //     transport: Transport.RMQ,
+    //     options: {
+    //       urls: [process.env.CLOUDAMQP_URL],
+    //       queue: process.env.SOCIAL_QUEUE,
+    //       queueOptions: { durable: false },
+    //     },
+    //   },
+    // ]),
     BudgetModule,
     TrailersModule,
   ],

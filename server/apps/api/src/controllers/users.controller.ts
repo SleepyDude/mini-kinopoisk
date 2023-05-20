@@ -9,7 +9,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserPermission } from '../decorators/user-permission.decorator';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
@@ -31,10 +39,12 @@ export class UsersController {
   @ApiOperation({
     summary: 'Получение своих данных пользователя (email и роли)',
   })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: UserPublic,
     description: 'Объект может получить только сам пользователь',
+  })
+  @ApiForbiddenResponse({
+    description: 'Пользователь не залогинен',
   })
   @Get('me')
   async getMyUserData(@UserData('id') id: number) {
@@ -49,11 +59,14 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
   @ApiOperation({ summary: 'Получение пользователя по email' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: UserPublic,
     description:
       'Объект может получить только администратор (ADMIN и выше) или сам пользователь',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'Недостаточно прав. Доступ имеет только администратор (роль ADMIN и выше) или сам пользователь',
   })
   @Get('/:email')
   async getUserByEmail(@Param('email') email: string) {
@@ -68,11 +81,17 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
   @ApiOperation({ summary: 'Добавление роли пользователю' })
-  @ApiResponse({
-    status: 201,
+  @ApiCreatedResponse({
     type: RolePublic,
+    description: 'Добавляет роль пользователю. Возвращает ее.',
+  })
+  @ApiNotFoundResponse({
+    type: RolePublic,
+    description: 'Роль или пользователь не найдены',
+  })
+  @ApiForbiddenResponse({
     description:
-      'Добавить роль может только пользователь не ниже ранга 10 (ADMIN), только роль с рангом меньшим, чем у него',
+      'Недостаточно прав. Добавить роль может только пользователь не ниже ранга 10 (ADMIN), только роль с рангом меньшим, чем у него',
   })
   @Post('/add_role')
   async addRole(

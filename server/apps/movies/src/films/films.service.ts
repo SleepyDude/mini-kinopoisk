@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
@@ -17,7 +17,7 @@ import {
   MoviesQueryDto,
 } from '@shared/dto';
 import { PaginationInterface } from '@shared/interfaces';
-import { MoviesUpdateFilmWithFilmIdDto } from '@shared';
+import { HttpRpcException, MoviesUpdateFilmWithFilmIdDto } from '@shared';
 
 @Injectable()
 export class FilmsService {
@@ -70,6 +70,12 @@ export class FilmsService {
         distinct: true,
       })
       .then(async (result) => {
+        if (!result) {
+          throw new HttpRpcException(
+            'Что то пошло не так',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
         await this.cacheManager.set(
           `getAllFilms${JSON.stringify(params)}`,
           result,
@@ -85,51 +91,53 @@ export class FilmsService {
     if (cache) {
       return cache;
     }
-    try {
-      const film: Films = await this.filmsRepository.findOne({
-        attributes: {
-          exclude: [
-            'reviewsCount',
-            'ratingGoodReview',
-            'ratingGoodReviewVoteCount',
-            'ratingFilmCritics',
-            'ratingFilmCriticsVoteCount',
-            'serial',
-            'shortFilm',
-            'createdAt',
-            'updatedAt',
-          ],
-        },
-        include: [
-          { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+    const film: Films = await this.filmsRepository.findOne({
+      attributes: {
+        exclude: [
+          'reviewsCount',
+          'ratingGoodReview',
+          'ratingGoodReviewVoteCount',
+          'ratingFilmCritics',
+          'ratingFilmCriticsVoteCount',
+          'serial',
+          'shortFilm',
+          'createdAt',
+          'updatedAt',
         ],
-        where: { kinopoiskId: filmId },
-      });
-      const staff = await lastValueFrom(
-        this.personsClient.send(
-          { cmd: 'get-staff-by-filmId' },
-          { id: film.id, size: 10 },
-        ),
+      },
+      include: [
+        { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      ],
+      where: { kinopoiskId: filmId },
+    });
+    if (!film) {
+      throw new HttpRpcException(
+        'Не удалось найти фильм по данному айди',
+        HttpStatus.NOT_FOUND,
       );
-      const reviews = await lastValueFrom(
-        this.socialClient.send(
-          { cmd: 'get-top-reviews-by-film-id' },
-          { filmId: filmId, paginationQueryDto: { size: 10, page: 0 } },
-        ),
-      );
-      await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
-        film,
-        staff,
-        reviews,
-      });
-      return {
-        film,
-        staff,
-        reviews,
-      };
-    } catch (err) {
-      return new HttpException('Айди не зарегистрирован', HttpStatus.NOT_FOUND);
     }
+    const staff = await lastValueFrom(
+      this.personsClient.send(
+        { cmd: 'get-staff-by-filmId' },
+        { id: film.id, size: 10 },
+      ),
+    );
+    const reviews = await lastValueFrom(
+      this.socialClient.send(
+        { cmd: 'get-top-reviews-by-film-id' },
+        { filmId: filmId, paginationQueryDto: { size: 10, page: 0 } },
+      ),
+    );
+    await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
+      film,
+      staff,
+      reviews,
+    });
+    return {
+      film,
+      staff,
+      reviews,
+    };
   }
 
   async getFilmsByFilers(params: MoviesFiltersQueryDto): Promise<any> {
@@ -187,48 +195,55 @@ export class FilmsService {
         ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: films };
 
-    return await this.filmsRepository
-      .findAndCountAll({
-        attributes: [
-          'id',
-          'kinopoiskId',
-          'nameRu',
-          'nameOriginal',
-          'ratingKinopoiskVoteCount',
-          'posterUrl',
-          'posterUrlPreview',
-          'coverUrl',
-          'logoUrl',
-          'ratingKinopoisk',
-          'year',
-          'filmLength',
-          'type',
-        ],
-        where: queryWhere,
-        order: orderBy,
-        include: [
-          {
-            model: Genres,
-            where: { id: { [Op.or]: genres } },
-            attributes: { exclude: ['createdAt', 'updatedAt'] },
-          },
-          {
-            model: Countries,
-            where: { id: { [Op.or]: countries } },
-            attributes: { exclude: ['createdAt', 'updatedAt'] },
-          },
-        ],
-        limit,
-        offset,
-        distinct: true,
-      })
-      .then(async (result) => {
-        await this.cacheManager.set(
-          `getFilmsByFilers${JSON.stringify(params)}`,
-          result,
-        );
-        return result;
-      });
+    try {
+      return await this.filmsRepository
+        .findAndCountAll({
+          attributes: [
+            'id',
+            'kinopoiskId',
+            'nameRu',
+            'nameOriginal',
+            'ratingKinopoiskVoteCount',
+            'posterUrl',
+            'posterUrlPreview',
+            'coverUrl',
+            'logoUrl',
+            'ratingKinopoisk',
+            'year',
+            'filmLength',
+            'type',
+          ],
+          where: queryWhere,
+          order: orderBy,
+          include: [
+            {
+              model: Genres,
+              where: { id: { [Op.or]: genres } },
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+            },
+            {
+              model: Countries,
+              where: { id: { [Op.or]: countries } },
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+            },
+          ],
+          limit,
+          offset,
+          distinct: true,
+        })
+        .then(async (result) => {
+          await this.cacheManager.set(
+            `getFilmsByFilers${JSON.stringify(params)}`,
+            result,
+          );
+          return result;
+        });
+    } catch (e) {
+      throw new HttpRpcException(
+        'Что то пошло не так',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async getFilmsByIdPrevious(filmsId: Array<{ id: number }>): Promise<any> {
@@ -238,30 +253,37 @@ export class FilmsService {
     if (cache) {
       return cache;
     }
-    return await this.filmsRepository
-      .findAll({
-        where: {
-          [Op.or]: filmsId,
-        },
-        attributes: [
-          'kinopoiskId',
-          'year',
-          'nameRu',
-          'nameOriginal',
-          'posterUrl',
-          'posterUrlPreview',
-          'coverUrl',
-          'logoUrl',
-          'ratingKinopoisk',
-        ],
-      })
-      .then(async (result) => {
-        await this.cacheManager.set(
-          `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
-          result,
-        );
-        return result;
-      });
+    try {
+      return await this.filmsRepository
+        .findAll({
+          where: {
+            [Op.or]: filmsId,
+          },
+          attributes: [
+            'kinopoiskId',
+            'year',
+            'nameRu',
+            'nameOriginal',
+            'posterUrl',
+            'posterUrlPreview',
+            'coverUrl',
+            'logoUrl',
+            'ratingKinopoisk',
+          ],
+        })
+        .then(async (result) => {
+          await this.cacheManager.set(
+            `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
+            result,
+          );
+          return result;
+        });
+    } catch (e) {
+      throw new HttpRpcException(
+        'Что то пошло не так',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async filmsAutosagest(params: MoviesQueryAutosagestDto): Promise<any> {
@@ -275,19 +297,26 @@ export class FilmsService {
       ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
       : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
     const { size = 10 } = params;
-    return await this.filmsRepository
-      .findAll({
-        attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
-        where: search,
-        limit: size,
-      })
-      .then(async (result) => {
-        await this.cacheManager.set(
-          `filmsAutosagest${JSON.stringify(params)}`,
-          result,
-        );
-        return result;
-      });
+    try {
+      return await this.filmsRepository
+        .findAll({
+          attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
+          where: search,
+          limit: size,
+        })
+        .then(async (result) => {
+          await this.cacheManager.set(
+            `filmsAutosagest${JSON.stringify(params)}`,
+            result,
+          );
+          return result;
+        });
+    } catch (e) {
+      throw new HttpRpcException(
+        'Что то пошло не так',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   private getPagination(page, size): PaginationInterface {
@@ -302,6 +331,12 @@ export class FilmsService {
     const currentFilm = await this.filmsRepository.findOne({
       where: { kinopoiskId: film.id },
     });
+    if (!currentFilm) {
+      throw new HttpRpcException(
+        'Не удалось найти фильм по айди',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return await currentFilm.update(filmData);
   }
 
@@ -313,14 +348,13 @@ export class FilmsService {
         where: { kinopoiskId: filmId },
       })
       .then((result) => {
-        if (result) {
-          return 'Фильм был удален';
-        } else {
-          return new HttpException(
-            'Удаление не удалось',
+        if (!result) {
+          throw new HttpRpcException(
+            'Не удалось найти такой фильм',
             HttpStatus.BAD_REQUEST,
           );
         }
+        return result;
       });
   }
 }

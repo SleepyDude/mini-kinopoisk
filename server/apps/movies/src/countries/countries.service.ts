@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Countries } from './countries.model';
 import { CountriesFilms } from './countries.m2m.model';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { UpdateCountryDto } from '@shared/dto';
-import { CountriesUpdateInterface } from '@shared';
+import { CountriesUpdateInterface, HttpRpcException } from '@shared';
 
 @Injectable()
 export class CountriesService {
@@ -26,6 +26,12 @@ export class CountriesService {
     return await this.countriesRepository
       .findOne({ where: { id: countryId } })
       .then(async (result) => {
+        if (!result) {
+          throw new HttpRpcException(
+            'Такой айди не зарегистрирован',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
         await this.cacheManager.set(
           `getCountryById${JSON.stringify(countryId)}`,
           result,
@@ -46,6 +52,12 @@ export class CountriesService {
         },
       })
       .then(async (result) => {
+        if (!result) {
+          throw new HttpRpcException(
+            'Что то пошло не так',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
         await this.cacheManager.set(`getAllCountries`, result);
         return result;
       });
@@ -56,6 +68,12 @@ export class CountriesService {
     const currentCountry = await this.countriesRepository.findOne({
       where: { id: country.id },
     });
+    if (!currentCountry) {
+      throw new HttpRpcException(
+        'Не нашлось страны по данному айди',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     await currentCountry.update(countryDto);
     return currentCountry;
   }
@@ -66,14 +84,11 @@ export class CountriesService {
         where: { id: countryId },
       })
       .then((result) => {
-        if (result) {
-          return 'Страна была удалена';
-        } else {
-          return new HttpException(
-            'Удаление не удалось',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
+        if (result) return [];
+        throw new HttpRpcException(
+          'такой айди не существует',
+          HttpStatus.BAD_REQUEST,
+        );
       });
   }
 }
