@@ -1,6 +1,7 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
+import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({})
 export class SharedModule {
@@ -28,6 +29,30 @@ export class SharedModule {
       module: SharedModule,
       providers,
       exports: providers,
+    };
+  }
+
+  static registerDatabase(dbName: string): DynamicModule {
+    const imports = [
+      SequelizeModule.forRootAsync({
+        imports: [],
+        useFactory: () => ({
+          dialect: 'postgres',
+          host: process.env.POSTGRES_HOST,
+          port: Number(process.env.POSTGRES_PORT_INSIDE),
+          username: process.env.POSTGRES_USER,
+          password: process.env.POSTGRES_PASSWORD,
+          database: dbName,
+          autoLoadModels: true,
+        }),
+
+        inject: [],
+      }),
+    ];
+
+    return {
+      module: SharedModule,
+      imports,
     };
   }
 }

@@ -7,9 +7,7 @@ import { CreateRoleDto, UpdateRoleDto } from '@shared/dto';
 @UseFilters(ExceptionFilter)
 @Controller('roles')
 export class RolesController {
-  constructor(
-    private readonly rolesService: RolesService, // private readonly sharedService: SharedService,
-  ) {}
+  constructor(private readonly rolesService: RolesService) {}
 
   @MessagePattern({ cmd: 'create-role' })
   async getUser(
