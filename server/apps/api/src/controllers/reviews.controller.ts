@@ -97,7 +97,6 @@ export class ReviewsController {
     @Param('reviewId', ParseIntPipe) reviewId: number,
     @Query(DtoValidationPipe) dto: DepthQueryDto,
   ) {
-    // console.log(`\n\n depth dto: = ${JSON.stringify(dto)}\n\n`);
     return this.socialService.send(
       { cmd: 'get-review-by-review-id-tree' },
       { reviewId, depth: dto.depth },
@@ -142,11 +141,6 @@ export class ReviewsController {
     @Param('filmId', ParseIntPipe) filmId: number,
     @Query(DtoValidationPipe) paginationQueryDto: PaginationQueryDto,
   ) {
-    console.log(
-      `[api][reviews.controller][getTopReviewsByFilmId] pagination query dto: ${JSON.stringify(
-        paginationQueryDto,
-      )}`,
-    );
     return this.socialService.send(
       { cmd: 'get-top-reviews-by-film-id' },
       { filmId, paginationQueryDto },

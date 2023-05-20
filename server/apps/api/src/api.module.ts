@@ -19,6 +19,7 @@ import { MoviesCountriesController } from './controllers/movies-countries.contro
     ConfigModule.forRoot({
       envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
     }),
+
     ClientsModule.register([
       {
         name: 'AUTH-SERVICE',
