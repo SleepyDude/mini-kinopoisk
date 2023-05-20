@@ -143,9 +143,8 @@ export class FilmsService {
 
   async getFilmsByFilers(params: MoviesFiltersQueryDto): Promise<any> {
     const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {};
-    const sortCacheKey = this.sortForCacheKey(params);
     const cache = await this.cacheManager.get(
-      `getFilmsByFilers${JSON.stringify(sortCacheKey)}`,
+      `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
     );
     const getParseQueryObject = this.parseQueryObject(params);
     const filmsIdByPerson = await lastValueFrom(
@@ -192,7 +191,7 @@ export class FilmsService {
           .findAndCountAll(queryDatabaseParams)
           .then(async (result) => {
             await this.cacheManager.set(
-              `getFilmsByFilers${JSON.stringify(sortCacheKey)}`,
+              `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
               result,
             );
             return result;
