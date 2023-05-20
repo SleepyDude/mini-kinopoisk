@@ -105,50 +105,12 @@ dist
 # vscode
 .vscode
 
-
 #server:
 
 #main:
-/.env
 pgdata
-pgdata-test
-
-#api
-/server/api/package-lock.json
-
-#Auth:
-/server/auth/package-lock.json
-/server/auth/node_modules
-
-#parser:
-/server/parser/.env
-/server/parser/package-lock.json
-/server/parser/node_modules
-
-#Users:
-/server/users/package-lock.json
-/server/users/node_modules
-
-#Profile
-/server/profile/package-lock.json
-/server/profile/node_modules
-
-#Movies
-/server/movies/package-lock.json
-/server/movies/node_modules
-
-#Persons
-/server/persons/package-lock.json
-/server/persons/node_modules
+/server/package-lock.json
 
 #client auth branch local
 /client
 
-# shared
-/shared/package-lock.json
-
-# social
-/server/social/package-lock.json
-
-package-lock.json
-/server/package-lock.json
