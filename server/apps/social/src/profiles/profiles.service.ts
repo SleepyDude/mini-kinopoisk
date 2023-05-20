@@ -23,12 +23,18 @@ export class ProfilesService {
     if (!username) {
       username = generateUsername();
     }
-    const profile = await this.profileRepository.create({ ...dto, username });
-    console.log(`[profile created]`);
-    if (dto.avatarId) {
-      await this.fileService.setAvatar(profile.id, dto.avatarId);
+    try {
+      const profile = await this.profileRepository.create({ ...dto, username });
+      if (dto.avatarId) {
+        await this.fileService.setAvatar(profile.id, dto.avatarId);
+      }
+      return profile;
+    } catch (e) {
+      throw new HttpRpcException(
+        'Ошибка при создании профиля',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return profile;
   }
 
   async getAllProfiles() {

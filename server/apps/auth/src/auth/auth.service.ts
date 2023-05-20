@@ -38,10 +38,7 @@ export class AuthService {
     }
 
     if (!isRightPassword && !skipPasswordCheck) {
-      throw new HttpRpcException(
-        'Invalid credentials',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpRpcException('Неверный пароль', HttpStatus.UNAUTHORIZED);
     }
     const tokenData = new UserDto(user);
     const tokens = await this.tokenService.generateAndSaveToken(tokenData);

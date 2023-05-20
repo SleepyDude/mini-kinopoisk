@@ -8,7 +8,17 @@ import {
   UseFilters,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiConflictResponse,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
@@ -28,12 +38,26 @@ const googleClient = new OAuth2Client(
 export class AuthController {
   constructor(@Inject('AUTH-SERVICE') private authService: ClientProxy) {}
 
-  @ApiOperation({ summary: 'Регистрация' })
-  @ApiResponse({
+  @ApiOperation({
+    summary:
+      'Регистрация, Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
+  })
+  @ApiOkResponse({
     status: 201,
     type: TokenId,
-    description:
-      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
+    description: 'Успешный запрос',
+  })
+  @ApiConflictResponse({
+    status: 409,
+    description: 'Пользователь уже существует',
+  })
+  @ApiBadRequestResponse({
+    status: 424,
+    description: 'Инициализация сервера не выполнена!',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при создании пользователя/профиля',
   })
   @Post('registration')
   async registration(
@@ -51,12 +75,22 @@ export class AuthController {
     return { token: accessToken, id: id };
   }
 
-  @ApiOperation({ summary: 'Логин' })
+  @ApiOperation({
+    summary:
+      'Логин, Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
+  })
   @ApiResponse({
     status: 200,
     type: TokenId,
-    description:
-      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
+    description: 'Успешный запрос',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Пользователь не найден',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Неверный пароль',
   })
   @Post('login')
   async login(
@@ -74,12 +108,11 @@ export class AuthController {
     return { token: accessToken, id: id };
   }
 
-  @ApiOperation({ summary: 'Логаут' })
+  @ApiOperation({ summary: 'Логаут, удалит Refresh token из куков и из БД' })
   @ApiResponse({
     status: 200,
     type: Boolean,
-    description:
-      'Удалит refresh token из куков и из БД, если всё успешно возвращает true',
+    description: 'Успешный запрос',
   })
   @Post('logout')
   async logout(
@@ -95,11 +128,17 @@ export class AuthController {
     return !!success;
   }
 
-  @ApiOperation({ summary: 'Получение нового токена доступа' })
+  @ApiOperation({
+    summary: 'Получение нового токена доступа, Refresh token запишет в куки',
+  })
   @ApiResponse({
     status: 200,
     type: Token,
-    description: 'Refresh token запишет в куки',
+    description: 'Успешный запрос',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Токен отсутствует',
   })
   @Post('refresh')
   async refresh(
@@ -118,12 +157,21 @@ export class AuthController {
     return { token: accessToken };
   }
 
-  @ApiOperation({ summary: `Вход через ВК` })
+  @ApiOperation({
+    summary: `Вход через ВК, Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer`,
+  })
   @ApiResponse({
     status: 200,
     type: TokenEmailId,
-    description:
-      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
+    description: 'Успешный запрос',
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Плохой вк-код либо ошибка при получении данных с ВК',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при создании пользователя/профиля',
   })
   @Post('vk')
   async vkLogin(
@@ -145,18 +193,20 @@ export class AuthController {
     };
   }
 
-  @ApiOperation({ summary: `Вход через google` })
+  @ApiOperation({
+    summary: `Вход через google, Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer`,
+  })
   @ApiResponse({
     status: 200,
     type: TokenEmailId,
-    description:
-      'Refresh token записывается в куки. Access token возвращается, он должен ставиться в заголовок Authorization и иметь тип Bearer',
+    description: 'Успешный запрос',
   })
   @Post('google')
   async googleLogin(
     @Body() token: Token,
     @Res({ passthrough: true }) response: Response,
   ): Promise<TokenEmailId> {
+    console.log('start login google');
     const ticket = await googleClient.verifyIdToken({
       idToken: token.token,
       audience: process.env.GOOGLE_CLIENT_ID,

@@ -12,7 +12,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { ClientProxy } from '@nestjs/microservices';
 import { AvatarId, AvatarPathId, UpdateProfileDto } from '@shared/dto';
@@ -39,7 +45,11 @@ export class ProfilesController {
   @ApiResponse({
     status: 200,
     type: ProfilePublic,
-    description: 'Профиль пользователя, доступ по токену авторизации',
+    description: 'Успешный запрос',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Профиль не найден',
   })
   @Get('/me')
   async getMyProfile(@UserData('id', ParseIntPipe) id: number) {
@@ -48,12 +58,18 @@ export class ProfilesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
-  @ApiOperation({ summary: 'Получение профиля по id' })
+  @ApiOperation({
+    summary:
+      'Получение профиля по id, доступ у самого пользователя и администратора',
+  })
   @ApiResponse({
     status: 200,
     type: ProfilePublic,
-    description:
-      'Профиль пользователя с данным <id>, доступ у самого пользователя и администратора',
+    description: 'Успешный запрос',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Профиль не найден',
   })
   @Get(':id')
   async getProfileByUserId(@Param('id', ParseIntPipe) id: number) {
@@ -63,12 +79,18 @@ export class ProfilesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.OWNER.value, allowSelf: true })
-  @ApiOperation({ summary: 'Изменение профиля по id' })
+  @ApiOperation({
+    summary:
+      'Изменение профиля по id, доступ у самого пользователя и у главного администратора',
+  })
   @ApiResponse({
     status: 200,
     type: ProfilePublic,
-    description:
-      'Профиль пользователя с данным <id>, доступ у самого пользователя и у главного администратора',
+    description: 'Успешный запрос',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Профиль не найден',
   })
   @Put(':id')
   async updateProfile(
@@ -84,11 +106,18 @@ export class ProfilesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
-  @ApiOperation({ summary: 'Удалить аватар профиля по id' })
+  @ApiOperation({
+    summary:
+      'Удалить аватар профиля по id, доступ у самого пользователя и у главного администратора',
+  })
   @ApiResponse({
     status: 201,
     type: Boolean,
-    description: 'Успешное выполнение',
+    description: 'Успешный запрос',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Профиль не найден',
   })
   @Get('/unset_avatar/:id')
   async unsetAvatar(@Param('id', ParseIntPipe) id: number) {
@@ -98,11 +127,18 @@ export class ProfilesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
-  @ApiOperation({ summary: 'Получить аватар профиля по id' })
+  @ApiOperation({
+    summary:
+      'Получить аватар профиля по id, доступ у самого пользователя и у главного администратора',
+  })
   @ApiResponse({
     status: 201,
     type: AvatarPathId,
     description: 'Успешное выполнение',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Аватар не найден',
   })
   @Get('/avatar/:id')
   async getAvatar(@Param('id', ParseIntPipe) id: number) {
@@ -114,11 +150,22 @@ export class ProfilesController {
 
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
-  @ApiOperation({ summary: 'Установить аватар профиля' })
+  @ApiOperation({
+    summary:
+      'Установить аватар профиля из файла, доступ у самого пользователя и у главного администратора',
+  })
   @ApiResponse({
     status: 201,
     type: AvatarId,
     description: 'Успешное выполнение',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при записи файла',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Ошибка при присваивании аватара',
   })
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload_avatar/:id')
