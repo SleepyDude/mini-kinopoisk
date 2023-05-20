@@ -3,10 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   ParseIntPipe,
-  Post,
   Put,
   UseFilters,
   UseGuards,
@@ -43,6 +43,7 @@ export class MoviesGenresController {
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
   @ApiOperation({ summary: 'Удаление жанра по айди' })
+  @HttpCode(204)
   @Delete('/genres/:id')
   deleteGenreById(@Param('id', ParseIntPipe) genreId: number) {
     return this.moviesService.send({ cmd: 'delete-genre-byId' }, genreId);

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   ParseIntPipe,
@@ -89,6 +90,7 @@ export class MoviesController {
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
   @ApiOperation({ summary: 'Удаление фильма по айди' })
+  @HttpCode(204)
   @Delete('/about/:id')
   deleteFilmById(@Param('id', ParseIntPipe) filmId: number) {
     return this.moviesService.send({ cmd: 'delete-film-byId' }, filmId);
