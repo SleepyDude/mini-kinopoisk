@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Films } from './films.model';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { Op } from 'sequelize';
+import { FindAndCountOptions, Op } from 'sequelize';
 import { Genres } from '../genres/genres.model';
 import { Countries } from '../countries/countries.model';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -18,6 +18,7 @@ import {
 } from '@shared/dto';
 import { PaginationInterface } from '@shared/interfaces';
 import { HttpRpcException, MoviesUpdateFilmWithFilmIdDto } from '@shared';
+import { filterFilmsAttributes } from './templates/query-database.template';
 
 @Injectable()
 export class FilmsService {
@@ -141,48 +142,19 @@ export class FilmsService {
   }
 
   async getFilmsByFilers(params: MoviesFiltersQueryDto): Promise<any> {
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {};
+    const sortCacheKey = this.sortForCacheKey(params);
     const cache = await this.cacheManager.get(
-      `getFilmsByFilers${JSON.stringify(params)}`,
+      `getFilmsByFilers${JSON.stringify(sortCacheKey)}`,
     );
-    if (cache) {
-      return cache;
-    }
-    const films = [];
-    const genres = [];
-    const countries = [];
-    const orderBy = [];
-    const personQuery = [];
-
-    const { page, size } = params;
-    const { limit, offset } = this.getPagination(page, size);
-
-    for (const [key, value] of Object.entries(params)) {
-      if (key === 'year' || key === 'type') {
-        films.push({ [key]: value });
-      }
-      if (key === 'ratingKinopoisk' || key === 'ratingKinopoiskVoteCount') {
-        films.push({ [key]: { [Op.gte]: value } });
-      }
-      if (key === 'genreId') {
-        genres.push(value);
-      }
-      if (key === 'countryId') {
-        countries.push(value);
-      }
-      if (key === 'orderBy') {
-        orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC'], [
-          'nameRu',
-          'ASC',
-        ]);
-      }
-      if (key === 'DIRECTOR' || key === 'ACTOR') {
-        personQuery.push({ professionKey: key, staffId: value });
-      }
-    }
+    const getParseQueryObject = this.parseQueryObject(params);
     const filmsIdByPerson = await lastValueFrom(
-      this.personsClient.send({ cmd: 'get-filmsId-byPersonId' }, personQuery),
+      this.personsClient.send(
+        { cmd: 'get-filmsId-byPersonId' },
+        getParseQueryObject.personQuery,
+      ),
     );
-    if (personQuery.length > 0) {
+    if (getParseQueryObject.personQuery.length > 0) {
       if (filmsIdByPerson.length === 0) {
         return {
           count: 0,
@@ -192,58 +164,45 @@ export class FilmsService {
     }
     const queryWhere =
       filmsIdByPerson.length > 0
-        ? { [Op.and]: films, [Op.or]: filmsIdByPerson }
-        : { [Op.and]: films };
+        ? { [Op.and]: getParseQueryObject.films, [Op.or]: filmsIdByPerson }
+        : { [Op.and]: getParseQueryObject.films };
 
-    try {
-      return await this.filmsRepository
-        .findAndCountAll({
-          attributes: [
-            'id',
-            'kinopoiskId',
-            'nameRu',
-            'nameOriginal',
-            'ratingKinopoiskVoteCount',
-            'posterUrl',
-            'posterUrlPreview',
-            'coverUrl',
-            'logoUrl',
-            'ratingKinopoisk',
-            'year',
-            'filmLength',
-            'type',
-          ],
-          where: queryWhere,
-          order: orderBy,
-          include: [
-            {
-              model: Genres,
-              where: { id: { [Op.or]: genres } },
-              attributes: { exclude: ['createdAt', 'updatedAt'] },
-            },
-            {
-              model: Countries,
-              where: { id: { [Op.or]: countries } },
-              attributes: { exclude: ['createdAt', 'updatedAt'] },
-            },
-          ],
-          limit,
-          offset,
-          distinct: true,
-        })
-        .then(async (result) => {
-          await this.cacheManager.set(
-            `getFilmsByFilers${JSON.stringify(params)}`,
-            result,
-          );
-          return result;
-        });
-    } catch (e) {
-      throw new HttpRpcException(
-        'Что то пошло не так',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    queryDatabaseParams.attributes = filterFilmsAttributes;
+    queryDatabaseParams.where = queryWhere;
+    queryDatabaseParams.order = getParseQueryObject.orderBy;
+    queryDatabaseParams.include = [
+      {
+        model: Genres,
+        where: { id: { [Op.or]: getParseQueryObject.genres } },
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      },
+      {
+        model: Countries,
+        where: { id: { [Op.or]: getParseQueryObject.countries } },
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      },
+    ];
+    queryDatabaseParams.limit = getParseQueryObject.limit;
+    queryDatabaseParams.offset = getParseQueryObject.offset;
+    queryDatabaseParams.distinct = true;
+
+    return cache
+      ? cache
+      : await this.filmsRepository
+          .findAndCountAll(queryDatabaseParams)
+          .then(async (result) => {
+            await this.cacheManager.set(
+              `getFilmsByFilers${JSON.stringify(params)}`,
+              result,
+            );
+            return result;
+          })
+          .catch(() => {
+            throw new HttpRpcException(
+              'Что то пошло не так',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+          });
   }
 
   async getFilmsByIdPrevious(filmsId: Array<{ id: number }>): Promise<any> {
@@ -324,6 +283,59 @@ export class FilmsService {
     const offset = page ? page * limit : 0;
 
     return { limit, offset };
+  }
+
+  private parseQueryObject(queryObject: MoviesFiltersQueryDto) {
+    const films = [];
+    const genres = [];
+    const countries = [];
+    const orderBy = [];
+    const personQuery = [];
+
+    const { page, size } = queryObject;
+    const { limit, offset } = this.getPagination(page, size);
+
+    for (const [key, value] of Object.entries(queryObject)) {
+      if (key === 'year' || key === 'type') {
+        films.push({ [key]: value });
+      }
+      if (key === 'ratingKinopoisk' || key === 'ratingKinopoiskVoteCount') {
+        films.push({ [key]: { [Op.gte]: value } });
+      }
+      if (key === 'genreId') {
+        genres.push(value);
+      }
+      if (key === 'countryId') {
+        countries.push(value);
+      }
+      if (key === 'orderBy') {
+        orderBy.push(value === 'nameRu' ? [value] : [value, 'DESC'], [
+          'nameRu',
+          'ASC',
+        ]);
+      }
+      if (key === 'DIRECTOR' || key === 'ACTOR') {
+        personQuery.push({ professionKey: key, staffId: value });
+      }
+    }
+    return {
+      films: films,
+      genres: genres,
+      countries: countries,
+      orderBy: orderBy,
+      personQuery: personQuery,
+      limit: limit,
+      offset: offset,
+    };
+  }
+
+  private sortForCacheKey(cacheKey) {
+    return Object.keys(cacheKey)
+      .sort()
+      .reduce<typeof cacheKey>((obj, key) => {
+        obj[key] = cacheKey[key];
+        return obj;
+      }, {});
   }
 
   async updateFilmById(film: MoviesUpdateFilmWithFilmIdDto): Promise<any> {

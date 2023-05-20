@@ -1,0 +1,15 @@
+export const filterFilmsAttributes = [
+  'id',
+  'kinopoiskId',
+  'nameRu',
+  'nameOriginal',
+  'ratingKinopoiskVoteCount',
+  'posterUrl',
+  'posterUrlPreview',
+  'coverUrl',
+  'logoUrl',
+  'ratingKinopoisk',
+  'year',
+  'filmLength',
+  'type',
+];
