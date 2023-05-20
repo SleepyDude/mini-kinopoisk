@@ -18,7 +18,17 @@ import {
 } from '@shared/dto';
 import { PaginationInterface } from '@shared/interfaces';
 import { HttpRpcException, MoviesUpdateFilmWithFilmIdDto } from '@shared';
-import { filterFilmsAttributes } from './templates/query-database.template';
+import {
+  allFilmsAttributes,
+  autosagestFilmsAttributes,
+  filterFilmsAttributes,
+  includeCountriesAttributes,
+  includeGenresAttributes,
+  includeOneFilmAttributes,
+  oneFilmAttributes,
+  previousFilmsAttributes,
+} from './templates/query-database.template';
+import { all } from 'axios';
 
 @Injectable()
 export class FilmsService {
@@ -32,85 +42,53 @@ export class FilmsService {
   ) {}
   async getAllFilms(params: MoviesQueryDto): Promise<any> {
     const cache = await this.cacheManager.get(
-      `getAllFilms${JSON.stringify(params)}`,
+      `getAllFilms${JSON.stringify(this.sortForCacheKey(params))}`,
     );
-    if (cache) {
-      return cache;
-    }
+    if (cache) return cache;
+
     const { page, size, name } = params;
     const query = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
 
-    return await this.filmsRepository
-      .findAndCountAll({
-        attributes: [
-          'kinopoiskId',
-          'nameRu',
-          'nameOriginal',
-          'posterUrl',
-          'posterUrlPreview',
-          'coverUrl',
-          'logoUrl',
-          'ratingKinopoisk',
-          'year',
-          'filmLength',
-        ],
-        include: [
-          {
-            model: Genres,
-            attributes: ['id', 'genreNameRu', 'genreNameEng'],
-          },
-          {
-            model: Countries,
-            attributes: ['id', 'countryNameRu', 'countryNameEng'],
-          },
-        ],
-        where: query,
-        limit,
-        offset,
-        distinct: true,
-      })
-      .then(async (result) => {
-        if (!result) {
-          throw new HttpRpcException(
-            'Что то пошло не так',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
-        await this.cacheManager.set(
-          `getAllFilms${JSON.stringify(params)}`,
-          result,
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {
+      attributes: allFilmsAttributes,
+      include: [includeGenresAttributes, includeCountriesAttributes],
+      where: query,
+      limit,
+      offset,
+      distinct: true,
+    };
+
+    const allFilms = await this.filmsRepository
+      .findAndCountAll(queryDatabaseParams)
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
-        return result;
       });
+
+    await this.cacheManager.set(
+      `getAllFilms${JSON.stringify(this.sortForCacheKey(params))}`,
+      allFilms,
+    );
+
+    return allFilms;
   }
 
   async getFilmById(filmId: number): Promise<any> {
     const cache = await this.cacheManager.get(
       `getFilmById${JSON.stringify(filmId)}`,
     );
-    if (cache) {
-      return cache;
-    }
-    const film: Films = await this.filmsRepository.findOne({
-      attributes: {
-        exclude: [
-          'reviewsCount',
-          'ratingGoodReview',
-          'ratingGoodReviewVoteCount',
-          'ratingFilmCritics',
-          'ratingFilmCriticsVoteCount',
-          'serial',
-          'shortFilm',
-          'createdAt',
-          'updatedAt',
-        ],
-      },
-      include: [
-        { all: true, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-      ],
+    if (cache) return cache;
+
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {
+      attributes: oneFilmAttributes,
+      include: includeOneFilmAttributes,
       where: { kinopoiskId: filmId },
-    });
+    };
+
+    const film: Films = await this.filmsRepository.findOne(queryDatabaseParams);
     if (!film) {
       throw new HttpRpcException(
         'Не удалось найти фильм по данному айди',
@@ -129,11 +107,13 @@ export class FilmsService {
         { filmId: filmId, paginationQueryDto: { size: 10, page: 0 } },
       ),
     );
+
     await this.cacheManager.set(`getFilmById${JSON.stringify(filmId)}`, {
       film,
       staff,
       reviews,
     });
+
     return {
       film,
       staff,
@@ -147,7 +127,6 @@ export class FilmsService {
     );
     if (cache) return cache;
 
-    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {};
     const getParseQueryObject = this.parseQueryObject(params);
 
     const filmsIdByPerson = await lastValueFrom(
@@ -169,114 +148,104 @@ export class FilmsService {
         ? { [Op.and]: getParseQueryObject.films, [Op.or]: filmsIdByPerson }
         : { [Op.and]: getParseQueryObject.films };
 
-    queryDatabaseParams.attributes = filterFilmsAttributes;
-    queryDatabaseParams.where = queryWhere;
-    queryDatabaseParams.order = getParseQueryObject.orderBy;
-    queryDatabaseParams.include = [
-      {
-        model: Genres,
-        where: { id: { [Op.or]: getParseQueryObject.genres } },
-        attributes: { exclude: ['createdAt', 'updatedAt'] },
-      },
-      {
-        model: Countries,
-        where: { id: { [Op.or]: getParseQueryObject.countries } },
-        attributes: { exclude: ['createdAt', 'updatedAt'] },
-      },
-    ];
-    queryDatabaseParams.limit = getParseQueryObject.limit;
-    queryDatabaseParams.offset = getParseQueryObject.offset;
-    queryDatabaseParams.distinct = true;
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {
+      attributes: filterFilmsAttributes,
+      where: queryWhere,
+      order: getParseQueryObject.orderBy,
+      include: [
+        {
+          model: Genres,
+          where: { id: { [Op.or]: getParseQueryObject.genres } },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+        {
+          model: Countries,
+          where: { id: { [Op.or]: getParseQueryObject.countries } },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+      ],
+      limit: getParseQueryObject.limit,
+      offset: getParseQueryObject.offset,
+      distinct: true,
+    };
 
-    return await this.filmsRepository
+    const allFilms = await this.filmsRepository
       .findAndCountAll(queryDatabaseParams)
-      .then(async (result: { rows: Films[]; count: number }) => {
-        await this.cacheManager.set(
-          `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
-          result,
-        );
-
-        return result;
-      })
       .catch(() => {
         throw new HttpRpcException(
           'Что то пошло не так',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
+
+    await this.cacheManager.set(
+      `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
+      allFilms,
+    );
+
+    return allFilms;
   }
 
   async getFilmsByIdPrevious(filmsId: Array<{ id: number }>): Promise<any> {
     const cache = await this.cacheManager.get(
-      `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
+      `getFilmsByIdPrevious${JSON.stringify(this.sortForCacheKey(filmsId))}`,
     );
-    if (cache) {
-      return cache;
-    }
-    try {
-      return await this.filmsRepository
-        .findAll({
-          where: {
-            [Op.or]: filmsId,
-          },
-          attributes: [
-            'kinopoiskId',
-            'year',
-            'nameRu',
-            'nameOriginal',
-            'posterUrl',
-            'posterUrlPreview',
-            'coverUrl',
-            'logoUrl',
-            'ratingKinopoisk',
-          ],
-        })
-        .then(async (result) => {
-          await this.cacheManager.set(
-            `getFilmsByIdPrevious${JSON.stringify(filmsId)}`,
-            result,
-          );
-          return result;
-        });
-    } catch (e) {
-      throw new HttpRpcException(
-        'Что то пошло не так',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    if (cache) return cache;
+
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {
+      attributes: previousFilmsAttributes,
+      where: { [Op.or]: filmsId },
+    };
+
+    const allFilms = await this.filmsRepository
+      .findAll(queryDatabaseParams)
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+    await this.cacheManager.set(
+      `getFilmsByIdPrevious${JSON.stringify(this.sortForCacheKey(filmsId))}`,
+      allFilms,
+    );
+
+    return allFilms;
   }
 
   async filmsAutosagest(params: MoviesQueryAutosagestDto): Promise<any> {
     const cache = await this.cacheManager.get(
-      `filmsAutosagest${JSON.stringify(params)}`,
+      `filmsAutosagest${JSON.stringify(this.sortForCacheKey(params))}`,
     );
-    if (cache) {
-      return cache;
-    }
-    const search = params.nameRu
-      ? { nameRu: { [Op.iLike]: `%${params.nameRu}%` } }
-      : { nameOriginal: { [Op.iLike]: `%${params.nameOriginal}%` } };
-    const { size = 10 } = params;
-    try {
-      return await this.filmsRepository
-        .findAll({
-          attributes: ['kinopoiskId', 'nameRu', 'nameOriginal', 'year'],
-          where: search,
-          limit: size,
-        })
-        .then(async (result) => {
-          await this.cacheManager.set(
-            `filmsAutosagest${JSON.stringify(params)}`,
-            result,
-          );
-          return result;
-        });
-    } catch (e) {
-      throw new HttpRpcException(
-        'Что то пошло не так',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    if (cache) return cache;
+
+    const { size = 10, nameRu, nameOriginal } = params;
+    const search = nameRu
+      ? { nameRu: { [Op.iLike]: `%${nameRu}%` } }
+      : { nameOriginal: { [Op.iLike]: `%${nameOriginal}%` } };
+
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {
+      attributes: autosagestFilmsAttributes,
+      where: search,
+      limit: size,
+    };
+
+    const allFilms = await this.filmsRepository
+      .findAll(queryDatabaseParams)
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+    await this.cacheManager.set(
+      `filmsAutosagest${JSON.stringify(params)}`,
+      allFilms,
+    );
+
+    return allFilms;
   }
 
   private getPagination(page, size): PaginationInterface {
@@ -319,6 +288,7 @@ export class FilmsService {
         personQuery.push({ professionKey: key, staffId: value });
       }
     }
+
     return {
       films: films,
       genres: genres,
@@ -344,12 +314,14 @@ export class FilmsService {
     const currentFilm = await this.filmsRepository.findOne({
       where: { kinopoiskId: film.id },
     });
+
     if (!currentFilm) {
       throw new HttpRpcException(
         'Не удалось найти фильм по айди',
         HttpStatus.NOT_FOUND,
       );
     }
+
     return await currentFilm.update(filmData);
   }
 
