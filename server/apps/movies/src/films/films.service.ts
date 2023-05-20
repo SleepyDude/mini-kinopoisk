@@ -142,25 +142,28 @@ export class FilmsService {
   }
 
   async getFilmsByFilers(params: MoviesFiltersQueryDto): Promise<any> {
-    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {};
     const cache = await this.cacheManager.get(
       `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
     );
+    if (cache) return cache;
+
+    const queryDatabaseParams: Omit<FindAndCountOptions<Films>, 'group'> = {};
     const getParseQueryObject = this.parseQueryObject(params);
+
     const filmsIdByPerson = await lastValueFrom(
       this.personsClient.send(
         { cmd: 'get-filmsId-byPersonId' },
         getParseQueryObject.personQuery,
       ),
     );
-    if (getParseQueryObject.personQuery.length > 0) {
-      if (filmsIdByPerson.length === 0) {
-        return {
-          count: 0,
-          rows: [],
-        };
-      }
+
+    if (
+      getParseQueryObject.personQuery.length > 0 &&
+      filmsIdByPerson.length === 0
+    ) {
+      return { count: 0, rows: [] };
     }
+
     const queryWhere =
       filmsIdByPerson.length > 0
         ? { [Op.and]: getParseQueryObject.films, [Op.or]: filmsIdByPerson }
@@ -185,23 +188,22 @@ export class FilmsService {
     queryDatabaseParams.offset = getParseQueryObject.offset;
     queryDatabaseParams.distinct = true;
 
-    return cache
-      ? cache
-      : await this.filmsRepository
-          .findAndCountAll(queryDatabaseParams)
-          .then(async (result) => {
-            await this.cacheManager.set(
-              `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
-              result,
-            );
-            return result;
-          })
-          .catch(() => {
-            throw new HttpRpcException(
-              'Что то пошло не так',
-              HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-          });
+    return await this.filmsRepository
+      .findAndCountAll(queryDatabaseParams)
+      .then(async (result: { rows: Films[]; count: number }) => {
+        await this.cacheManager.set(
+          `getFilmsByFilers${JSON.stringify(this.sortForCacheKey(params))}`,
+          result,
+        );
+
+        return result;
+      })
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
   }
 
   async getFilmsByIdPrevious(filmsId: Array<{ id: number }>): Promise<any> {
