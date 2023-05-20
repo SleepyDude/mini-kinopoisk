@@ -28,7 +28,6 @@ import {
   oneFilmAttributes,
   previousFilmsAttributes,
 } from './templates/query-database.template';
-import { all } from 'axios';
 
 @Injectable()
 export class FilmsService {
