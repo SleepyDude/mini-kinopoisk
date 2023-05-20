@@ -9,9 +9,7 @@ import { Review } from '../../models/reviews.model';
 
 @Injectable()
 export class ReviewsService {
-  constructor(
-    @InjectModel(Review) private reviewsRepository: typeof Review, // private sequelize: Sequelize, // @InjectModel(Films) private filmsRepository: typeof Films,
-  ) {}
+  constructor(@InjectModel(Review) private reviewsRepository: typeof Review) {}
 
   async createReview(dto: CreateReviewDto, userId: number) {
     const { parentId } = dto;
@@ -24,7 +22,7 @@ export class ReviewsService {
       if (!parent) {
         throw new HttpRpcException(
           `Отзыв с parentId = ${parentId} не найден`,
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.NOT_FOUND,
         );
       }
 
@@ -40,7 +38,7 @@ export class ReviewsService {
     }
 
     const review = await this.reviewsRepository.create({
-      profileId: userId, // Пока у нас инты, то id профиля и юзера равны
+      profileId: userId,
       ...dto,
       path: parentPath,
       childsNum: 0,
@@ -48,35 +46,32 @@ export class ReviewsService {
     });
 
     if (parent) {
-      parent.set('childsNum', parent.childsNum + 1); // Добавить после обновления модели
+      parent.set('childsNum', parent.childsNum + 1);
       await parent.save();
     }
 
     return review;
   }
 
-  async getReviewByReviewIdSingle(review_id: number) {
-    const review = await this.reviewsRepository.findByPk(review_id, {
+  async getReviewByReviewIdSingle(reviewId: number) {
+    const review = await this.reviewsRepository.findByPk(reviewId, {
       include: {
         model: Profile,
         attributes: {
-          exclude: ['user_id', 'createdAt', 'updatedAt'],
+          exclude: ['userId', 'createdAt', 'updatedAt'],
         },
       },
       attributes: {
-        exclude: ['profile_id'],
+        exclude: ['profileId'],
       },
     });
     if (!review) {
-      throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
+      throw new HttpRpcException('Отзыв не найден', HttpStatus.NOT_FOUND);
     }
     return review;
   }
 
   private async collapseTree(reviews: Review[], findOne = false) {
-    // console.log(
-    //   `collapse tree reviews: ${JSON.stringify(reviews, undefined, 2)}`,
-    // );
     let i = 0;
     const roots = [];
     const reviewStack = [];
@@ -94,11 +89,8 @@ export class ReviewsService {
 
     reviewStack.reverse();
 
-    // console.log(`start reviewStack = ${reviewStack}`);
-
     while (true) {
       if (i === reviews.length) break;
-      // Достаем очередное значение review из списка
       const review = new ReviewTreeDto(reviews[i]);
 
       if (reviewStack[reviewStack.length - 1].id === review.parentId) {
@@ -106,15 +98,10 @@ export class ReviewsService {
         i += 1;
       } else {
         const fullParent = reviewStack.pop();
-        // Его дети могут также иметь детей, заносим их в стек в обратном порядке
         for (let j = fullParent.childs.length - 1; j >= 0; j--) {
           reviewStack.push(fullParent.childs[j]);
         }
-        // Скипаем сверху тех из них, которые не являются родителем текущему или пока стек не опустеет
-        while (
-          // reviewStack.length &&
-          reviewStack[reviewStack.length - 1].id !== review.parentId
-        ) {
+        while (reviewStack[reviewStack.length - 1].id !== review.parentId) {
           reviewStack.pop();
         }
       }
@@ -124,25 +111,24 @@ export class ReviewsService {
     return roots;
   }
 
-  async getReviewByReviewIdTree(review_id: number, depth: number) {
-    // console.log(
-    //   `\n\n[reviews.service][gerReviewTree] review_id: ${JSON.stringify(
-    //     review_id,
-    //   )}\n\n`,
-    // );
-    const parentReview = await this.reviewsRepository.findByPk(review_id, {
+  async getReviewByReviewIdTree(reviewId: number, depth: number) {
+    const parentReview = await this.reviewsRepository.findByPk(reviewId, {
       include: {
         model: Profile,
         attributes: {
-          exclude: ['user_id', 'createdAt', 'updatedAt'],
+          exclude: ['userId', 'createdAt', 'updatedAt'],
         },
       },
       attributes: {
-        exclude: ['profile_id'],
+        exclude: ['profileId'],
       },
     });
 
-    const pathToStart = `${parentReview.path}${review_id}.`;
+    if (!parentReview) {
+      throw new HttpRpcException('Отзыв не найден', HttpStatus.NOT_FOUND);
+    }
+
+    const pathToStart = `${parentReview.path}${reviewId}.`;
     console.log(pathToStart);
 
     const whereOptions: WhereOptions<ReviewModelAttrs> = {
@@ -153,14 +139,9 @@ export class ReviewsService {
     };
 
     if (depth !== undefined) {
-      // console.log(`depth != undef: ${depth}`);
       whereOptions.depth = {
-        [Op.lte]: parentReview.depth + depth,
+        [Op.lte]: parentReview.depth + +depth,
       };
-    }
-
-    if (!parentReview) {
-      throw new HttpRpcException('Комментарий не найден', HttpStatus.NOT_FOUND);
     }
 
     const reviews = await this.reviewsRepository.findAll({
@@ -168,11 +149,11 @@ export class ReviewsService {
       include: {
         model: Profile,
         attributes: {
-          exclude: ['user_id', 'createdAt', 'updatedAt'],
+          exclude: ['userId', 'createdAt', 'updatedAt'],
         },
       },
       attributes: {
-        exclude: ['profile_id'],
+        exclude: ['profileId'],
       },
       order: [
         ['path', 'ASC'],
@@ -199,11 +180,11 @@ export class ReviewsService {
       include: {
         model: Profile,
         attributes: {
-          exclude: ['user_id', 'createdAt', 'updatedAt'],
+          exclude: ['userId', 'createdAt', 'updatedAt'],
         },
       },
       attributes: {
-        exclude: ['profile_id'],
+        exclude: ['profileId'],
       },
       order: [
         ['path', 'ASC'],
@@ -227,11 +208,11 @@ export class ReviewsService {
       include: {
         model: Profile,
         attributes: {
-          exclude: ['user_id', 'createdAt', 'updatedAt'],
+          exclude: ['userId', 'createdAt', 'updatedAt'],
         },
       },
       attributes: {
-        exclude: ['profile_id'],
+        exclude: ['profileId'],
       },
       order: [
         ['path', 'ASC'],
@@ -246,9 +227,7 @@ export class ReviewsService {
     }
 
     const reviews = await this.reviewsRepository.findAndCountAll(findOptions);
-    // const rows = this.collapseTree(reviews.rows);
     return reviews;
-    // return { rows: rows, count: reviews.count };
   }
 
   async getReviewsByProfileId(profileId: number) {
@@ -263,11 +242,35 @@ export class ReviewsService {
     });
   }
 
-  async deleteReviewByReviewId(review_id: number) {
-    const review = await this.reviewsRepository.findByPk(review_id);
-    review.set('text', 'Комментарий удален');
-    review.set('title', null);
-    review.save();
-    return review;
+  async deleteReviewByReviewId(reviewId: number) {
+    const parent = await this.reviewsRepository.findByPk(reviewId);
+    if (!parent) return [];
+
+    if (parent.parentId !== null) {
+      const grandParent = await this.reviewsRepository.findByPk(
+        parent.parentId,
+      );
+
+      grandParent.set('childsNum', grandParent.childsNum - 1);
+      await grandParent.save();
+    }
+
+    const childs = await this.reviewsRepository.findAll({
+      where: {
+        path: {
+          [Op.startsWith]: parent.path + parent.id + '.',
+        },
+        filmId: parent.filmId,
+      },
+      attributes: ['id'],
+    });
+
+    for (let i = 0; i < childs.length; i++) {
+      await childs[i].destroy();
+    }
+
+    await parent.destroy();
+
+    return [];
   }
 }

@@ -9,7 +9,6 @@ export class RolesService {
   constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
 
   async createRole(dto: CreateRoleDto, userPerm = Infinity) {
-    // console.log(`[roles.service][create-role] dto: ${JSON.stringify(dto)}`);
     if (userPerm <= dto.value) {
       throw new HttpRpcException(
         'Можно создать роль только с меньшими чем у Вас правами',
@@ -22,7 +21,7 @@ export class RolesService {
       return role;
     } catch (error) {
       throw new HttpRpcException(
-        'Ошибка при создании роли (роль уже существует)',
+        'Ошибка при создании роли',
         HttpStatus.CONFLICT,
       );
     }
@@ -41,23 +40,18 @@ export class RolesService {
   async deleteByName(name: string, userPerm = Infinity) {
     const role = await this.roleRepository.findOne({ where: { name } });
     if (role) {
-      // Проверим, что пользователь вправе удалить роль
       if (userPerm <= role.value) {
         throw new HttpRpcException('Недостаточно прав', HttpStatus.FORBIDDEN);
       }
       role.destroy();
-      return;
+      return [];
     }
-    throw new HttpRpcException(
-      'Роли с таким именем не существует',
-      HttpStatus.NOT_FOUND,
-    );
+    return [];
   }
 
   async updateByName(name: string, dto: UpdateRoleDto, userPerm: number) {
-    // console.log(`update role with name ${name}`)
     const role = await this.roleRepository.findOne({ where: { name: name } });
-    // console.log(`find role ${JSON.stringify(role)}`)
+
     if (role) {
       if (userPerm <= role.value || (dto.value && dto.value >= userPerm)) {
         throw new HttpRpcException('Недостаточно прав', HttpStatus.FORBIDDEN);
@@ -65,6 +59,7 @@ export class RolesService {
       role.update(dto);
       return role;
     }
+
     throw new HttpRpcException(
       'Роли с таким именем не существует',
       HttpStatus.NOT_FOUND,

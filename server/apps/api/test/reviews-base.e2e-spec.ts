@@ -315,7 +315,7 @@ describe('Reviews e2e', () => {
         .post('/reviews')
         .auth(bobAccess, { type: 'bearer' })
         .send({ text: 'abc', filmId: 28, parentId: 15 })
-        .expect(400)
+        .expect(404)
         .expect((resp: RespError) => {
           const body = JSON.parse(resp.text) as RespErrorBody;
           expect(body.error).toBe('Отзыв с parentId = 15 не найден');

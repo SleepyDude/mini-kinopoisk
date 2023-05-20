@@ -19,7 +19,6 @@ export class UsersController {
     return await this.usersService.getUserById(id);
   }
 
-  // Отдает публичные данные пользователя - email и roles
   @MessagePattern({ cmd: 'get-user-public-by-id' })
   async getUserPublicById(@Payload() id: number) {
     return await this.usersService.getUserPublicById(id);
@@ -35,8 +34,6 @@ export class UsersController {
     @Payload('dto') dto: AddRoleDtoEmail,
     @Payload('maxRoleValue') maxRoleValue: number,
   ) {
-    console.log(`[users][add-role-by-email] dto: ${JSON.stringify(dto)}`);
-    console.log(`[users][add-role-by-email] maxRoleValue: ${maxRoleValue}`);
     return await this.usersService.addRoleByEmail(dto, maxRoleValue);
   }
 

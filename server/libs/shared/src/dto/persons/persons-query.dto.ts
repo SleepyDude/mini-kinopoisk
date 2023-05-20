@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional } from 'class-validator';
-import { FiltersProfessionQuery } from '@shared/dto/persons/filters.query.enum';
+import { IsDefined, IsOptional, IsString } from 'class-validator';
+import { FiltersProfessionQuery } from '@shared/dto/persons/filters-query-persons.enum';
 
 export class PersonsQueryDto {
   @ApiProperty({
@@ -33,12 +33,14 @@ export class PersonsAutosagestDto {
     enum: FiltersProfessionQuery,
     description: 'квери по актеру или режиссеру',
   })
+  @IsDefined()
   profession: string;
 
   @ApiProperty({
     example: 'Квентин тар',
     description: 'Только русское имя',
   })
+  @IsString()
   name: string;
 
   @ApiProperty({
@@ -47,10 +49,5 @@ export class PersonsAutosagestDto {
     required: false,
   })
   @IsOptional()
-  size?: number;
-}
-
-export class StaffQueryDto {
-  id: number;
   size?: number;
 }

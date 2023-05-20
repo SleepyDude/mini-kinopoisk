@@ -11,18 +11,15 @@ import { validate } from 'class-validator';
 @Injectable()
 export class DtoValidationPipe implements PipeTransform<any> {
   async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
-    // console.log(`Object for DtoValidation: ${value}`);
 
-    const obj = plainToClass(metadata.metatype, value); // Получаем объект, который будем валидировать
+    const obj = plainToClass(metadata.metatype, value);
     const errors = await validate(obj);
-    // console.log(`Got Errors: ${errors}`);
 
     if (errors.length) {
       const record: object = {};
       errors.map((err) => {
         record[err.property] = Object.values(err.constraints).join(', ');
       });
-      // console.log(`Record: ${JSON.stringify(record)}`);
       throw new HttpException(
         { validation_message: record },
         HttpStatus.BAD_REQUEST,

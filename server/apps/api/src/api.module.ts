@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
-import { ClientsModule } from '@nestjs/microservices';
-import { Transport } from '@nestjs/microservices';
 import { PersonsController } from './controllers/persons.controller';
 import { MoviesController } from './controllers/movies.controller';
 import { AuthController } from './controllers/auth.controller';
@@ -11,50 +9,19 @@ import { InitController } from './controllers/init.controller';
 import { ProfilesController } from './controllers/profiles.controller';
 import { ReviewsController } from './controllers/reviews.controller';
 import { FilesController } from './controllers/files.controller';
+import { MoviesGenresController } from './controllers/movies-genres.controller';
+import { MoviesCountriesController } from './controllers/movies-countries.controller';
+import { SharedModule } from '@shared';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [process.env.NODE_ENV_LOCAL, process.env.NODE_ENV],
     }),
-    ClientsModule.register([
-      {
-        name: 'AUTH-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.AUTH_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-      {
-        name: 'SOCIAL-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.SOCIAL_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-      {
-        name: 'MOVIES-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.MOVIES_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-      {
-        name: 'PERSONS-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.PERSONS_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-    ]),
+    SharedModule.registerRmq('AUTH-SERVICE', process.env.AUTH_QUEUE),
+    SharedModule.registerRmq('SOCIAL-SERVICE', process.env.SOCIAL_QUEUE),
+    SharedModule.registerRmq('MOVIES-SERVICE', process.env.MOVIES_QUEUE),
+    SharedModule.registerRmq('PERSONS-SERVICE', process.env.PERSONS_QUEUE),
   ],
   controllers: [
     UsersController,
@@ -66,6 +33,8 @@ import { FilesController } from './controllers/files.controller';
     ProfilesController,
     ReviewsController,
     FilesController,
+    MoviesGenresController,
+    MoviesCountriesController,
   ],
   providers: [],
 })

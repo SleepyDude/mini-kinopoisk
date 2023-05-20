@@ -12,13 +12,18 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
-import { initRoles } from '../guards/init.roles';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { initRoles } from '@shared';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с файлами')
@@ -29,11 +34,15 @@ export class FilesController {
   @UseGuards(RolesGuard)
   @RoleAccess({ minRoleVal: initRoles.ADMIN.value, allowSelf: true })
   @ApiOperation({
-    summary: 'Удалить файлы неиспользующиеся более ${REQ_TIME} милисекунд',
+    summary: `Удалить файлы неиспользующиеся более ${process.env.REQ_TIME} милисекунд`,
   })
-  @ApiResponse({ status: 201, type: Boolean })
+  @ApiResponse({ status: 201, type: Boolean, description: 'Успешный запрос' })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при очистке файлов',
+  })
   @Delete('clean')
-  async cleanFiles() {
+  async cleanFiles(): Promise<boolean> {
     return await firstValueFrom(
       this.socialService.send({ cmd: 'clean-files' }, {}),
     );
@@ -45,15 +54,19 @@ export class FilesController {
   @ApiResponse({
     status: 201,
     type: AvatarPathId,
-    description: 'Внутренний id файла в БД и путь к файлу на сервере',
+    description: 'Успешный запрос',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при записи файла',
   })
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload_avatar')
-  async uploadFile(@UploadedFile('file') file) {
-    const avatarId = await firstValueFrom(
+  async uploadFile(@UploadedFile('file') file): Promise<AvatarPathId> {
+    const avatarPathId: AvatarPathId = await firstValueFrom(
       this.socialService.send({ cmd: 'upload-avatar' }, file),
     );
-    return { avatarId };
+    return avatarPathId;
   }
 
   @UseGuards(RolesGuard)
@@ -62,13 +75,19 @@ export class FilesController {
   @ApiResponse({
     status: 201,
     type: AvatarPathId,
-    description: 'Внутренний id файла в БД и путь к файлу на сервере',
+    description: 'Успешный запрос',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при записи файла',
   })
   @Post('upload_avatar_by_link')
-  async uploadAvatarByLink(@Body(DtoValidationPipe) link: Link) {
-    const avatarId = await firstValueFrom(
+  async uploadAvatarByLink(
+    @Body(DtoValidationPipe) link: Link,
+  ): Promise<AvatarPathId> {
+    const avatarPathId: AvatarPathId = await firstValueFrom(
       this.socialService.send({ cmd: 'upload-avatar-by-link' }, link.link),
     );
-    return { avatarId };
+    return avatarPathId;
   }
 }

@@ -8,6 +8,7 @@ import { HttpService } from '@nestjs/axios';
 import { DatabaseFile } from '../../models/files.model';
 import { AvatarPathId } from '@shared/dto';
 import { HttpRpcException } from '@shared';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class DatabaseFilesService {
@@ -20,12 +21,12 @@ export class DatabaseFilesService {
 
   async uploadAvatarByLink(link: string): Promise<AvatarPathId> {
     try {
-      const avatar = await this.http
-        .get(link, {
+      const avatar = await firstValueFrom(
+        this.http.get(link, {
           responseType: 'text',
           responseEncoding: 'base64',
-        })
-        .toPromise();
+        }),
+      );
       const { avatarId, path2File } = await this.uploadAvatar(
         Buffer.from(avatar.data, 'base64'),
       );
@@ -105,26 +106,45 @@ export class DatabaseFilesService {
         return true;
       }
     }
+    return false;
   }
 
   async cleanUnusedFiles() {
     const REQUIRED_TIME = new Date(Date.now() - +process.env.REQ_TIME);
-    const files = await this.dbFilesRepository.findAll({
-      where: { essenceProfileId: null, createdAt: { [Op.lte]: REQUIRED_TIME } },
-    });
-    for (const file of files) {
-      this.deleteFile(file.fileName);
+    try {
+      const files = await this.dbFilesRepository.findAll({
+        where: {
+          essenceProfileId: null,
+          createdAt: { [Op.lte]: REQUIRED_TIME },
+        },
+      });
+      for (const file of files) {
+        this.deleteFile(file.fileName);
+      }
+    } catch (e) {
+      console.log(`[FILES][SERVICE][CLEAN] ${e}`);
+      throw new HttpRpcException(
+        'Ошибка при очистке файлов',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     return true;
   }
 
   async deleteFile(fileName: string) {
-    const filePath = path.join(this.uploadPath, fileName);
-    fs.unlinkSync(filePath);
-    const file = await this.dbFilesRepository.findOne({
-      where: { path2File: filePath },
-    });
-    await file.destroy();
-    return `File ${fileName} deleted`; // for testing with postman
+    try {
+      const filePath = path.join(this.uploadPath, fileName);
+      fs.unlinkSync(filePath);
+      const file = await this.dbFilesRepository.findOne({
+        where: { path2File: filePath },
+      });
+      await file.destroy();
+    } catch (e) {
+      console.log(`[FILES][SERVICE][DELETE] ${e}`);
+      throw new HttpRpcException(
+        'Ошибка при удалении файлов',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

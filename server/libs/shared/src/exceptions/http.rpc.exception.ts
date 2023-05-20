@@ -1,10 +1,10 @@
-import { RpcException } from "@nestjs/microservices";
+import { RpcException } from '@nestjs/microservices';
 
 export class HttpRpcException extends RpcException {
-    statusCode: number;
+  statusCode: number;
 
-    constructor(response: string, statusCode: number) {
-        super(response);
-        this.statusCode = statusCode;
-    }
+  constructor(response: string, statusCode: number) {
+    super(response);
+    this.statusCode = statusCode;
+  }
 }

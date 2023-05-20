@@ -14,6 +14,7 @@ import { validateRefresh } from './validators/token.validator';
 
 import * as cookieParser from 'cookie-parser';
 import { socialPool } from './dbPools/socialDb';
+import { SharedModule } from '@shared';
 
 // ДОБАВИТЬ ТЕСТЫ!!!
 
@@ -254,9 +255,7 @@ describe('Access e2e', () => {
           expect(resp).toHaveProperty('text');
           const body = JSON.parse(resp.text);
           expect(body).toHaveProperty('error');
-          expect(body.error).toBe(
-            'Ошибка при создании роли (роль уже существует)',
-          );
+          expect(body.error).toBe('Ошибка при создании роли');
         });
     });
 

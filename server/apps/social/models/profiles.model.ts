@@ -21,10 +21,6 @@ export class Profile extends Model<ProfileAttrs, ProfileCreationAttrs> {
   })
   id: number;
 
-  // @ApiProperty({ example: 'dsgserEEgsdg', description: 'Внутренний id профиля пользователя' })
-  // @Column({ type: DataType.STRING })
-  // uuid: string;
-
   @ApiProperty({ example: 'Ubivashka666', description: 'Имя пользователя' })
   @Column({ type: DataType.STRING })
   username: string;

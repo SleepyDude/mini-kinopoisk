@@ -1,9 +1,9 @@
 import { RpcException } from '@nestjs/microservices';
 import { getModelToken } from '@nestjs/sequelize';
 import { Test } from '@nestjs/testing';
-import { RolesService } from '../roles/roles.service';
-import { UsersService } from './users.service';
-import { User } from '../../models/users.model';
+import { RolesService } from '../src/roles/roles.service';
+import { UsersService } from '../src/users/users.service';
+import { User } from '../models/users.model';
 
 const role9Model = () => ({
   id: 9,

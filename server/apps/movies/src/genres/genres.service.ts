@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Genres } from './genres.model';
 import { GenresFilms } from './genres.m2m.model';
-import { UpdateGenreDto } from './dto/update.genre.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { GenresUpdateInterface, HttpRpcException } from '@shared';
+import { UpdateGenreDto } from '@shared/dto';
 
 @Injectable()
 export class GenresService {
@@ -14,7 +15,7 @@ export class GenresService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getGenreById(genreId: number) {
+  async getGenreById(genreId: number): Promise<any> {
     const cache = await this.cacheManager.get(
       `getGenreById${JSON.stringify(genreId)}`,
     );
@@ -24,6 +25,12 @@ export class GenresService {
     return await this.genresRepository
       .findOne({ where: { id: genreId } })
       .then(async (result) => {
+        if (!result) {
+          return new HttpException(
+            'Айди не зарегистрирован',
+            HttpStatus.NOT_FOUND,
+          );
+        }
         await this.cacheManager.set(
           `getGenreById${JSON.stringify(genreId)}`,
           result,
@@ -32,7 +39,7 @@ export class GenresService {
       });
   }
 
-  async getAllGenres() {
+  async getAllGenres(): Promise<any> {
     const cache = await this.cacheManager.get(`getAllGenres`);
     if (cache) {
       return cache;
@@ -44,24 +51,45 @@ export class GenresService {
         },
       })
       .then(async (result) => {
+        if (!result) {
+          throw new HttpRpcException(
+            'Что то пошло не так',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
         await this.cacheManager.set(`getAllGenres`, result);
         return result;
       });
   }
 
-  async updateGenreById(genre) {
+  async updateGenreById(genre: GenresUpdateInterface): Promise<any> {
     const genreDto: UpdateGenreDto = genre.genre;
     const currentGenre = await this.genresRepository.findOne({
       where: { id: genre.id },
     });
+    if (!currentGenre) {
+      throw new HttpRpcException(
+        'Не удалось найти жанр по айди',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     await currentGenre.update(genreDto);
     return currentGenre;
   }
 
-  async deleteGenreById(id) {
-    const currentGenre = await this.genresRepository.findOne({
-      where: id,
-    });
-    return currentGenre.destroy();
+  async deleteGenreById(genreId: number) {
+    return await this.genresRepository
+      .destroy({
+        where: { id: genreId },
+      })
+      .then((result) => {
+        if (result) {
+          return true;
+        }
+        throw new HttpRpcException(
+          'Жанр с таким айди не найден',
+          HttpStatus.BAD_REQUEST,
+        );
+      });
   }
 }

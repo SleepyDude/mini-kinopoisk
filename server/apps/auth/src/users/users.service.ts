@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesService } from '../roles/roles.service';
-import { RpcException } from '@nestjs/microservices';
 import { User } from '../../models/users.model';
 import { HttpRpcException } from '@shared';
 import { AddRoleDto, AddRoleDtoEmail, CreateUserDto } from '@shared/dto';
@@ -15,27 +14,32 @@ export class UsersService {
 
   async createUser(dto: CreateUserDto): Promise<User> {
     const role = await this.roleService.getRoleByName('USER');
-    // console.log(`test get role: ${JSON.stringify(role)}`);
 
     if (role === null) {
       throw new HttpRpcException(
         "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
-        HttpStatus.I_AM_A_TEAPOT,
+        HttpStatus.FAILED_DEPENDENCY,
       );
     }
 
     const candidate = await this.getUserByEmail(dto.email);
     if (candidate) {
-      throw new RpcException('Пользователь уже существует');
+      throw new HttpRpcException(
+        `Пользователь с таким e-mail уже существует`,
+        HttpStatus.CONFLICT,
+      );
     }
 
     try {
       const user = await this.userRepository.create(dto);
-      await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+      await user.$set('roles', [role.id]);
       user.roles = [role];
       return user;
     } catch (e) {
-      throw new RpcException('Ошибка при создании пользователя');
+      throw new HttpRpcException(
+        'Ошибка при создании пользователя',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -115,7 +119,6 @@ export class UsersService {
         'Вы не можете присвоить роль с правами большими или равными Вашим',
         HttpStatus.FORBIDDEN,
       );
-      // throw new RpcException('Вы не можете присвоить роль с правами большими или равными Вашим');
     }
 
     if (role && user) {
