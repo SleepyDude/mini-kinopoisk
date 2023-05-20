@@ -8,6 +8,7 @@ import { HttpService } from '@nestjs/axios';
 import { DatabaseFile } from '../../models/files.model';
 import { AvatarPathId } from '@shared/dto';
 import { HttpRpcException } from '@shared';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class DatabaseFilesService {
@@ -20,12 +21,12 @@ export class DatabaseFilesService {
 
   async uploadAvatarByLink(link: string): Promise<AvatarPathId> {
     try {
-      const avatar = await this.http
-        .get(link, {
+      const avatar = await firstValueFrom(
+        this.http.get(link, {
           responseType: 'text',
           responseEncoding: 'base64',
-        })
-        .toPromise();
+        }),
+      );
       const { avatarId, path2File } = await this.uploadAvatar(
         Buffer.from(avatar.data, 'base64'),
       );

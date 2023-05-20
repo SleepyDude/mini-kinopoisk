@@ -22,11 +22,11 @@ export class VkService {
   ) {}
 
   async getUserDataFromVk(userId: number, token: string): Promise<any> {
-    return this.http
-      .get(
+    return firstValueFrom(
+      this.http.get(
         `https://api.vk.com/method/users.get?user_ids=${userId}&fields=photo_400,has_mobile,home_town,contacts,mobile_phone&access_token=${token}&v=5.120`,
-      )
-      .toPromise();
+      ),
+    );
   }
 
   async getVkToken(code: string): Promise<any> {
@@ -38,11 +38,11 @@ export class VkService {
     const host = process.env.HOST;
     const redirectLink = process.env.REDIRECT_LINK;
 
-    return this.http
-      .get(
+    return firstValueFrom(
+      this.http.get(
         `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}${redirectLink}&code=${code}`,
-      )
-      .toPromise();
+      ),
+    );
   }
 
   async loginVk(auth: AuthVKDto) {

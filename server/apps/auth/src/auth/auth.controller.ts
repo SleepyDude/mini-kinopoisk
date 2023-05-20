@@ -7,7 +7,6 @@ import { ExceptionFilter } from '../rpc-exception.filter';
 import { InitService } from '../init/init.service';
 import { GoogleService } from '../google/google.service';
 import { AuthVKDto, CreateUserDto } from '@shared/dto';
-import { TokenId } from '@shared/interfaces';
 
 @UseFilters(ExceptionFilter)
 @Controller('auth')
