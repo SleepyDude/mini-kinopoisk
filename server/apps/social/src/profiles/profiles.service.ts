@@ -18,7 +18,6 @@ export class ProfilesService {
   ) {}
 
   async createProfile(dto: CreateProfileDto): Promise<Profile> {
-    // console.log(`[dto] == ${JSON.stringify(dto)}`)
     let { username } = dto;
     if (!username) {
       username = generateUsername();

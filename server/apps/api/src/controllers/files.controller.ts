@@ -20,10 +20,10 @@ import {
 } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
-import { initRoles } from '../guards/init.roles';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
+import { initRoles } from '@shared';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с файлами')

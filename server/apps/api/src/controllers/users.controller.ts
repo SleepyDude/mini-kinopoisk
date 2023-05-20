@@ -15,7 +15,6 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserPermission } from '../decorators/user-permission.decorator';
@@ -23,7 +22,7 @@ import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
-import { initRoles } from '../guards/init.roles';
+import { initRoles } from '@shared';
 import { UserData } from '../decorators/user-data.decorator';
 import { RolePublic, UserPublic } from '@shared/interfaces';
 import { AddRoleDtoEmail } from '@shared/dto';

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   HttpStatus,
   Inject,
   Injectable,
@@ -30,7 +29,7 @@ export class VkService {
   }
 
   async getVkToken(code: string): Promise<any> {
-    const VKDATA = {
+    const vkData = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
     };
@@ -40,7 +39,7 @@ export class VkService {
 
     return firstValueFrom(
       this.http.get(
-        `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${host}${redirectLink}&code=${code}`,
+        `https://oauth.vk.com/access_token?client_id=${vkData.client_id}&client_secret=${vkData.client_secret}&redirect_uri=${host}${redirectLink}&code=${code}`,
       ),
     );
   }

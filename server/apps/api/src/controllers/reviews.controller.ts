@@ -34,7 +34,7 @@ import {
 } from '@shared/dto';
 import { CustomHttpExceptionResponse } from '../filters/http.exceptions.response.interface';
 import { RoleAccess } from '../guards/roles.decorator';
-import { initRoles } from '../guards/init.roles';
+import { initRoles } from '@shared';
 import { firstValueFrom } from 'rxjs';
 
 @UseFilters(AllExceptionsFilter)

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ReviewsController } from './reviews.controller';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Review } from '../../models/reviews.model';
 
 @Module({

@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
-import { ClientsModule } from '@nestjs/microservices';
-import { Transport } from '@nestjs/microservices';
 import { PersonsController } from './controllers/persons.controller';
 import { MoviesController } from './controllers/movies.controller';
 import { AuthController } from './controllers/auth.controller';

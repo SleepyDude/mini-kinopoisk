@@ -40,7 +40,6 @@ export class RolesService {
   async deleteByName(name: string, userPerm = Infinity) {
     const role = await this.roleRepository.findOne({ where: { name } });
     if (role) {
-      // Проверим, что пользователь вправе удалить роль
       if (userPerm <= role.value) {
         throw new HttpRpcException('Недостаточно прав', HttpStatus.FORBIDDEN);
       }

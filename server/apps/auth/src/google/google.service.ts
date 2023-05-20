@@ -23,7 +23,6 @@ export class GoogleService {
       ticketPayload.family_name,
     ];
     let candidate = await this.userService.getUserByEmail(email);
-    // console.log(`[ID] == ${candidate.id}`)
     if (!candidate) {
       candidate = await this.userService.createUser({
         email: email,
@@ -36,7 +35,6 @@ export class GoogleService {
         ),
       );
 
-      //create profile with firstName and lastName
       const profileData = {
         userId: candidate.id,
         name: firstName,
@@ -44,7 +42,6 @@ export class GoogleService {
         avatarId: avatarId,
       };
 
-      // console.log(JSON.stringify(profileData))
       await firstValueFrom(
         this.socialService.send({ cmd: 'create-profile' }, profileData),
       );

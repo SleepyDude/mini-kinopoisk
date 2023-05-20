@@ -24,7 +24,7 @@ import {
 
 import { RolesGuard } from '../guards/roles.guard';
 import { RoleAccess } from '../guards/roles.decorator';
-import { initRoles } from '../guards/init.roles';
+import { initRoles } from '@shared';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 

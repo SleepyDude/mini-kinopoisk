@@ -8,7 +8,6 @@ import { VkService } from '../vk/vk.service';
 import { HttpModule } from '@nestjs/axios';
 import { RolesModule } from '../roles/roles.module';
 import { GoogleService } from '../google/google.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SharedModule } from '@shared';
 
 @Module({
@@ -20,17 +19,6 @@ import { SharedModule } from '@shared';
     RolesModule,
     HttpModule,
     SharedModule.registerRmq('SOCIAL-SERVICE', process.env.SOCIAL_QUEUE),
-    // ClientsModule.register([
-    //   {
-    //     name: 'SOCIAL-SERVICE',
-    //     transport: Transport.RMQ,
-    //     options: {
-    //       urls: [process.env.CLOUDAMQP_URL],
-    //       queue: process.env.SOCIAL_QUEUE,
-    //       queueOptions: { durable: false },
-    //     },
-    //   },
-    // ]),
   ],
   exports: [AuthService],
 })

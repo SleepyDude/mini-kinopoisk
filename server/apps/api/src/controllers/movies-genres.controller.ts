@@ -17,8 +17,8 @@ import { UpdateGenreDto } from '@shared/dto';
 
 import { RolesGuard } from '../guards/roles.guard';
 import { RoleAccess } from '../guards/roles.decorator';
-import { initRoles } from '../guards/init.roles';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
+import { initRoles } from '@shared';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Фильмы-жанры')

@@ -25,7 +25,7 @@ import { AvatarId, AvatarPathId, UpdateProfileDto } from '@shared/dto';
 import { ProfilePublic } from '@shared/interfaces';
 import { RolesGuard } from '../guards/roles.guard';
 import { RoleAccess } from '../guards/roles.decorator';
-import { initRoles } from '../guards/init.roles';
+import { initRoles } from '@shared';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { firstValueFrom } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';

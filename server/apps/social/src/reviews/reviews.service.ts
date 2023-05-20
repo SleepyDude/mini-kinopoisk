@@ -9,9 +9,7 @@ import { Review } from '../../models/reviews.model';
 
 @Injectable()
 export class ReviewsService {
-  constructor(
-    @InjectModel(Review) private reviewsRepository: typeof Review, // private sequelize: Sequelize, // @InjectModel(Films) private filmsRepository: typeof Films,
-  ) {}
+  constructor(@InjectModel(Review) private reviewsRepository: typeof Review) {}
 
   async createReview(dto: CreateReviewDto, userId: number) {
     const { parentId } = dto;
@@ -40,7 +38,7 @@ export class ReviewsService {
     }
 
     const review = await this.reviewsRepository.create({
-      profileId: userId, // Пока у нас инты, то id профиля и юзера равны
+      profileId: userId,
       ...dto,
       path: parentPath,
       childsNum: 0,
@@ -48,7 +46,7 @@ export class ReviewsService {
     });
 
     if (parent) {
-      parent.set('childsNum', parent.childsNum + 1); // Добавить после обновления модели
+      parent.set('childsNum', parent.childsNum + 1);
       await parent.save();
     }
 
@@ -74,9 +72,6 @@ export class ReviewsService {
   }
 
   private async collapseTree(reviews: Review[], findOne = false) {
-    // console.log(
-    //   `collapse tree reviews: ${JSON.stringify(reviews, undefined, 2)}`,
-    // );
     let i = 0;
     const roots = [];
     const reviewStack = [];
@@ -94,11 +89,8 @@ export class ReviewsService {
 
     reviewStack.reverse();
 
-    // console.log(`start reviewStack = ${reviewStack}`);
-
     while (true) {
       if (i === reviews.length) break;
-      // Достаем очередное значение review из списка
       const review = new ReviewTreeDto(reviews[i]);
 
       if (reviewStack[reviewStack.length - 1].id === review.parentId) {
@@ -106,13 +98,10 @@ export class ReviewsService {
         i += 1;
       } else {
         const fullParent = reviewStack.pop();
-        // Его дети могут также иметь детей, заносим их в стек в обратном порядке
         for (let j = fullParent.childs.length - 1; j >= 0; j--) {
           reviewStack.push(fullParent.childs[j]);
         }
-        // Скипаем сверху тех из них, которые не являются родителем текущему или пока стек не опустеет
         while (
-          // reviewStack.length &&
           reviewStack[reviewStack.length - 1].id !== review.parentId
         ) {
           reviewStack.pop();
@@ -125,11 +114,6 @@ export class ReviewsService {
   }
 
   async getReviewByReviewIdTree(reviewId: number, depth: number) {
-    // console.log(
-    //   `\n\n[reviews.service][gerReviewTree] reviewId: ${JSON.stringify(
-    //     reviewId,
-    //   )}\n\n`,
-    // );
     const parentReview = await this.reviewsRepository.findByPk(reviewId, {
       include: {
         model: Profile,
@@ -157,18 +141,10 @@ export class ReviewsService {
     };
 
     if (depth !== undefined) {
-      // console.log(`depth != undef: ${depth}`);
       whereOptions.depth = {
         [Op.lte]: parentReview.depth + +depth,
       };
     }
-
-    // console.log(`where options: ${JSON.stringify(whereOptions)}`);
-    // console.log(
-    //   `whereOptions.depth [Op.lte]: ${JSON.stringify(
-    //     parentReview.depth + +depth,
-    //   )}`,
-    // );
 
     const reviews = await this.reviewsRepository.findAll({
       where: whereOptions,
@@ -253,9 +229,7 @@ export class ReviewsService {
     }
 
     const reviews = await this.reviewsRepository.findAndCountAll(findOptions);
-    // const rows = this.collapseTree(reviews.rows);
     return reviews;
-    // return { rows: rows, count: reviews.count };
   }
 
   async getReviewsByProfileId(profileId: number) {

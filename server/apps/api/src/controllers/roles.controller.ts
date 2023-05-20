@@ -27,7 +27,7 @@ import { UserPermission } from '../decorators/user-permission.decorator';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { RoleAccess } from '../guards/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
-import { initRoles } from '../guards/init.roles';
+import { initRoles } from '@shared';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { CreateRoleDto, UpdateRoleDto } from '@shared/dto';
 import { RolePublic } from '@shared/interfaces';

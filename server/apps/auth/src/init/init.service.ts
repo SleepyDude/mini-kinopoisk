@@ -1,8 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { initRoles } from './init.roles';
 import { RolesService } from '../roles/roles.service';
 import { UsersService } from '../users/users.service';
-import { HttpRpcException } from '@shared';
+import { HttpRpcException, initRoles } from '@shared';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()

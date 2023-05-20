@@ -30,7 +30,6 @@ export class ProfilesController {
 
   @MessagePattern({ cmd: 'get-profile-by-user-id' })
   async getProfileByUserId(@Payload() id: number) {
-    // console.log(`[social][profiles.controller][get-profile-by-id] id: ${id}`);
     return this.profilesService.getProfileByUserId(id);
   }
 

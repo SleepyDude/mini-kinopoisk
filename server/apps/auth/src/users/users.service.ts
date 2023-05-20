@@ -14,7 +14,6 @@ export class UsersService {
 
   async createUser(dto: CreateUserDto): Promise<User> {
     const role = await this.roleService.getRoleByName('USER');
-    // console.log(`test get role: ${JSON.stringify(role)}`);
 
     if (role === null) {
       throw new HttpRpcException(
@@ -33,7 +32,7 @@ export class UsersService {
 
     try {
       const user = await this.userRepository.create(dto);
-      await user.$set('roles', [role.id]); // $set позволяет изменить объект и сразу обновить его в базе
+      await user.$set('roles', [role.id]);
       user.roles = [role];
       return user;
     } catch (e) {
@@ -120,7 +119,6 @@ export class UsersService {
         'Вы не можете присвоить роль с правами большими или равными Вашим',
         HttpStatus.FORBIDDEN,
       );
-      // throw new RpcException('Вы не можете присвоить роль с правами большими или равными Вашим');
     }
 
     if (role && user) {

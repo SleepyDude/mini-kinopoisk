@@ -9,16 +9,6 @@ import { SharedModule } from '@shared';
 @Module({
   imports: [
     SharedModule.registerDatabase(process.env.POSTGRES_USERS_DB),
-    // SequelizeModule.forRoot({
-    //   dialect: 'postgres',
-    //   host: process.env.POSTGRES_HOST,
-    //   port: Number(process.env.POSTGRES_PORT_INSIDE),
-    //   username: process.env.POSTGRES_USER,
-    //   password: process.env.POSTGRES_PASSWORD,
-    //   database: process.env.POSTGRES_USERS_DB,
-    //   models: [],
-    //   autoLoadModels: true,
-    // }),
     AuthModule,
     TokensModule,
     RolesModule,
