@@ -192,7 +192,7 @@ export class FilmsService {
           .findAndCountAll(queryDatabaseParams)
           .then(async (result) => {
             await this.cacheManager.set(
-              `getFilmsByFilers${JSON.stringify(params)}`,
+              `getFilmsByFilers${JSON.stringify(sortCacheKey)}`,
               result,
             );
             return result;
