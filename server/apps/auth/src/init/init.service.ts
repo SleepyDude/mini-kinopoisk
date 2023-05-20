@@ -14,7 +14,6 @@ export class InitService {
   ) {}
 
   async createAdminAndRoles(): Promise<boolean> {
-    // Метод должен быть вызван только единожды, поэтому проверяем, есть ли уже роль OWNER и как следствие главный админ
     const ownerRole = await this.roleService.getRoleByName('OWNER');
     if (ownerRole) {
       throw new HttpRpcException(
@@ -23,7 +22,6 @@ export class InitService {
       );
     }
 
-    // Проверка на наличие переменных окружения
     if (
       process.env.OWNER_MAIL === undefined ||
       process.env.OWNER_PASSWORD === undefined
@@ -34,20 +32,15 @@ export class InitService {
       );
     }
 
-    // Создаём 3 базовые роли - USER, ADMIN и OWNER
     await this.roleService.createRole(initRoles['ADMIN']);
     await this.roleService.createRole(initRoles['OWNER']);
     await this.roleService.createRole(initRoles['USER']);
 
-    // Зарегистрируем владельца ресурса
     await this.authService.registration({
       email: process.env.OWNER_MAIL,
       password: process.env.OWNER_PASSWORD,
     });
-    // const hashedPassword = await bcrypt.hash( process.env.OWNER_PASSWORD, +process.env.SALT );
-    // const tokens = await this.userService.createUser({email: process.env.OWNER_MAIL, password: hashedPassword});
 
-    // Присвоим владельцу ресурса соответствующую роль
     await this.userService.addRoleByEmail({
       email: process.env.OWNER_MAIL,
       roleName: initRoles.OWNER.name,

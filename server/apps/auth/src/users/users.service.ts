@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesService } from '../roles/roles.service';
-import { RpcException } from '@nestjs/microservices';
 import { User } from '../../models/users.model';
 import { HttpRpcException } from '@shared';
 import { AddRoleDto, AddRoleDtoEmail, CreateUserDto } from '@shared/dto';
@@ -20,13 +19,16 @@ export class UsersService {
     if (role === null) {
       throw new HttpRpcException(
         "Роль 'USER' не найдена, необходимо выполнение инициализации ресурса",
-        HttpStatus.I_AM_A_TEAPOT,
+        HttpStatus.FAILED_DEPENDENCY,
       );
     }
 
     const candidate = await this.getUserByEmail(dto.email);
     if (candidate) {
-      throw new RpcException('Пользователь уже существует');
+      throw new HttpRpcException(
+        `Пользователь с таким e-mail уже существует`,
+        HttpStatus.CONFLICT,
+      );
     }
 
     try {
@@ -35,7 +37,10 @@ export class UsersService {
       user.roles = [role];
       return user;
     } catch (e) {
-      throw new RpcException('Ошибка при создании пользователя');
+      throw new HttpRpcException(
+        'Ошибка при создании пользователя',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 

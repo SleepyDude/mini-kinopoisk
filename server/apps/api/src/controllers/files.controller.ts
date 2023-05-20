@@ -12,7 +12,12 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { initRoles } from '../guards/init.roles';
@@ -31,7 +36,11 @@ export class FilesController {
   @ApiOperation({
     summary: `Удалить файлы неиспользующиеся более ${process.env.REQ_TIME} милисекунд`,
   })
-  @ApiResponse({ status: 201, type: Boolean })
+  @ApiResponse({ status: 201, type: Boolean, description: 'Успешный запрос' })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при очистке файлов',
+  })
   @Delete('clean')
   async cleanFiles(): Promise<boolean> {
     return await firstValueFrom(
@@ -45,7 +54,11 @@ export class FilesController {
   @ApiResponse({
     status: 201,
     type: AvatarPathId,
-    description: 'Внутренний id файла в БД и путь к файлу на сервере',
+    description: 'Успешный запрос',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при записи файла',
   })
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload_avatar')
@@ -62,7 +75,11 @@ export class FilesController {
   @ApiResponse({
     status: 201,
     type: AvatarPathId,
-    description: 'Внутренний id файла в БД и путь к файлу на сервере',
+    description: 'Успешный запрос',
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Ошибка при записи файла',
   })
   @Post('upload_avatar_by_link')
   async uploadAvatarByLink(
