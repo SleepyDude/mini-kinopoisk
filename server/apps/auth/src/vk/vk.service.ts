@@ -1,8 +1,4 @@
-import {
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from '../users/users.service';

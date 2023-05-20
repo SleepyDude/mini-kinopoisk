@@ -101,9 +101,7 @@ export class ReviewsService {
         for (let j = fullParent.childs.length - 1; j >= 0; j--) {
           reviewStack.push(fullParent.childs[j]);
         }
-        while (
-          reviewStack[reviewStack.length - 1].id !== review.parentId
-        ) {
+        while (reviewStack[reviewStack.length - 1].id !== review.parentId) {
           reviewStack.pop();
         }
       }

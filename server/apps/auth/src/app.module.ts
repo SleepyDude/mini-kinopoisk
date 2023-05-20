@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthModule } from './auth/auth.module';
 import { TokensModule } from './tokens/tokens.module';
 import { RolesModule } from './roles/roles.module';

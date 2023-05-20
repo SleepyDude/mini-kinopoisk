@@ -12,7 +12,7 @@ import { validate } from 'class-validator';
 export class DtoValidationPipe implements PipeTransform<any> {
   async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
 
-    const obj = plainToClass(metadata.metatype, value); // Получаем объект, который будем валидировать
+    const obj = plainToClass(metadata.metatype, value);
     const errors = await validate(obj);
 
     if (errors.length) {
