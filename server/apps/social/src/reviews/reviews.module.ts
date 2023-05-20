@@ -8,19 +8,6 @@ import { Review } from '../../models/reviews.model';
 @Module({
   controllers: [ReviewsController],
   providers: [ReviewsService],
-  imports: [
-    SequelizeModule.forFeature([Review]),
-    // ClientsModule.register([
-    //   {
-    //     name: 'REVIEWS-SERVICE',
-    //     transport: Transport.RMQ,
-    //     options: {
-    //       urls: [process.env.CLOUDAMQP_URL],
-    //       queue: process.env.AUTH_QUEUE,
-    //       queueOptions: { durable: false },
-    //     },
-    //   },
-    // ]),
-  ],
+  imports: [SequelizeModule.forFeature([Review])],
 })
 export class ReviewsModule {}

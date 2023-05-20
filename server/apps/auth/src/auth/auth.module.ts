@@ -9,6 +9,7 @@ import { HttpModule } from '@nestjs/axios';
 import { RolesModule } from '../roles/roles.module';
 import { GoogleService } from '../google/google.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { SharedModule } from '@shared';
 
 @Module({
   controllers: [AuthController],
@@ -18,17 +19,18 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     UsersModule,
     RolesModule,
     HttpModule,
-    ClientsModule.register([
-      {
-        name: 'SOCIAL-SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.CLOUDAMQP_URL],
-          queue: process.env.SOCIAL_QUEUE,
-          queueOptions: { durable: false },
-        },
-      },
-    ]),
+    SharedModule.registerRmq('SOCIAL-SERVICE', process.env.SOCIAL_QUEUE),
+    // ClientsModule.register([
+    //   {
+    //     name: 'SOCIAL-SERVICE',
+    //     transport: Transport.RMQ,
+    //     options: {
+    //       urls: [process.env.CLOUDAMQP_URL],
+    //       queue: process.env.SOCIAL_QUEUE,
+    //       queueOptions: { durable: false },
+    //     },
+    //   },
+    // ]),
   ],
   exports: [AuthService],
 })

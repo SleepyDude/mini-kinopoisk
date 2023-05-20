@@ -14,6 +14,7 @@ import { validateRefresh } from './validators/token.validator';
 
 import * as cookieParser from 'cookie-parser';
 import { socialPool } from './dbPools/socialDb';
+import { SharedModule } from '@shared';
 
 // ДОБАВИТЬ ТЕСТЫ!!!
 
