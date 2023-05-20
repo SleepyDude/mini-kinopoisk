@@ -70,9 +70,11 @@ export class ReviewsController {
     type: ReviewPublic,
     description: 'Отзыв без потомков с данными профиля',
   })
+
   @ApiNotFoundResponse({
     description: 'Отзыв по данному id не найден',
   })
+
   @Get('single/:reviewId')
   async getReviewByReviewId(@Param('reviewId', ParseIntPipe) reviewId: number) {
     return this.socialService.send(
@@ -89,9 +91,11 @@ export class ReviewsController {
     type: ReviewTreePublic,
     description: 'Древовидная структура отзывов и их детей',
   })
+
   @ApiNotFoundResponse({
     description: 'Корневой отзыв по данному id не найден',
   })
+
   @Get('tree/:reviewId')
   async getReviewTreeByReviewId(
     @Param('reviewId', ParseIntPipe) reviewId: number,
@@ -146,6 +150,7 @@ export class ReviewsController {
       { filmId, paginationQueryDto },
     );
   }
+
 
   @UseGuards(RolesGuard)
   @RoleAccess(initRoles.ADMIN.value)
