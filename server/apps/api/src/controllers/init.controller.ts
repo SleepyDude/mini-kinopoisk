@@ -9,6 +9,7 @@ import {
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { ClientProxy } from '@nestjs/microservices';
 
+@UseFilters(AllExceptionsFilter)
 @ApiTags('Инициализация приложения')
 @Controller('init')
 export class InitController {
