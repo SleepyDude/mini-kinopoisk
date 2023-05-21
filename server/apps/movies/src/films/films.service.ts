@@ -27,7 +27,7 @@ import {
   includeOneFilmAttributes,
   oneFilmAttributes,
   previousFilmsAttributes,
-} from './templates/query-database.template';
+} from './templates/films.query-database.template';
 
 @Injectable()
 export class FilmsService {
