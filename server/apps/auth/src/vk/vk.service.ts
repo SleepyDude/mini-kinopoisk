@@ -25,17 +25,17 @@ export class VkService {
   }
 
   async getVkToken(code: string): Promise<any> {
-    const vkData = {
+    const VKDATA = {
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
     };
 
-    const host = process.env.HOST;
-    const redirectLink = process.env.REDIRECT_LINK;
+    const HOST = process.env.HOST;
+    const REDIRECT_LINK = process.env.REDIRECT_LINK;
 
     return firstValueFrom(
       this.http.get(
-        `https://oauth.vk.com/access_token?client_id=${vkData.client_id}&client_secret=${vkData.client_secret}&redirect_uri=${host}${redirectLink}&code=${code}`,
+        `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${HOST}${REDIRECT_LINK}&code=${code}`,
       ),
     );
   }
