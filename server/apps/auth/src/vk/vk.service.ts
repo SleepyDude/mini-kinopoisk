@@ -88,19 +88,25 @@ export class VkService {
 
     try {
       const user = await this.userService.createUser({ ...userData });
-
-      const avatarData = await firstValueFrom(
-        this.socialService.send(
-          { cmd: 'upload-avatar-by-link' },
-          profileFromVk.photo_400,
-        ),
+      console.log(
+        `[VK SERVICE] ${JSON.stringify(user)}, ${profileFromVk.photo_400}`,
       );
+
+      let avatarData;
+      if (profileFromVk.photo_400) {
+        avatarData = await firstValueFrom(
+          this.socialService.send(
+            { cmd: 'upload-avatar-by-link' },
+            profileFromVk.photo_400,
+          ),
+        );
+      }
 
       const profileData = {
         userId: user.id,
         name: profileFromVk.first_name,
         lastName: profileFromVk.last_name,
-        avatarId: avatarData.avatarId,
+        avatarId: avatarData ? avatarData.avatarId : null,
       };
 
       await firstValueFrom(

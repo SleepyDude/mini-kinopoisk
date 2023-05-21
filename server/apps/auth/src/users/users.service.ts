@@ -4,6 +4,7 @@ import { RolesService } from '../roles/roles.service';
 import { User } from '../../models/users.model';
 import { HttpRpcException } from '@shared';
 import { AddRoleDto, AddRoleDtoEmail, CreateUserDto } from '@shared/dto';
+import { CreateUserVkDto } from '@shared/dto/users/create-user-vk.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +13,7 @@ export class UsersService {
     private readonly roleService: RolesService,
   ) {}
 
-  async createUser(dto: CreateUserDto): Promise<User> {
+  async createUser(dto: CreateUserDto | CreateUserVkDto): Promise<User> {
     const role = await this.roleService.getRoleByName('USER');
 
     if (role === null) {

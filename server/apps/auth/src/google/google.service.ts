@@ -36,18 +36,22 @@ export class GoogleService {
       email: email,
       password: null,
     });
-    const avatarData = await firstValueFrom(
-      this.socialService.send(
-        { cmd: 'upload-avatar-by-link' },
-        ticketPayload.picture,
-      ),
-    );
+
+    let avatarData;
+    if (ticketPayload.picture) {
+      avatarData = await firstValueFrom(
+        this.socialService.send(
+          { cmd: 'upload-avatar-by-link' },
+          ticketPayload.picture,
+        ),
+      );
+    }
 
     const profileData = {
       userId: candidate.id,
       name: firstName,
       lastName: lastName,
-      avatarId: avatarData.avatarId,
+      avatarId: avatarData ? avatarData.avatarId : null,
     };
 
     await firstValueFrom(
