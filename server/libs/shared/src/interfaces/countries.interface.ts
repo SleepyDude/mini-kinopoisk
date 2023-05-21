@@ -1,6 +1,6 @@
 import { UpdateCountryDto } from '@shared/dto';
 
-export interface CountriesUpdateInterface {
+export interface ICountriesUpdate {
   id: number;
   country: UpdateCountryDto;
 }

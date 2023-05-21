@@ -6,7 +6,7 @@ import {
   MoviesQueryAutosagestDto,
   MoviesQueryDto,
 } from '@shared/dto';
-import { MoviesUpdateFilmWithFilmIdDto } from '@shared';
+import { IMoviesUpdateFilmWithFilmId } from '@shared';
 
 @Controller('films')
 export class FilmsController {
@@ -38,7 +38,7 @@ export class FilmsController {
   }
 
   @MessagePattern({ cmd: 'update-film-byId' })
-  async updateFilmById(@Payload() film: MoviesUpdateFilmWithFilmIdDto) {
+  async updateFilmById(@Payload() film: IMoviesUpdateFilmWithFilmId) {
     return await this.filmsService.updateFilmById(film);
   }
 

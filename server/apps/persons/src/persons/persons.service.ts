@@ -1,14 +1,11 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { HttpRpcException, Persons, PersonsFilms } from '@shared';
 import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
-import {
-  GetStaffByFilmIdInterface,
-  PaginationInterface,
-} from '@shared/interfaces';
+import { IGetStaffByFilmId, IPagination } from '@shared/interfaces';
 
 @Injectable()
 export class PersonsService {
@@ -23,21 +20,22 @@ export class PersonsService {
     const cache = await this.cacheManager.get(
       `getPersonById${JSON.stringify(personId)}`,
     );
-    if (cache) {
-      return cache;
-    }
+    if (cache) return cache;
+
     const person: Persons = await this.personsRepository.findOne({
       attributes: {
         exclude: ['createdAt', 'updatedAt'],
       },
       where: { personId: personId },
     });
+
     if (!person) {
       throw new HttpRpcException(
         'Такой айди не зарегистрирован',
         HttpStatus.NOT_FOUND,
       );
     }
+
     const filmsId: PersonsFilms[] = await this.personsFilmsRepository.findAll({
       attributes: [['filmId', 'id']],
       where: { staffId: personId },
@@ -46,6 +44,7 @@ export class PersonsService {
       filmsId: filmsId,
       person: person,
     });
+
     return {
       filmsId: filmsId,
       person: person,
@@ -54,85 +53,88 @@ export class PersonsService {
 
   async getAllPersons(params: PersonsQueryDto): Promise<any> {
     const cache = await this.cacheManager.get(
-      `getAllPersons${JSON.stringify(params)}`,
+      `getAllPersons${JSON.stringify(this.sortForCacheKey(params))}`,
     );
-    if (cache) {
-      return cache;
-    }
+    if (cache) return cache;
+
     const { page, size, name } = params;
     const condition = name ? { nameRu: { [Op.iLike]: `%${name}%` } } : null;
     const { limit, offset } = this.getPagination(page, size);
-    try {
-      return await this.personsRepository
-        .findAndCountAll({
-          where: condition,
-          limit,
-          offset,
-        })
-        .then(async (result) => {
-          await this.cacheManager.set(
-            `getAllPersons${JSON.stringify(params)}`,
-            result,
-          );
-          return result;
-        });
-    } catch (e) {
-      throw new HttpRpcException(
-        'Что то пошло не так',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
 
-  async getPersonsAutosagest(params: PersonsAutosagestDto): Promise<any> {
-    const cache = await this.cacheManager.get(
-      `getPersonsAutosagest${JSON.stringify(params)}`,
-    );
-    if (cache) {
-      return cache;
-    }
-    const { profession, name, size = 10 } = params;
-    return await this.personsRepository
-      .findAndCountAll({
-        attributes: ['personId', 'nameRu'],
-        where: {
-          [Op.and]: [
-            { profession: { [Op.iLike]: `%${profession}%` } },
-            { nameRu: { [Op.iLike]: `%${name}%` } },
-          ],
-        },
-        limit: size,
-        order: ['nameRu'],
-      })
-      .then(async (result) => {
-        await this.cacheManager.set(
-          `getPersonsAutosagest${JSON.stringify(params)}`,
-          result,
-        );
-        return result;
-      })
+    const queryDatabaseParams: Omit<FindAndCountOptions<Persons>, 'group'> = {
+      where: condition,
+      limit,
+      offset,
+    };
+
+    const allPersons = await this.personsRepository
+      .findAndCountAll(queryDatabaseParams)
       .catch(() => {
         throw new HttpRpcException(
           'Что то пошло не так',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
+
+    await this.cacheManager.set(
+      `getAllPersons${JSON.stringify(this.sortForCacheKey(params))}`,
+      allPersons,
+    );
+
+    return allPersons;
   }
 
-  async getStaffByFilmId(params: GetStaffByFilmIdInterface): Promise<any> {
+  async getPersonsAutosagest(params: PersonsAutosagestDto): Promise<any> {
     const cache = await this.cacheManager.get(
-      `getStaffByFilmId${JSON.stringify(params)}`,
+      `getPersonsAutosagest${JSON.stringify(this.sortForCacheKey(params))}`,
     );
-    if (cache) {
-      return cache;
-    }
+    if (cache) return cache;
+
+    const { profession, name, size = 10 } = params;
+
+    const queryDatabaseParams: Omit<FindAndCountOptions<Persons>, 'group'> = {
+      attributes: ['personId', 'nameRu'],
+      where: {
+        [Op.and]: [
+          { profession: { [Op.iLike]: `%${profession}%` } },
+          { nameRu: { [Op.iLike]: `%${name}%` } },
+        ],
+      },
+      limit: size,
+      order: ['nameRu'],
+    };
+
+    const allPersons = await this.personsRepository
+      .findAndCountAll(queryDatabaseParams)
+      .catch(() => {
+        throw new HttpRpcException(
+          'Что то пошло не так',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+    await this.cacheManager.set(
+      `getPersonsAutosagest${JSON.stringify(this.sortForCacheKey(params))}`,
+      allPersons,
+    );
+
+    return allPersons;
+  }
+
+  async getStaffByFilmId(params: IGetStaffByFilmId): Promise<any> {
+    const cache = await this.cacheManager.get(
+      `getStaffByFilmId${JSON.stringify(this.sortForCacheKey(params))}`,
+    );
+    if (cache) return cache;
+
     const staff: any[] = await this.personsFilmsRepository.findAll({
       raw: true,
       attributes: [['staffId', 'personId']],
       where: { filmId: params.id },
       limit: params.size,
     });
-    return await this.personsRepository
+
+    const allStaff = await this.personsRepository
       .findAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt'],
@@ -142,35 +144,45 @@ export class PersonsService {
         },
         order: ['nameRu'],
       })
-      .then(async (result) => {
-        await this.cacheManager.set(
-          `getStaffByFilmId${JSON.stringify(params)}`,
-          result,
-        );
-        return result;
-      })
       .catch(() => {
         throw new HttpRpcException(
           'Что то пошло не так',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
+
+    await this.cacheManager.set(
+      `getStaffByFilmId${JSON.stringify(this.sortForCacheKey(params))}`,
+      allStaff,
+    );
+
+    return allStaff;
   }
 
-  private getPagination(page: number, size: number): PaginationInterface {
+  private getPagination(page: number, size: number): IPagination {
     const limit: number = size ? +size : 10;
     const offset: number = page ? page * limit : 0;
 
     return { limit, offset };
   }
 
-  async getFilmsIdByPersonId(personQuery: Array<any>) {
+  private sortForCacheKey(cacheKey) {
+    return Object.keys(cacheKey)
+      .sort()
+      .reduce<typeof cacheKey>((obj, key) => {
+        obj[key] = cacheKey[key];
+        return obj;
+      }, {});
+  }
+
+  async getFilmsIdByPersonId(personQuery: Array<WhereOptions<PersonsFilms>>) {
     const cache = await this.cacheManager.get(
-      `getFilmsIdByPersonId${JSON.stringify(personQuery)}`,
+      `getFilmsIdByPersonId${JSON.stringify(
+        this.sortForCacheKey(personQuery),
+      )}`,
     );
-    if (cache) {
-      return cache;
-    }
+    if (cache) return cache;
+
     const filmsId: Array<{ id: number }> =
       await this.personsFilmsRepository.findAll({
         attributes: [['filmId', 'id']],
@@ -189,10 +201,14 @@ export class PersonsService {
         return false;
       });
     }
+
     await this.cacheManager.set(
-      `getFilmsIdByPersonId${JSON.stringify(personQuery)}`,
+      `getFilmsIdByPersonId${JSON.stringify(
+        this.sortForCacheKey(personQuery),
+      )}`,
       filmsId,
     );
+
     return filmsId;
   }
 }

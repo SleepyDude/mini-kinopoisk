@@ -1,11 +1,11 @@
 import { Persons, PersonsFilms } from '@shared';
 
-export interface PersonByIdObjectInterface {
+export interface IPersonByIdObject {
   filmsId: PersonsFilms[];
   person: Persons;
 }
 
-export interface GetStaffByFilmIdInterface {
+export interface IGetStaffByFilmId {
   id: number;
   size?: number;
 }

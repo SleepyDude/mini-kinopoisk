@@ -16,8 +16,8 @@ import {
   MoviesQueryAutosagestDto,
   MoviesQueryDto,
 } from '@shared/dto';
-import { PaginationInterface } from '@shared/interfaces';
-import { HttpRpcException, MoviesUpdateFilmWithFilmIdDto } from '@shared';
+import { IPagination } from '@shared/interfaces';
+import { HttpRpcException, IMoviesUpdateFilmWithFilmId } from '@shared';
 import {
   allFilmsAttributes,
   autosagestFilmsAttributes,
@@ -27,7 +27,7 @@ import {
   includeOneFilmAttributes,
   oneFilmAttributes,
   previousFilmsAttributes,
-} from './templates/query-database.template';
+} from './templates/films.query-database.template';
 
 @Injectable()
 export class FilmsService {
@@ -247,7 +247,7 @@ export class FilmsService {
     return allFilms;
   }
 
-  private getPagination(page, size): PaginationInterface {
+  private getPagination(page, size): IPagination {
     const limit = size ? +size : 10;
     const offset = page ? page * limit : 0;
 
@@ -308,7 +308,7 @@ export class FilmsService {
       }, {});
   }
 
-  async updateFilmById(film: MoviesUpdateFilmWithFilmIdDto): Promise<any> {
+  async updateFilmById(film: IMoviesUpdateFilmWithFilmId): Promise<any> {
     const filmData: FilmsUpdateDto = film.film;
     const currentFilm = await this.filmsRepository.findOne({
       where: { kinopoiskId: film.id },

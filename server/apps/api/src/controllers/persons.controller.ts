@@ -13,7 +13,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllExceptionsFilter } from '../filters/all.exceptions.filter';
 import { DtoValidationPipe } from '../pipes/dto-validation.pipe';
 import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
-import { PersonByIdObjectInterface } from '@shared/interfaces';
+import { IPersonByIdObject } from '@shared/interfaces';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags('Работа с персонами из фильмов')
@@ -41,7 +41,7 @@ export class PersonsController {
   })
   @Get('/about/:id')
   async getPersonById(@Param('id', ParseIntPipe) personId: number) {
-    const person: PersonByIdObjectInterface = await lastValueFrom(
+    const person: IPersonByIdObject = await lastValueFrom(
       this.personsClient.send({ cmd: 'get-person-byId' }, personId),
     );
     const films = await lastValueFrom(

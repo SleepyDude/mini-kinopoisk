@@ -1,6 +1,6 @@
 import { MoviesUpdateFilmDto } from '@shared/dto';
 
-export interface MoviesUpdateFilmWithFilmIdDto {
+export interface IMoviesUpdateFilmWithFilmId {
   id?: number;
   film?: MoviesUpdateFilmDto;
 }
