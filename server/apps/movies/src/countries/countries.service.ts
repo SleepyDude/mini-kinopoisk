@@ -5,7 +5,7 @@ import { CountriesFilms } from './countries.m2m.model';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { UpdateCountryDto } from '@shared/dto';
-import { CountriesUpdateInterface, HttpRpcException } from '@shared';
+import { ICountriesUpdate, HttpRpcException } from '@shared';
 
 @Injectable()
 export class CountriesService {
@@ -63,7 +63,7 @@ export class CountriesService {
       });
   }
 
-  async updateCountryById(country: CountriesUpdateInterface): Promise<any> {
+  async updateCountryById(country: ICountriesUpdate): Promise<any> {
     const countryDto: UpdateCountryDto = country.country;
     const currentCountry = await this.countriesRepository.findOne({
       where: { id: country.id },

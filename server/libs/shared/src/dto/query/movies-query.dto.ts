@@ -3,7 +3,7 @@ import { IsOptional } from 'class-validator';
 import {
   FiltersMoviesOrderBy,
   FiltersMoviesTypes,
-} from '@shared/dto/movies/filters-movies-query.enum';
+} from '@shared/enum/filters-movies-query.enum';
 
 export class MoviesQueryDto {
   @ApiProperty({

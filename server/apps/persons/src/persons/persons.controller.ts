@@ -3,7 +3,7 @@ import { PersonsService } from './persons.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ServiceRpcFilter } from '@shared';
 import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
-import { GetStaffByFilmIdInterface } from '@shared/interfaces';
+import { IGetStaffByFilmId } from '@shared/interfaces';
 
 @Controller('persons')
 export class PersonsController {
@@ -21,7 +21,7 @@ export class PersonsController {
   }
 
   @MessagePattern({ cmd: 'get-staff-by-filmId' })
-  async getStaffByFilmId(@Payload() params: GetStaffByFilmIdInterface) {
+  async getStaffByFilmId(@Payload() params: IGetStaffByFilmId) {
     return await this.personsService.getStaffByFilmId(params);
   }
 

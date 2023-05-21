@@ -1,4 +1,4 @@
-export class PaginationInterface {
+export class IPagination {
   limit: number;
   offset: number;
 }

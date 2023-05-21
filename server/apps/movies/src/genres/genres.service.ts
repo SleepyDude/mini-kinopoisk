@@ -4,7 +4,7 @@ import { Genres } from './genres.model';
 import { GenresFilms } from './genres.m2m.model';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { GenresUpdateInterface, HttpRpcException } from '@shared';
+import { IGenresUpdate, HttpRpcException } from '@shared';
 import { UpdateGenreDto } from '@shared/dto';
 
 @Injectable()
@@ -62,7 +62,7 @@ export class GenresService {
       });
   }
 
-  async updateGenreById(genre: GenresUpdateInterface): Promise<any> {
+  async updateGenreById(genre: IGenresUpdate): Promise<any> {
     const genreDto: UpdateGenreDto = genre.genre;
     const currentGenre = await this.genresRepository.findOne({
       where: { id: genre.id },

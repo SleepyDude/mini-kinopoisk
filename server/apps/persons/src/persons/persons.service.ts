@@ -5,10 +5,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { HttpRpcException, Persons, PersonsFilms } from '@shared';
 import { PersonsAutosagestDto, PersonsQueryDto } from '@shared/dto';
-import {
-  GetStaffByFilmIdInterface,
-  PaginationInterface,
-} from '@shared/interfaces';
+import { IGetStaffByFilmId, IPagination } from '@shared/interfaces';
 
 @Injectable()
 export class PersonsService {
@@ -119,7 +116,7 @@ export class PersonsService {
       });
   }
 
-  async getStaffByFilmId(params: GetStaffByFilmIdInterface): Promise<any> {
+  async getStaffByFilmId(params: IGetStaffByFilmId): Promise<any> {
     const cache = await this.cacheManager.get(
       `getStaffByFilmId${JSON.stringify(params)}`,
     );
@@ -157,7 +154,7 @@ export class PersonsService {
       });
   }
 
-  private getPagination(page: number, size: number): PaginationInterface {
+  private getPagination(page: number, size: number): IPagination {
     const limit: number = size ? +size : 10;
     const offset: number = page ? page * limit : 0;
 

@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { GenresService } from './genres.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { GenresUpdateInterface } from '@shared';
+import { IGenresUpdate } from '@shared';
 
 @Controller('genres')
 export class GenresController {
@@ -13,7 +13,7 @@ export class GenresController {
   }
 
   @MessagePattern({ cmd: 'update-genre-byId' })
-  async updateGenreById(@Payload() genre: GenresUpdateInterface) {
+  async updateGenreById(@Payload() genre: IGenresUpdate) {
     return await this.genresService.updateGenreById(genre);
   }
 
