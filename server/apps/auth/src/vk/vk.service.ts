@@ -89,7 +89,7 @@ export class VkService {
     try {
       const user = await this.userService.createUser({ ...userData });
 
-      const avatarId = await firstValueFrom(
+      const avatarData = await firstValueFrom(
         this.socialService.send(
           { cmd: 'upload-avatar-by-link' },
           profileFromVk.photo_400,
@@ -100,7 +100,7 @@ export class VkService {
         userId: user.id,
         name: profileFromVk.first_name,
         lastName: profileFromVk.last_name,
-        avatarId: avatarId.avatarId,
+        avatarId: avatarData.avatarId,
       };
 
       await firstValueFrom(
