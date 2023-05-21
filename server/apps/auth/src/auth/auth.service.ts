@@ -26,7 +26,7 @@ export class AuthService {
 
     if (!user) {
       throw new HttpRpcException(
-        `Пользователя с email ${userDto.email} не существует`,
+        `Пользователя не существует`,
         HttpStatus.NOT_FOUND,
       );
     }

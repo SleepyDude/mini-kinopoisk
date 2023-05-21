@@ -22,33 +22,43 @@ export class GoogleService {
       ticketPayload.given_name,
       ticketPayload.family_name,
     ];
+
     let candidate = await this.userService.getUserByEmail(email);
-    if (!candidate) {
-      candidate = await this.userService.createUser({
-        email: email,
-        password: null,
-      });
-      const avatarId = await firstValueFrom(
+    if (candidate) {
+      return await this.authService.login(
+        { email: email, password: null },
+        true,
+        candidate.id,
+      );
+    }
+
+    candidate = await this.userService.createUser({
+      email: email,
+      password: null,
+    });
+
+    let avatarData;
+    if (ticketPayload.picture) {
+      avatarData = await firstValueFrom(
         this.socialService.send(
           { cmd: 'upload-avatar-by-link' },
           ticketPayload.picture,
         ),
       );
-
-      const profileData = {
-        userId: candidate.id,
-        name: firstName,
-        lastName: lastName,
-        avatarId: avatarId,
-      };
-
-      await firstValueFrom(
-        this.socialService.send({ cmd: 'create-profile' }, profileData),
-      );
     }
 
+    const profileData = {
+      userId: candidate.id,
+      name: firstName,
+      lastName: lastName,
+      avatarId: avatarData ? avatarData.avatarId : null,
+    };
+
+    await firstValueFrom(
+      this.socialService.send({ cmd: 'create-profile' }, profileData),
+    );
     return await this.authService.login(
-      { email: email, password: null },
+      { email: candidate.email, password: null },
       true,
       candidate.id,
     );
